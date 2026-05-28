@@ -3623,6 +3623,11 @@ function TopBarSearch({ onPick }) {
    keyed on `loading` state in App, so the same DOM is the single source of
    truth for both boot hydration and in-app refreshes. */
 function RefreshButton({ onRefresh, busy }) {
+  // The pipeline runs in a local Python dev server; on hosted builds
+  // (Vercel etc.) there is no /api/refresh, so hide the button entirely.
+  const host = typeof window !== "undefined" ? window.location.hostname : "";
+  const isLocal = host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0" || host === "";
+  if (!isLocal) return null;
   return (
     <button
       className={"refresh-btn" + (busy ? " spinning" : "")}

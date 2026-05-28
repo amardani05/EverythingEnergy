@@ -114,6 +114,16 @@ See `ARCHITECTURE.md` for design rationale and the deferred-feature list.
 - **Three-font system:** EB Garamond (serif headers/names) · Inter (UI) · JetBrains Mono (numerics).
 - **Anti-goals:** no playful gradients, no rounded SaaS cards, no light mode. This is an analyst workstation.
 
+## Deploying to Vercel
+
+The frontend is a static bundle (HTML + JSX-transpiled-in-browser + JSON) — no build step. The repo is wired for Vercel:
+
+- `vercel.json` serves `.jsx` files with `Content-Type: application/javascript` (required so Babel-standalone can pick them up) and redirects `/` → `/dashboard.html`.
+- `.vercelignore` keeps the Python pipeline, parquet caches, and intermediate `*_results/` CSVs out of the deploy. Only `dashboard.html`, the three `.jsx` files, `dashboard_data.json`, `map_config.json`, and `icons/` ship to prod.
+- The ↻ refresh button is hidden on non-localhost hosts — pipeline reruns are local-only. To update the hosted snapshot, re-run the pipeline locally, then commit the new `dashboard_data.json`.
+
+Deploy: `vercel` (preview) or `vercel --prod`. No env vars or build command needed.
+
 ## Troubleshooting
 
 | Symptom | Fix |

@@ -1,0 +1,17 @@
+# Python pipeline — runs locally, not on Vercel
+*.py
+*.parquet
+*.yaml
+
+# Intermediate analysis outputs (consolidate_data.py merges these into dashboard_data.json)
+basket_results/
+drivers_results/
+phase3_results/
+phase4_results/
+
+# Docs / dev metadata
+ARCHITECTURE.md
+.DS_Store
+.git/
+.gitignore
+.claude/
