@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Phase 4 — Attribution & IVR</title>
+<style>
+body { font-family: -apple-system, system-ui, sans-serif; max-width: 1400px; margin: 30px auto; padding: 20px; color: #222; }
+h1 { border-bottom: 2px solid #2c3e50; padding-bottom: 8px; }
+h2 { margin-top: 35px; color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+h3 { color: #555; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+th { background: #2c3e50; color: white; padding: 7px; text-align: left; }
+td { padding: 5px 7px; border-bottom: 1px solid #eee; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.mono { font-family: ui-monospace, 'SF Mono', monospace; }
+img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0; }
+.note { background: #fffbe6; padding: 10px; border-left: 4px solid #f1c40f; margin: 12px 0; font-size: 13px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+</style></head><body>
+
+<h1>Phase 4 — Performance Attribution &amp; Implied vs Realized</h1>
+<p style="color:#666;">Decomposes recent returns into factor (driver-explained) and idiosyncratic (residual).</p>
+
+<div class="note">
+<b>How to read attribution:</b> for each basket, ACTUAL return = FACTOR return + IDIOSYNCRATIC return.
+Factor return is what the basket's historical betas would predict given the actual driver moves over the window.
+Idiosyncratic is everything else — could be unmodeled factors, news, mispricing, or noise.
+A large positive idio means the basket outperformed what its driver model predicts; large negative means underperformed.
+This is the lens for "what's actually moving here that I should investigate."
+</div>
+
+<h2>1. Basket attribution — 3 month</h2>
+<img src="attribution_chart_3m.png" alt="Attribution 3m">
+
+<div class="cols">
+<div>
+<h3>Top idio outperformers (3m)</h3>
+<table>
+<tr><th>Basket</th><th>Actual</th><th>Factor</th><th>Idio</th></tr>
+<tr><td><b>downstream_retail</b></td><td class='num'>+34.3%</td><td class='num'>+3.1%</td><td class='num' style='color:#5db075'>+31.2%</td></tr><tr><td><b>tanker_shipping</b></td><td class='num'>+27.7%</td><td class='num'>+16.7%</td><td class='num' style='color:#5db075'>+11.1%</td></tr><tr><td><b>power_utilities_regulated_gas</b></td><td class='num'>+3.8%</td><td class='num'>+1.9%</td><td class='num' style='color:#5db075'>+1.9%</td></tr><tr><td><b>downstream_biofuels</b></td><td class='num'>+23.3%</td><td class='num'>+22.4%</td><td class='num' style='color:#5db075'>+0.9%</td></tr><tr><td><b>power_ipps_merchant</b></td><td class='num'>+10.7%</td><td class='num'>+10.2%</td><td class='num' style='color:#5db075'>+0.5%</td></tr><tr><td><b>power_utilities_regulated_ldc</b></td><td class='num'>+2.1%</td><td class='num'>+3.7%</td><td class='num' style='color:#c4544a'>-1.5%</td></tr><tr><td><b>petrochem</b></td><td class='num'>+16.3%</td><td class='num'>+17.9%</td><td class='num' style='color:#c4544a'>-1.5%</td></tr><tr><td><b>midstream_gpt</b></td><td class='num'>+12.8%</td><td class='num'>+18.8%</td><td class='num' style='color:#c4544a'>-6.0%</td></tr>
+</table>
+</div>
+<div>
+<h3>Top idio underperformers (3m)</h3>
+<table>
+<tr><th>Basket</th><th>Actual</th><th>Factor</th><th>Idio</th></tr>
+<tr><td><b>coal</b></td><td class='num'>-12.9%</td><td class='num'>+24.1%</td><td class='num' style='color:#c4544a'>-37.0%</td></tr><tr><td><b>ofs_equipment</b></td><td class='num'>+6.1%</td><td class='num'>+33.7%</td><td class='num' style='color:#c4544a'>-27.6%</td></tr><tr><td><b>upstream_gas_eandp</b></td><td class='num'>-3.5%</td><td class='num'>+23.8%</td><td class='num' style='color:#c4544a'>-27.3%</td></tr><tr><td><b>ofs_offshore</b></td><td class='num'>+10.4%</td><td class='num'>+34.4%</td><td class='num' style='color:#c4544a'>-24.0%</td></tr><tr><td><b>uranium_nuclear_fuel</b></td><td class='num'>-7.6%</td><td class='num'>+14.7%</td><td class='num' style='color:#c4544a'>-22.3%</td></tr><tr><td><b>ofs_onshore</b></td><td class='num'>+15.8%</td><td class='num'>+37.8%</td><td class='num' style='color:#c4544a'>-22.0%</td></tr><tr><td><b>upstream_oil_eandp</b></td><td class='num'>+18.1%</td><td class='num'>+39.1%</td><td class='num' style='color:#c4544a'>-21.0%</td></tr><tr><td><b>iocs_integrated</b></td><td class='num'>+1.9%</td><td class='num'>+22.2%</td><td class='num' style='color:#c4544a'>-20.4%</td></tr>
+</table>
+</div>
+</div>
+
+<h2>2. Implied vs realized — last 4 weeks</h2>
+<img src="implied_vs_realized_snap.png" alt="IVR snap">
+<table>
+<tr><th>Basket</th><th>Realized 4w</th><th>Implied 4w</th><th>Gap</th></tr>
+<tr><td><b>coal</b></td><td class='num'>-6.2%</td><td class='num'>+8.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-15.0%</td></tr><tr><td><b>petrochem</b></td><td class='num'>-4.8%</td><td class='num'>+8.9%</td><td class='num' style='color:#c4544a; font-weight:bold'>-13.6%</td></tr><tr><td><b>upstream_gas_eandp</b></td><td class='num'>-4.8%</td><td class='num'>+7.9%</td><td class='num' style='color:#c4544a; font-weight:bold'>-12.6%</td></tr><tr><td><b>ofs_offshore</b></td><td class='num'>-2.4%</td><td class='num'>+9.9%</td><td class='num' style='color:#c4544a; font-weight:bold'>-12.3%</td></tr><tr><td><b>ofs_equipment</b></td><td class='num'>-3.9%</td><td class='num'>+8.3%</td><td class='num' style='color:#c4544a; font-weight:bold'>-12.3%</td></tr><tr><td><b>downstream_retail</b></td><td class='num'>+15.4%</td><td class='num'>+3.2%</td><td class='num' style='color:#5db075; font-weight:bold'>+12.1%</td></tr><tr><td><b>power_utilities_regulated_ldc</b></td><td class='num'>-6.2%</td><td class='num'>+4.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-11.0%</td></tr><tr><td><b>upstream_offshore_drillers</b></td><td class='num'>-1.1%</td><td class='num'>+9.1%</td><td class='num' style='color:#c4544a; font-weight:bold'>-10.2%</td></tr><tr><td><b>lng_terminals</b></td><td class='num'>-1.7%</td><td class='num'>+6.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-8.5%</td></tr><tr><td><b>power_utilities_regulated_gas</b></td><td class='num'>-3.6%</td><td class='num'>+4.6%</td><td class='num' style='color:#c4544a; font-weight:bold'>-8.2%</td></tr><tr><td><b>upstream_oil_eandp</b></td><td class='num'>+0.5%</td><td class='num'>+7.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-7.4%</td></tr><tr><td><b>iocs_integrated</b></td><td class='num'>-2.2%</td><td class='num'>+5.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-7.2%</td></tr><tr><td><b>minerals_royalty</b></td><td class='num'>+1.1%</td><td class='num'>+6.5%</td><td class='num' style='color:#c4544a; font-weight:bold'>-5.5%</td></tr><tr><td><b>power_renewables</b></td><td class='num'>+0.7%</td><td class='num'>+6.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-5.3%</td></tr><tr><td><b>power_ipps_merchant</b></td><td class='num'>+7.6%</td><td class='num'>+12.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-4.4%</td></tr><tr><td><b>uranium_nuclear_fuel</b></td><td class='num'>+18.2%</td><td class='num'>+13.9%</td><td class='num' style='color:#5db075; font-weight:bold'>+4.3%</td></tr><tr><td><b>midstream_gpt</b></td><td class='num'>+2.6%</td><td class='num'>+6.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-4.2%</td></tr><tr><td><b>tanker_shipping</b></td><td class='num'>+9.7%</td><td class='num'>+6.6%</td><td class='num' style='color:#5db075; font-weight:bold'>+3.1%</td></tr><tr><td><b>downstream_biofuels</b></td><td class='num'>+9.5%</td><td class='num'>+6.8%</td><td class='num' style='color:#5db075; font-weight:bold'>+2.8%</td></tr><tr><td><b>midstream_pipelines</b></td><td class='num'>+3.3%</td><td class='num'>+5.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-1.7%</td></tr><tr><td><b>ofs_onshore</b></td><td class='num'>+11.2%</td><td class='num'>+10.5%</td><td class='num' style='color:#5db075; font-weight:bold'>+0.7%</td></tr><tr><td><b>downstream_refiners</b></td><td class='num'>+6.3%</td><td class='num'>+6.2%</td><td class='num' style='color:#5db075; font-weight:bold'>+0.1%</td></tr>
+</table>
+
+<h3>Gap over time — top 6 baskets by current |gap|</h3>
+<img src="ivr_timeseries.png" alt="IVR timeseries">
+
+<h2>3. Top idiosyncratic name movers (3m)</h2>
+
+<div class="cols">
+<div>
+<h3>↑ Outperformed factor model</h3>
+<table>
+<tr><th>Ticker</th><th>Name</th><th>Node</th><th>Actual</th><th>Factor</th><th>Idio</th></tr>
+<tr><td class='mono'>MUSA</td><td>Murphy USA</td><td>downstream_retail</td><td class='num'>+42.4%</td><td class='num'>+3.2%</td><td class='num' style='color:#5db075; font-weight:bold'>+39.2%</td></tr><tr><td class='mono'>SOC</td><td>Sable Offshore</td><td>upstream_offshore_drillers</td><td class='num'>+52.4%</td><td class='num'>+16.7%</td><td class='num' style='color:#5db075; font-weight:bold'>+35.7%</td></tr><tr><td class='mono'>DEC</td><td>Diversified Energy</td><td>upstream_gas_eandp</td><td class='num'>+16.2%</td><td class='num'>-17.6%</td><td class='num' style='color:#5db075; font-weight:bold'>+33.8%</td></tr><tr><td class='mono'>CASY</td><td>Casey&#x27;s General Stores</td><td>downstream_retail</td><td class='num'>+26.2%</td><td class='num'>+3.2%</td><td class='num' style='color:#5db075; font-weight:bold'>+23.0%</td></tr><tr><td class='mono'>NAT</td><td>Nordic American Tankers</td><td>tanker_shipping</td><td class='num'>+33.4%</td><td class='num'>+10.9%</td><td class='num' style='color:#5db075; font-weight:bold'>+22.5%</td></tr><tr><td class='mono'>INSW</td><td>International Seaways</td><td>tanker_shipping</td><td class='num'>+37.0%</td><td class='num'>+14.7%</td><td class='num' style='color:#5db075; font-weight:bold'>+22.3%</td></tr><tr><td class='mono'>ASC</td><td>Ardmore Shipping</td><td>tanker_shipping</td><td class='num'>+36.3%</td><td class='num'>+16.1%</td><td class='num' style='color:#5db075; font-weight:bold'>+20.3%</td></tr><tr><td class='mono'>KGS</td><td>Kodiak Gas Services</td><td>midstream_gpt</td><td class='num'>+36.8%</td><td class='num'>+16.5%</td><td class='num' style='color:#5db075; font-weight:bold'>+20.2%</td></tr><tr><td class='mono'>TEN</td><td>Tsakos Energy Navigation</td><td>tanker_shipping</td><td class='num'>+47.0%</td><td class='num'>+26.8%</td><td class='num' style='color:#5db075; font-weight:bold'>+20.1%</td></tr><tr><td class='mono'>SFL</td><td>SFL Corporation</td><td>tanker_shipping</td><td class='num'>+27.2%</td><td class='num'>+12.0%</td><td class='num' style='color:#5db075; font-weight:bold'>+15.1%</td></tr><tr><td class='mono'>TK</td><td>Teekay Corporation</td><td>tanker_shipping</td><td class='num'>+26.1%</td><td class='num'>+12.0%</td><td class='num' style='color:#5db075; font-weight:bold'>+14.1%</td></tr><tr><td class='mono'>DHT</td><td>DHT Holdings</td><td>tanker_shipping</td><td class='num'>+26.7%</td><td class='num'>+12.9%</td><td class='num' style='color:#5db075; font-weight:bold'>+13.8%</td></tr><tr><td class='mono'>ETR</td><td>Entergy</td><td>power_utilities_regulated_gas</td><td class='num'>+15.4%</td><td class='num'>+1.9%</td><td class='num' style='color:#5db075; font-weight:bold'>+13.6%</td></tr><tr><td class='mono'>OKLO</td><td>Oklo Inc</td><td>nuclear_smr_developers</td><td class='num'>+11.3%</td><td class='num'>-1.7%</td><td class='num' style='color:#5db075; font-weight:bold'>+13.0%</td></tr><tr><td class='mono'>REX</td><td>REX American Resources</td><td>downstream_biofuels</td><td class='num'>+30.1%</td><td class='num'>+18.9%</td><td class='num' style='color:#5db075; font-weight:bold'>+11.2%</td></tr>
+</table>
+</div>
+<div>
+<h3>↓ Underperformed factor model</h3>
+<table>
+<tr><th>Ticker</th><th>Name</th><th>Node</th><th>Actual</th><th>Factor</th><th>Idio</th></tr>
+<tr><td class='mono'>BTU</td><td>Peabody Energy</td><td>coal</td><td class='num'>-38.9%</td><td class='num'>+33.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-71.9%</td></tr><tr><td class='mono'>CLB</td><td>Core Laboratories</td><td>ofs_onshore</td><td class='num'>-30.5%</td><td class='num'>+35.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-66.3%</td></tr><tr><td class='mono'>CRK</td><td>Comstock Resources</td><td>upstream_gas_eandp</td><td class='num'>-36.4%</td><td class='num'>+29.9%</td><td class='num' style='color:#c4544a; font-weight:bold'>-66.3%</td></tr><tr><td class='mono'>TTI</td><td>TETRA Technologies</td><td>ofs_onshore</td><td class='num'>-16.9%</td><td class='num'>+45.7%</td><td class='num' style='color:#c4544a; font-weight:bold'>-62.5%</td></tr><tr><td class='mono'>SD</td><td>SandRidge Energy</td><td>upstream_oil_eandp</td><td class='num'>-14.2%</td><td class='num'>+34.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-49.0%</td></tr><tr><td class='mono'>CLNE</td><td>Clean Energy Fuels</td><td>ofs_onshore</td><td class='num'>-20.5%</td><td class='num'>+26.3%</td><td class='num' style='color:#c4544a; font-weight:bold'>-46.8%</td></tr><tr><td class='mono'>NOG</td><td>Northern Oil &amp; Gas</td><td>upstream_oil_eandp</td><td class='num'>-2.1%</td><td class='num'>+44.5%</td><td class='num' style='color:#c4544a; font-weight:bold'>-46.6%</td></tr><tr><td class='mono'>OIS</td><td>Oil States International</td><td>ofs_equipment</td><td class='num'>-2.1%</td><td class='num'>+42.4%</td><td class='num' style='color:#c4544a; font-weight:bold'>-44.5%</td></tr><tr><td class='mono'>XPRO</td><td>Expro Group</td><td>ofs_onshore</td><td class='num'>-3.0%</td><td class='num'>+36.3%</td><td class='num' style='color:#c4544a; font-weight:bold'>-39.3%</td></tr><tr><td class='mono'>WHD</td><td>Cactus Inc</td><td>ofs_equipment</td><td class='num'>-5.9%</td><td class='num'>+32.9%</td><td class='num' style='color:#c4544a; font-weight:bold'>-38.8%</td></tr><tr><td class='mono'>GPOR</td><td>Gulfport Energy</td><td>upstream_gas_eandp</td><td class='num'>-16.2%</td><td class='num'>+20.6%</td><td class='num' style='color:#c4544a; font-weight:bold'>-36.8%</td></tr><tr><td class='mono'>VTS</td><td>Vitesse Energy</td><td>upstream_oil_eandp</td><td class='num'>-13.1%</td><td class='num'>+22.1%</td><td class='num' style='color:#c4544a; font-weight:bold'>-35.2%</td></tr><tr><td class='mono'>WFRD</td><td>Weatherford International</td><td>ofs_equipment</td><td class='num'>+2.7%</td><td class='num'>+37.1%</td><td class='num' style='color:#c4544a; font-weight:bold'>-34.5%</td></tr><tr><td class='mono'>CNR</td><td>Core Natural Resources</td><td>coal</td><td class='num'>-4.8%</td><td class='num'>+28.4%</td><td class='num' style='color:#c4544a; font-weight:bold'>-33.3%</td></tr><tr><td class='mono'>TALO</td><td>Talos Energy</td><td>upstream_oil_eandp</td><td class='num'>+16.9%</td><td class='num'>+50.1%</td><td class='num' style='color:#c4544a; font-weight:bold'>-33.2%</td></tr>
+</table>
+</div>
+</div>
+
+</body></html>

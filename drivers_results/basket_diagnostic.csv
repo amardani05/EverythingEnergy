@@ -1,0 +1,24 @@
+node,n_in_yaml,n_priced,n_obs,note
+coal,3,3,261,ok
+downstream_biofuels,2,2,261,ok
+downstream_refiners,11,11,261,ok
+downstream_retail,2,2,261,ok
+iocs_integrated,2,2,261,ok
+lng_terminals,5,5,261,ok
+midstream_gpt,12,12,261,ok
+midstream_pipelines,12,12,261,ok
+minerals_royalty,8,8,261,ok
+nuclear_smr_developers,1,1,0,singleton or no prices
+ofs_equipment,6,6,261,ok
+ofs_offshore,5,5,261,ok
+ofs_onshore,21,21,261,ok
+petrochem,4,4,261,ok
+power_ipps_merchant,4,4,261,ok
+power_renewables,3,3,261,ok
+power_utilities_regulated_gas,37,37,261,ok
+power_utilities_regulated_ldc,8,8,261,ok
+tanker_shipping,14,14,261,ok
+upstream_gas_eandp,10,10,261,ok
+upstream_offshore_drillers,5,5,261,ok
+upstream_oil_eandp,28,28,261,ok
+uranium_nuclear_fuel,2,2,261,ok

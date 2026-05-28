@@ -1,0 +1,226 @@
+{
+  "_comment": "IMA Energy Atlas — map view configuration. The illustrator fills in the visual SVG; this file specifies the structural data the map binds to.",
+  "_version": "1.0",
+
+  "canvas": {
+    "viewBox": "0 0 1400 900",
+    "_note": "Top half (y < 450) is ocean. Bottom half is the island. Coastline runs roughly along y=420-460 with irregular bay/inlet shapes. Adjust as the illustration develops, but keep the ocean/island split."
+  },
+
+  "districts": [
+    {
+      "id": "open_ocean",
+      "label": "Open Ocean",
+      "center": [350, 200],
+      "bounds": [60, 60, 700, 380],
+      "_position_note": "Upper left of canvas. Deep water. Drilling rigs and OFS vessels scattered across this area; tankers cluster toward the right side approaching port.",
+      "nodes": [
+        "upstream_offshore_drillers",
+        "ofs_offshore",
+        "tanker_shipping"
+      ]
+    },
+    {
+      "id": "port_waterfront",
+      "label": "Port / Industrial Waterfront",
+      "center": [950, 280],
+      "bounds": [760, 80, 1340, 470],
+      "_position_note": "Right side of canvas, straddling the coastline. LNG export terminals at the actual water's edge, refineries and petrochem plants set back slightly. Cranes, tank farms, jetties.",
+      "nodes": [
+        "lng_terminals",
+        "downstream_refiners",
+        "petrochem"
+      ]
+    },
+    {
+      "id": "industrial_inland",
+      "label": "Industrial Inland",
+      "center": [1100, 600],
+      "bounds": [880, 480, 1340, 740],
+      "_position_note": "Just inland from the port. Pipeline corridors radiating outward. IOC corporate campuses (taller buildings, but minimal — these are just headquarters). Gathering & processing plants nearer the basin.",
+      "nodes": [
+        "midstream_pipelines",
+        "midstream_gpt",
+        "iocs_integrated"
+      ]
+    },
+    {
+      "id": "oilfield_basin",
+      "label": "Oilfield / Basin",
+      "center": [580, 600],
+      "bounds": [180, 470, 880, 800],
+      "_position_note": "The largest district — sprawling sepia-toned oilfield occupying the center and lower-left of the island. Pump jacks, rigs, well pads. This is where most of the visual weight goes.",
+      "nodes": [
+        "upstream_oil_eandp",
+        "upstream_gas_eandp",
+        "ofs_onshore",
+        "minerals_royalty"
+      ]
+    },
+    {
+      "id": "equipment_yards",
+      "label": "Equipment Yards",
+      "center": [820, 770],
+      "bounds": [720, 720, 920, 850],
+      "_position_note": "Small district between the basin and the port. Rows of stacked pipe, drilling rigs in storage, fabrication shops. Industrial but smaller scale than the port.",
+      "nodes": [
+        "ofs_equipment"
+      ]
+    },
+    {
+      "id": "quarry_mine",
+      "label": "Quarry / Mine",
+      "center": [180, 760],
+      "bounds": [60, 700, 320, 850],
+      "_position_note": "Lower-left corner. Open-pit mine with terraced walls. Conveyor belts. A quieter, darker district — coal and minerals are extractive but lower-vol than oil.",
+      "nodes": [
+        "coal"
+      ]
+    },
+    {
+      "id": "farmland_edge",
+      "label": "Farmland Edge",
+      "center": [430, 820],
+      "bounds": [320, 770, 560, 870],
+      "_position_note": "Thin strip along the bottom of the basin. Cornfields with a small ethanol plant. Muted greens.",
+      "nodes": [
+        "downstream_biofuels"
+      ]
+    },
+    {
+      "id": "power_district",
+      "label": "Power District",
+      "center": [1180, 820],
+      "bounds": [950, 740, 1340, 870],
+      "_position_note": "Lower-right of island. A grouping: gas-fired power station (cooling towers), wind turbines on a ridge, transmission lines radiating. Distinct from the industrial port — this is where electricity is GENERATED, not consumed.",
+      "nodes": [
+        "power_ipps_merchant",
+        "power_renewables",
+        "power_utilities_regulated_gas",
+        "power_utilities_regulated_ldc"
+      ]
+    },
+    {
+      "id": "nuclear_quarter",
+      "label": "Nuclear Quarter",
+      "center": [1280, 660],
+      "bounds": [1200, 600, 1340, 740],
+      "_position_note": "Adjacent to the power district but visually separated — its own enclave with cooling towers (the canonical nuclear silhouette). Smaller, fewer elements, more iconic.",
+      "nodes": [
+        "uranium_nuclear_fuel",
+        "nuclear_smr_developers"
+      ]
+    },
+    {
+      "id": "town",
+      "label": "Town",
+      "center": [700, 750],
+      "bounds": [600, 700, 800, 800],
+      "_position_note": "Small clustered town — a few buildings, a gas station icon, maybe a road running through. The 'consumer' end of the value chain. Smallest district by visual weight.",
+      "nodes": [
+        "downstream_retail"
+      ]
+    }
+  ],
+
+  "_district_layout_summary": [
+    "Ocean (top half): open_ocean spans most of the upper area",
+    "Coastline runs y=420-460, with port_waterfront protruding into the water on the right",
+    "Island (bottom half) districts, roughly clockwise from upper-right:",
+    "  port_waterfront (right edge, on coast)",
+    "  industrial_inland (just behind port)",
+    "  power_district (lower right)",
+    "  nuclear_quarter (right of power, smaller)",
+    "  town (center-bottom, small)",
+    "  equipment_yards (small, between basin and port)",
+    "  farmland_edge (thin strip, bottom-center-left)",
+    "  oilfield_basin (large, center and left)",
+    "  quarry_mine (lower left corner)"
+  ],
+
+  "edges": {
+    "_note": "Three toggleable edge modes. 'flow' is hand-specified commodity flow direction. 'correlation' is data-driven (computed at runtime from cross_basket_correlation.csv). 'signal' is data-driven (active pairs from pairs_table.csv where |z|>1.5).",
+
+    "flow": [
+      {"from": "open_ocean", "to": "port_waterfront", "weight": 1.0, "label": "crude/LNG via tanker"},
+      {"from": "oilfield_basin", "to": "industrial_inland", "weight": 1.0, "label": "wellhead to gathering"},
+      {"from": "industrial_inland", "to": "port_waterfront", "weight": 1.0, "label": "long-haul pipeline to refinery/LNG"},
+      {"from": "industrial_inland", "to": "power_district", "weight": 0.8, "label": "gas to power"},
+      {"from": "oilfield_basin", "to": "equipment_yards", "weight": 0.5, "label": "OFS service flow"},
+      {"from": "port_waterfront", "to": "town", "weight": 0.7, "label": "refined products to retail"},
+      {"from": "port_waterfront", "to": "open_ocean", "weight": 0.6, "label": "LNG/product export"},
+      {"from": "quarry_mine", "to": "power_district", "weight": 0.6, "label": "coal to power"},
+      {"from": "farmland_edge", "to": "port_waterfront", "weight": 0.3, "label": "biofuels blended"},
+      {"from": "nuclear_quarter", "to": "power_district", "weight": 0.5, "label": "nuclear fuel cycle"},
+      {"from": "industrial_inland", "to": "open_ocean", "weight": 0.7, "label": "LNG export feedgas (via terminals)"}
+    ],
+
+    "_correlation_mode": "Computed at page load from cross_basket_correlation.csv. Edge between two districts whose AVERAGE constituent-node correlation > 0.5. Thickness = correlation strength.",
+
+    "_signal_mode": "Computed at page load from pairs_table.csv. Edge between two districts wherever an active taxonomy-driven pair has |z_60d| > 1.5. Color: red for negative z, green for positive z."
+  },
+
+  "edge_modes": [
+    {
+      "id": "flow",
+      "label": "Commodity Flow",
+      "description": "Directed edges show physical commodity movement through the value chain. Static.",
+      "default": true
+    },
+    {
+      "id": "correlation",
+      "label": "Correlation",
+      "description": "Edge thickness encodes pairwise district correlation over the lookback window.",
+      "default": false
+    },
+    {
+      "id": "signal",
+      "label": "Active Signals",
+      "description": "Highlights pairs currently stretched (|z|>1.5). Updates with each data refresh.",
+      "default": false
+    }
+  ],
+
+  "interactions": {
+    "click_district": {
+      "behavior": "If district has 1 node, open that node's drawer directly. If district has multiple nodes, show a small picker (or open the first node by default and let user navigate within drawer).",
+      "data_attribute": "data-district-id on the district group"
+    },
+    "click_node_marker": {
+      "behavior": "Open the corresponding node's drawer. Marker is a small clickable visual element (e.g. a derrick icon for an E&P node within the oilfield district).",
+      "data_attribute": "data-node-id on each node element"
+    },
+    "hover_node_marker": {
+      "behavior": "Highlight the marker, dim others. Show tooltip with display_name, representative_ticker, R², dominant driver. Highlight any edges connected to this node's district.",
+      "data_attribute": "data-node-id"
+    }
+  },
+
+  "rendering_hints": {
+    "node_marker_count_per_district": {
+      "_note": "How many distinct visual elements should represent the sub-industries within each district. Some districts have multiple nodes — the illustrator can either render one element per node OR render thematic clusters (e.g. 'a row of pump jacks' represents the oil_eandp node).",
+      "open_ocean": "3 elements: a drillship (drillers), a smaller subsea vessel (OFS offshore), a tanker (shipping)",
+      "port_waterfront": "3 elements: LNG storage tanks with jetty (LNG terminals), a refinery silhouette (refiners), a chemical plant with stacks (petrochem)",
+      "industrial_inland": "3 elements: a pipeline pump station (pipelines), a gas processing facility (GPT), a corporate tower or two (IOCs)",
+      "oilfield_basin": "Treat as a sprawling region; multiple pump jacks scattered (oil E&P primarily), a few drilling rigs (gas E&P), a service yard (OFS onshore), and a small surveyor's mark or property line motif (minerals/royalty)",
+      "equipment_yards": "1-2 elements: stacked drill pipe, fabrication shed",
+      "quarry_mine": "1 element: open-pit mine with terraces",
+      "farmland_edge": "1 element: corn rows + small ethanol plant",
+      "power_district": "4 elements: gas plant cooling towers (regulated gas), wind turbines on a ridge (renewables), transmission tower (IPPs), small distribution station (LDC)",
+      "nuclear_quarter": "2 elements: classic nuclear cooling towers (uranium fuel), a small modular reactor cylinder (SMR)",
+      "town": "1 element: gas station + convenience store (retail)"
+    },
+    "atmospheric_palette": {
+      "ocean": ["#1a3447", "#234458"],
+      "port_industrial": ["#3d3326", "#4a3f2d"],
+      "inland_industrial": ["#3a342a", "#453d2e"],
+      "oilfield": ["#4a3825", "#5c4a30"],
+      "quarry": ["#2e2820", "#3a3328"],
+      "farmland": ["#2d3a26", "#384730"],
+      "power": ["#2a2f3a", "#363c48"],
+      "nuclear": ["#2a3a3a", "#364848"],
+      "town": ["#3a342a", "#473e30"],
+      "_note": "Restrained, desaturated. Each district's fill color is one of these. Background remains the existing very-dark base."
+    }
+  }
+}
