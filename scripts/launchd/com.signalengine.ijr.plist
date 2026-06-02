@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  IJR holdings nightly snapshot.
+
+  To install (one-time):
+    cp scripts/launchd/com.signalengine.ijr.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.signalengine.ijr.plist
+
+  To check status:
+    launchctl list | grep signalengine
+    tail -f data_store/logs/ijr.{stdout,stderr}.log
+
+  To uninstall:
+    launchctl unload ~/Library/LaunchAgents/com.signalengine.ijr.plist
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.signalengine.ijr</string>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/amardani/EverythingEnergy</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/amardani/EverythingEnergy/.venv/bin/python</string>
+    <string>/Users/amardani/EverythingEnergy/scripts/snapshot_ijr.py</string>
+  </array>
+
+  <!-- Run nightly at 18:30 ET (22:30 / 23:30 UTC). iShares typically posts
+       end-of-day holdings before market close T+0; running after 6pm local
+       gives them time to publish. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>18</integer>
+    <key>Minute</key><integer>30</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/amardani/EverythingEnergy/data_store/logs/ijr.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/amardani/EverythingEnergy/data_store/logs/ijr.stderr.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

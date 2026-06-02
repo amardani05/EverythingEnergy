@@ -1,0 +1,163 @@
+# Cross-sectional signal engine — runtime configuration.
+# Edit freely; nothing in the code hardcodes these values.
+
+universe:
+  # 'ijr_current' = today's IJR membership applied to all dates (biased; flagged in outputs)
+  # 'ijr_pit'     = point-in-time IJR membership (only available from today forward)
+  # 'none'        = no membership filter — diagnostic, see how much IJR contributes
+  membership_mode: ijr_current
+  # Report a comparison row using these alternate modes on every backtest output.
+  report_also: [none]
+  # Min trailing days of price coverage required to score a name.
+  min_price_history_days: 252
+
+# Liquidity floor removed in v1 per spec — walk-forward is the primary gate.
+# Spreads/ADV will be revisited only if a position-sizing layer needs them.
+
+signals:
+  # Selection signals — sector-neutralized, equal-weight composite.
+  selection:
+    - name: value
+      enabled: false      # implemented later
+      weight: 1.0
+    - name: quality
+      enabled: false      # implemented later
+      weight: 1.0
+    - name: momentum
+      enabled: false      # implemented first (step 2)
+      weight: 1.0
+    - name: pead
+      enabled: false      # implemented last (step 3, with SUE-datekey test)
+      weight: 1.0
+  # Macro sleeve — separate ranked sleeve, NOT in the composite.
+  macro:
+    - name: commodity_beta
+      enabled: false      # implemented in step 4 from atlas/
+
+scoring:
+  # 1st/99th percentile winsorization on raw values, then cross-sectional z within sector.
+  winsorize_pct: [0.01, 0.99]
+  # Sector-relative scores also computed as a side-by-side variant (per Decisions block).
+  emit_sector_relative: true
+  # Hysteresis: enter actionable set at top decile, exit only when below top tertile.
+  enter_decile: 0.10
+  exit_tertile: 0.33
+
+validation:
+  # Walk-forward is the primary gate (per pivot in turn 5).
+  walk_forward:
+    horizons_days: [1, 5, 21, 63]
+    rebalance_freq: B           # business-daily
+    min_train_days: 504         # 2 years of in-sample before first scored day
+  # Holdout demoted to a one-off final check — still emitted in the scorecard.
+  holdout_months: 12
+  # Cost model — gross and net both reported.
+  cost_model:
+    spread_bps: 60              # placeholder; revisit when we have a real estimator
+    impact_bps_per_pct_adv: 10
+  # Survivorship/membership flag is always logged on every output row.
+
+output:
+  snapshot_dir: data_store/snapshots
+  diff:
+    new_entrant_decile: 0.10
+    rank_jump_threshold: 50     # percentile points
+    pair_z_alert: 2.0
+
+# EDGAR XBRL — fundamentals
+edgar:
+  user_agent_email: amard2@illinois.edu        # required by SEC fair-use policy
+  user_agent_name: "EverythingEnergy/SignalEngine"
+  rate_limit_per_sec: 8                         # SEC ceiling is ~10; stay under
+  # Concept fallback chains. The first tag that returns data wins; the chosen
+  # tag is logged per-row as concept_used so we can audit fallback frequency.
+  concepts:
+    revenue:
+      taxonomy: us-gaap
+      tags: [Revenues, RevenueFromContractWithCustomerExcludingAssessedTax,
+             SalesRevenueNet, SalesRevenueGoodsNet]
+    net_income:
+      taxonomy: us-gaap
+      tags: [NetIncomeLoss, ProfitLoss]
+    eps_diluted:
+      taxonomy: us-gaap
+      tags: [EarningsPerShareDiluted, IncomeLossFromContinuingOperationsPerDilutedShare]
+    eps_basic:
+      taxonomy: us-gaap
+      tags: [EarningsPerShareBasic]
+    operating_income:
+      taxonomy: us-gaap
+      tags: [OperatingIncomeLoss]
+    gross_profit:
+      taxonomy: us-gaap
+      tags: [GrossProfit]
+    depreciation_amortization:
+      taxonomy: us-gaap
+      tags: [DepreciationAndAmortization, DepreciationDepletionAndAmortization, Depreciation]
+    interest_expense:
+      taxonomy: us-gaap
+      tags: [InterestExpense, InterestExpenseDebt]
+    tax_expense:
+      taxonomy: us-gaap
+      tags: [IncomeTaxExpenseBenefit]
+    operating_cash_flow:
+      taxonomy: us-gaap
+      tags: [NetCashProvidedByUsedInOperatingActivities]
+    capex:
+      taxonomy: us-gaap
+      tags: [PaymentsToAcquirePropertyPlantAndEquipment, PaymentsToAcquireProductiveAssets]
+    total_assets:
+      taxonomy: us-gaap
+      tags: [Assets]
+    stockholders_equity:
+      taxonomy: us-gaap
+      tags: [StockholdersEquity, StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest]
+    long_term_debt:
+      taxonomy: us-gaap
+      tags: [LongTermDebt, LongTermDebtNoncurrent]
+    long_term_debt_current:
+      taxonomy: us-gaap
+      tags: [LongTermDebtCurrent]
+    cash:
+      taxonomy: us-gaap
+      tags: [CashAndCashEquivalentsAtCarryingValue,
+             CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents]
+    shares_outstanding:
+      taxonomy: dei
+      tags: [EntityCommonStockSharesOutstanding]
+    shares_outstanding_fallback:
+      taxonomy: us-gaap
+      tags: [CommonStockSharesOutstanding]
+  # Derived line items computed in factors/, not at ingest:
+  #   ebitda = net_income + interest_expense + tax_expense + depreciation_amortization
+  #            (street formula — per turn 6 decision)
+  #   fcf    = operating_cash_flow - capex
+
+# Stooq — primary EOD prices
+stooq:
+  bulk_us_url: "https://stooq.com/db/d/?b=d_us_txt"
+  # On stooq, US tickers carry a .us suffix. Stripped on ingest.
+  ticker_suffix: ".us"
+
+# iShares IJR — S&P 600 proxy for universe construction
+ijr:
+  holdings_url: "https://www.ishares.com/us/products/239774/ishares-core-sp-small-cap-etf/1467271812596.ajax?fileType=csv&fileName=IJR_holdings&dataType=fund"
+  snapshot_dir: data_store/raw/ijr
+
+# FINRA — semi-monthly short interest (free)
+finra:
+  monthly_index_url: "https://cdn.finra.org/equity/regsho/monthly/"
+
+# Macro / commodity overlays (Atlas)
+macro:
+  fred_base: "https://api.stlouisfed.org/fred/series/observations"
+  eia_base: "https://api.eia.gov/v2"
+  # Series mapped per Atlas basket in signal_engine/atlas/clusters.py (reads energy_taxonomy.yaml).
+
+# Atlas — reads existing /energy_taxonomy.yaml; no duplication here.
+atlas:
+  taxonomy_path: energy_taxonomy.yaml
+
+storage:
+  duckdb_path: data_store/signal_engine.duckdb
+  raw_dir: data_store/raw

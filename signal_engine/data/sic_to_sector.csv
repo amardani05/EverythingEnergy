@@ -1,0 +1,82 @@
+# SIC range -> sector bucket. EDIT THIS FILE — it is the single source of truth
+# for every sector-neutralization step in the engine. Ranges are inclusive on both
+# ends and resolved in order: the FIRST matching row wins. A `*` low/high is treated
+# as -inf / +inf so you can write catch-all rows.
+#
+# Default scheme below is GICS-ish in 11 buckets, biased toward what shows up in
+# the S&P 600 + the energy universe in /energy_taxonomy.yaml. Adjust to taste.
+#
+# Columns: sic_low, sic_high, sector, note
+sic_low,sic_high,sector,note
+100,999,Materials,Agriculture/forestry/fishing
+1000,1299,Materials,Metal mining
+1311,1389,Energy,Oil & gas extraction + services
+1400,1499,Materials,Non-metallic mining
+1500,1799,Industrials,Construction
+2000,2199,ConsumerStaples,Food & kindred products
+2200,2399,ConsumerDiscretionary,Apparel & textile
+2400,2599,Materials,Lumber/furniture/paper feedstocks
+2600,2699,Materials,Paper
+2700,2799,CommunicationServices,Printing/publishing
+2800,2829,Materials,Industrial chemicals
+2830,2839,HealthCare,Pharma-adjacent chemicals
+2834,2836,HealthCare,Pharmaceuticals / biotech
+2840,2899,Materials,Specialty chemicals
+2900,2999,Energy,Petroleum refining & related
+3000,3199,Materials,Rubber/plastics/leather
+3200,3299,Materials,Stone/clay/glass/concrete
+3300,3399,Materials,Primary metals
+3400,3499,Industrials,Fabricated metal
+3500,3569,Industrials,Industrial machinery
+3570,3579,InfoTech,Computer hardware
+3580,3599,Industrials,Service industry machinery
+3600,3669,InfoTech,Electronic components
+3670,3679,InfoTech,Semiconductors
+3680,3699,InfoTech,Electronics nec
+3700,3719,Industrials,Motor vehicles & equipment
+3720,3729,Industrials,Aerospace
+3730,3743,Industrials,Ship/rail equipment
+3750,3799,Industrials,Transport equipment nec
+3800,3829,HealthCare,Lab/measurement instruments
+3830,3839,HealthCare,Medical devices
+3840,3849,HealthCare,Medical instruments
+3850,3899,Industrials,Optical/measurement misc
+3900,3999,ConsumerDiscretionary,Misc manufacturing
+4000,4099,Industrials,Railroads
+4100,4199,Industrials,Local/highway transit
+4200,4299,Industrials,Trucking & warehousing
+4400,4499,Industrials,Water transportation
+4500,4599,Industrials,Air transportation
+4600,4699,Energy,Pipelines (oil & gas)
+4700,4799,Industrials,Transportation services
+4800,4829,CommunicationServices,Telecom (radio/TV/wireless)
+4830,4839,CommunicationServices,Broadcasting
+4840,4899,CommunicationServices,Cable & other media
+4900,4939,Utilities,Electric services
+4940,4959,Utilities,Water + sanitary
+4960,4999,Utilities,Gas distribution / combined
+5000,5199,ConsumerDiscretionary,Wholesale durable/nondurable
+5200,5999,ConsumerDiscretionary,Retail
+5800,5899,ConsumerDiscretionary,Eating & drinking places
+6000,6199,Financials,Depository / non-depository
+6200,6299,Financials,Securities & brokers
+6300,6399,Financials,Insurance carriers
+6400,6499,Financials,Insurance agents/brokers
+6500,6599,RealEstate,Real estate (operators/developers)
+6700,6726,Financials,Holding & investment offices
+6770,6799,RealEstate,Blank checks / REITs / SPACs
+7000,7099,ConsumerDiscretionary,Hotels/lodging
+7200,7299,ConsumerDiscretionary,Personal services
+7300,7359,Industrials,Business services
+7370,7379,InfoTech,Computer services / SaaS / IT
+7380,7389,Industrials,Business services nec
+7500,7599,ConsumerDiscretionary,Auto repair/services
+7600,7699,ConsumerDiscretionary,Misc repair services
+7800,7899,CommunicationServices,Motion pictures
+7900,7999,ConsumerDiscretionary,Amusement & recreation
+8000,8099,HealthCare,Health services / providers
+8200,8299,ConsumerDiscretionary,Educational services
+8300,8399,ConsumerDiscretionary,Social services
+8700,8799,Industrials,Engineering / management services
+9000,9999,Industrials,Public admin / nonclassifiable
+*,*,Unclassified,Catch-all
