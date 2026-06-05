@@ -133,16 +133,24 @@ edgar:
   #            (street formula — per turn 6 decision)
   #   fcf    = operating_cash_flow - capex
 
-# Stooq — primary EOD prices
-stooq:
-  bulk_us_url: "https://stooq.com/db/d/?b=d_us_txt"
-  # On stooq, US tickers carry a .us suffix. Stripped on ingest.
-  ticker_suffix: ".us"
+# Prices — yfinance is primary in v1 (flagged unofficial); Stooq deferred
+# until a captcha-acquired apikey is wired up.
+prices:
+  primary_source: yfinance
+  yfinance_throttle_sec: 0.1
+  # Stooq path is retained but disabled by default. To enable: obtain an
+  # apikey via captcha at https://stooq.com/q/d/?s=aaon.us&get_apikey,
+  # set STOOQ_API_KEY in the env, flip enabled to true.
+  stooq:
+    enabled: false
+    per_ticker_url: "https://stooq.com/q/d/l/?s={ticker}.us&i=d"
 
-# iShares IJR — S&P 600 proxy for universe construction
+# iShares IJR — S&P 600 proxy. Akamai walls the AJAX URL, so v1 ingests CSVs
+# you manually save into data_store/raw/ijr/. scripts/snapshot_ijr.py is a
+# disk-based ingester (idempotent).
 ijr:
-  holdings_url: "https://www.ishares.com/us/products/239774/ishares-core-sp-small-cap-etf/1467271812596.ajax?fileType=csv&fileName=IJR_holdings&dataType=fund"
   snapshot_dir: data_store/raw/ijr
+  download_page: "https://www.ishares.com/us/products/239774/ishares-core-sp-small-cap-etf"
 
 # FINRA — semi-monthly short interest (free)
 finra:

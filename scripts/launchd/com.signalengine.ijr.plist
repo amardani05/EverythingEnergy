@@ -2,6 +2,11 @@
 <!--
   IJR holdings nightly snapshot.
 
+  Workflow: drop the iShares "Download holdings (CSV)" file into
+  data_store/raw/ijr/ each day. This launchd job runs the disk-based
+  ingester nightly so any newly-dropped file gets pulled into DuckDB
+  without you having to remember.
+
   To install (one-time):
     cp scripts/launchd/com.signalengine.ijr.plist ~/Library/LaunchAgents/
     launchctl load ~/Library/LaunchAgents/com.signalengine.ijr.plist
