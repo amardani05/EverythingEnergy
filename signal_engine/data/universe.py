@@ -67,11 +67,16 @@ class IJRDownloader:
 # ---------- parsing ----------
 
 # iShares CSVs prepend ~9 header rows of fund metadata, then the table.
-# Layout (subject to change): the "Fund Holdings as of, MM/DD/YYYY" line is
-# the key. We find the first row that starts with "Ticker," to anchor the table.
+# Layout as observed 2026-06: line 2 is `Fund Holdings as of,"Jun 12, 2026"`
+# (date is a quoted CSV cell containing an internal comma). The regex allows
+# the optional surrounding quote.
 
-_AS_OF_RE = re.compile(r"Fund Holdings as of[,\s]+([A-Za-z]+ \d{1,2},?\s*\d{4})", re.I)
-_AS_OF_RE_NUM = re.compile(r"Fund Holdings as of[,\s]+(\d{1,2}/\d{1,2}/\d{2,4})", re.I)
+_AS_OF_RE = re.compile(
+    r'Fund Holdings as of[,\s]+"?([A-Za-z]+ \d{1,2},?\s*\d{4})"?', re.I,
+)
+_AS_OF_RE_NUM = re.compile(
+    r'Fund Holdings as of[,\s]+"?(\d{1,2}/\d{1,2}/\d{2,4})"?', re.I,
+)
 
 
 def parse_as_of_date(text: str) -> date | None:
@@ -124,17 +129,32 @@ def parse_holdings_csv(text: str) -> tuple[date | None, pl.DataFrame]:
     reader = csv.DictReader(io.StringIO("\n".join(table_lines)))
     rows: list[dict[str, Any]] = []
     for r in reader:
+        # Schema as of 2026-06: Ticker, Name, Type, Sector, Asset Class,
+        # Market Value, Notional Value, Quantity, Price, Location, Exchange,
+        # Currency, FX Rate, Market Currency, Accrual Date, Market Weight,
+        # Notional Weight. Older snapshots used `Weight (%)` / `Shares`.
         rows.append({
             "snapshot_date": as_of,
             "ticker": (r.get("Ticker") or "").strip().upper() or None,
             "name": (r.get("Name") or "").strip() or None,
-            "weight": _to_float(r.get("Weight (%)") or r.get("Weight")),
-            "shares": _to_float(r.get("Shares")),
+            "weight": _to_float(
+                r.get("Market Weight")
+                or r.get("Weight (%)")
+                or r.get("Weight")
+            ),
+            "shares": _to_float(r.get("Quantity") or r.get("Shares")),
             "market_value": _to_float(r.get("Market Value") or r.get("Market Value ($)")),
             "asset_class": (r.get("Asset Class") or "").strip() or None,
             "sector": (r.get("Sector") or "").strip() or None,
         })
-    df = pl.DataFrame([r for r in rows if r["ticker"]])
+    # Filter to equity holdings only. iShares includes cash sweeps and
+    # derivatives (e.g. XTSLA = BlackRock Cash Fund). We're building the
+    # equity universe for cross-sectional scoring.
+    equity_rows = [
+        r for r in rows
+        if r["ticker"] and (r["asset_class"] or "").lower() == "equity"
+    ]
+    df = pl.DataFrame(equity_rows)
     return as_of, df
 
 
