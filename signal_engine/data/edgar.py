@@ -156,10 +156,17 @@ class EdgarClient:
 
     @staticmethod
     def submissions_row(payload: dict[str, Any], snapshot_date: str) -> dict[str, Any]:
-        """Flatten one submissions.json response into a single edgar_submissions row."""
-        # Sometimes ticker/exchange arrays are empty; pipe-join for storage simplicity.
-        tickers = payload.get("tickers") or []
-        exchanges = payload.get("exchanges") or []
+        """Flatten one submissions.json response into a single edgar_submissions row.
+
+        Some filers carry `null` entries inside their `tickers` / `exchanges`
+        arrays (multi-class shares where one class isn't ticker-listed, OTC
+        dual-listings where one venue is null, etc.). Filter those out
+        before joining — leaving them in raises TypeError on str.join.
+        """
+        tickers_raw = payload.get("tickers") or []
+        exchanges_raw = payload.get("exchanges") or []
+        tickers = [t for t in tickers_raw if isinstance(t, str) and t]
+        exchanges = [e for e in exchanges_raw if isinstance(e, str) and e]
         return {
             "cik": int(payload.get("cik", 0)),
             "snapshot_date": snapshot_date,
