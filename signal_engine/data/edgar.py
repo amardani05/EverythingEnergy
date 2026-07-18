@@ -27,9 +27,10 @@ from __future__ import annotations
 import json
 import logging
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import requests
 
@@ -186,6 +187,29 @@ def cache_raw(path: Path, payload: dict[str, Any]) -> None:
     for debugging and for re-parsing without re-pulling."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload))
+
+
+def iter_cached_payloads(raw_dir: Path, prefix: str) -> Iterable[tuple[int, Path, dict[str, Any]]]:
+    """Yield (cik, path, payload) for every '{prefix}_{cik:010d}.json' under
+    `raw_dir` — the re-parse-without-re-pull counterpart to `cache_raw`.
+
+    Files whose name doesn't parse to a CIK or whose JSON is corrupt are
+    logged and skipped, never fatal: one bad cache file must not kill a
+    bulk re-parse.
+    """
+    for path in sorted(raw_dir.glob(f"{prefix}_*.json")):
+        stem_suffix = path.stem.removeprefix(f"{prefix}_")
+        try:
+            cik = int(stem_suffix)
+        except ValueError:
+            log.warning("[cache] skipping %s: unparseable CIK %r", path.name, stem_suffix)
+            continue
+        try:
+            payload = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError) as e:
+            log.warning("[cache] skipping %s: %s", path.name, e)
+            continue
+        yield cik, path, payload
 
 
 def cik_for_ticker(ticker_cik_payload: dict[str, Any], ticker: str) -> int | None:

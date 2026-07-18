@@ -7,34 +7,44 @@ Pulls:
   * submissions for the same CIKs (~750 calls; provides SIC for sector mapping)
 
 You run this LOCALLY. At 8 req/s the universe pull is ~5 minutes wall-clock
-(750 CIKs × 2 endpoints / 8 req/s ≈ 190s, plus ~10s/call decode for the
+(750 CIKs x 2 endpoints / 8 req/s ≈ 190s, plus ~10s/call decode for the
 largest filers). Idempotent: re-runs upsert by accession, no duplicates.
 
-Caches raw payloads under data_store/raw/edgar/ so a re-parse without a
-re-pull is cheap.
+Robustness contract (post-mortem of the 2026-06-23 crash at ~650/766 CIKs):
+  * One bad filer can never kill the run — fetch + cache + parse are all
+    inside the per-CIK try.
+  * Rows are flushed to DuckDB incrementally (every FLUSH_EVERY CIKs), so a
+    crash loses at most one flush window, not the whole run.
+  * Raw payloads are cached under data_store/raw/edgar/ as they arrive, and
+    `--from-cache` re-parses them into DuckDB without any HTTP — a re-parse
+    after a code fix costs seconds, not a re-pull.
 
 Usage:
   .venv/bin/python scripts/ingest_edgar.py                # both universes
   .venv/bin/python scripts/ingest_edgar.py --universe energy
   .venv/bin/python scripts/ingest_edgar.py --universe ijr --limit 10  # debugging
+  .venv/bin/python scripts/ingest_edgar.py --from-cache   # no network, re-parse raw/
 """
 
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import sys
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
+from typing import Any
+
+import polars as pl
 
 from signal_engine.atlas.clusters import energy_universe_tickers
 from signal_engine.config import Config
 from signal_engine.data import edgar, store
-from signal_engine.data.prices import yfinance_batch  # noqa: F401 — kept for parity with prices script
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s | %(message)s")
 log = logging.getLogger("ingest_edgar")
+
+FLUSH_EVERY = 50  # submissions rows buffered between DuckDB flushes
 
 
 def ijr_universe_from_db(db_path: Path) -> list[str]:
@@ -59,7 +69,6 @@ def upsert_ticker_cik(client: edgar.EdgarClient, db_path: Path) -> dict[str, dic
         {"snapshot_date": today, "ticker": ticker, "cik": cik, "title": title}
         for cik, ticker, title in edgar.iter_cik_ticker_pairs(payload)
     ]
-    import polars as pl
     df = pl.DataFrame(rows)
     with store.connect(db_path) as con:
         con.register("incoming", df)
@@ -72,23 +81,8 @@ def upsert_ticker_cik(client: edgar.EdgarClient, db_path: Path) -> dict[str, dic
     return payload
 
 
-def upsert_submissions(client: edgar.EdgarClient, ciks: list[int], db_path: Path,
-                       raw_dir: Path) -> int:
-    """Snapshot submissions metadata for each CIK. SIC drives sector mapping."""
-    import polars as pl
-    today = date.today()
-    rows: list[dict] = []
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    for i, cik in enumerate(ciks, start=1):
-        try:
-            sub = client.submissions(cik)
-        except Exception as e:  # noqa: BLE001
-            log.warning("[submissions] CIK %d failed: %s", cik, e)
-            continue
-        edgar.cache_raw(raw_dir / f"submissions_{cik:010d}.json", sub)
-        rows.append(edgar.EdgarClient.submissions_row(sub, today.isoformat()))
-        if i % 50 == 0:
-            log.info("[submissions] %d/%d", i, len(ciks))
+def flush_submissions(db_path: Path, rows: list[dict[str, Any]]) -> int:
+    """Insert a batch of edgar_submissions rows. Small batches, called often."""
     if not rows:
         return 0
     df = pl.DataFrame(rows)
@@ -104,38 +98,138 @@ def upsert_submissions(client: edgar.EdgarClient, ciks: list[int], db_path: Path
     return len(rows)
 
 
+def flush_facts(db_path: Path, rows: list[dict[str, Any]]) -> int:
+    """Insert one CIK's edgar_facts rows."""
+    if not rows:
+        return 0
+    df = pl.DataFrame(rows)
+    with store.connect(db_path) as con:
+        con.register("incoming", df)
+        con.execute("""
+            INSERT INTO edgar_facts
+              (cik, taxonomy, concept, concept_used, unit, period_start, period_end,
+               fy, fp, form, is_amendment, accession, filed, value)
+            SELECT cik, taxonomy, concept, concept_used, unit, period_start, period_end,
+                   fy, fp, form, is_amendment, accession, filed, value
+            FROM incoming
+            ON CONFLICT DO NOTHING;
+        """)
+    return len(rows)
+
+
+def upsert_submissions(client: edgar.EdgarClient, ciks: list[int], db_path: Path,
+                       raw_dir: Path) -> int:
+    """Snapshot submissions metadata for each CIK. SIC drives sector mapping.
+
+    Fetch, cache, AND parse live inside the try: the 6/23 crash was a parse
+    error (`None` in the exchanges array) escaping a try that only covered
+    the HTTP call, killing the batch insert that used to sit after the loop.
+    """
+    today = date.today()
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    buffered: list[dict[str, Any]] = []
+    total = 0
+    failed: list[int] = []
+    for i, cik in enumerate(ciks, start=1):
+        try:
+            sub = client.submissions(cik)
+            edgar.cache_raw(raw_dir / f"submissions_{cik:010d}.json", sub)
+            buffered.append(edgar.EdgarClient.submissions_row(sub, today.isoformat()))
+        except Exception as e:
+            log.warning("[submissions] CIK %d failed: %s", cik, e)
+            failed.append(cik)
+            continue
+        if len(buffered) >= FLUSH_EVERY:
+            total += flush_submissions(db_path, buffered)
+            buffered = []
+        if i % 50 == 0:
+            log.info("[submissions] %d/%d (flushed: %d, failed: %d)",
+                     i, len(ciks), total, len(failed))
+    total += flush_submissions(db_path, buffered)
+    if failed:
+        log.warning("[submissions] %d CIKs failed: %s", len(failed), failed[:10])
+    return total
+
+
 def upsert_companyfacts(client: edgar.EdgarClient, ciks: list[int], db_path: Path,
                         raw_dir: Path, concept_chains: dict) -> int:
-    """Pull companyfacts per CIK, extract via config'd chains, upsert."""
-    import polars as pl
+    """Pull companyfacts per CIK, extract via config'd chains, upsert per CIK."""
     raw_dir.mkdir(parents=True, exist_ok=True)
     total_rows = 0
+    failed: list[int] = []
     for i, cik in enumerate(ciks, start=1):
         try:
             facts = client.company_facts(cik)
-        except Exception as e:  # noqa: BLE001
+            edgar.cache_raw(raw_dir / f"companyfacts_{cik:010d}.json", facts)
+            rows = edgar.EdgarClient.extract_facts(facts, cik, concept_chains)
+        except Exception as e:
             log.warning("[companyfacts] CIK %d failed: %s", cik, e)
+            failed.append(cik)
             continue
-        edgar.cache_raw(raw_dir / f"companyfacts_{cik:010d}.json", facts)
-        rows = edgar.EdgarClient.extract_facts(facts, cik, concept_chains)
-        if not rows:
-            continue
-        df = pl.DataFrame(rows)
-        with store.connect(db_path) as con:
-            con.register("incoming", df)
-            con.execute("""
-                INSERT INTO edgar_facts
-                  (cik, taxonomy, concept, concept_used, unit, period_start, period_end,
-                   fy, fp, form, is_amendment, accession, filed, value)
-                SELECT cik, taxonomy, concept, concept_used, unit, period_start, period_end,
-                       fy, fp, form, is_amendment, accession, filed, value
-                FROM incoming
-                ON CONFLICT DO NOTHING;
-            """)
-        total_rows += len(rows)
+        total_rows += flush_facts(db_path, rows)
         if i % 25 == 0:
-            log.info("[companyfacts] %d/%d (rows so far: %d)", i, len(ciks), total_rows)
+            log.info("[companyfacts] %d/%d (rows so far: %d, failed: %d)",
+                     i, len(ciks), total_rows, len(failed))
+    if failed:
+        log.warning("[companyfacts] %d CIKs failed: %s", len(failed), failed[:10])
     return total_rows
+
+
+def reparse_from_cache(db_path: Path, raw_dir: Path, concept_chains: dict) -> None:
+    """Rebuild edgar_submissions + edgar_facts from cached raw JSON — no HTTP.
+
+    snapshot_date for cached submissions = the cache file's mtime date (when
+    the knowledge was actually fetched), NOT today: a re-parse must not
+    fabricate fresher knowledge than we have.
+    """
+    n_files = 0
+    n_rows = 0
+    buffered: list[dict[str, Any]] = []
+    for cik, path, payload in edgar.iter_cached_payloads(raw_dir, "submissions"):
+        snap = datetime.fromtimestamp(path.stat().st_mtime).date().isoformat()
+        try:
+            buffered.append(edgar.EdgarClient.submissions_row(payload, snap))
+        except Exception as e:
+            log.warning("[cache/submissions] CIK %d failed: %s", cik, e)
+            continue
+        n_files += 1
+        if len(buffered) >= FLUSH_EVERY:
+            n_rows += flush_submissions(db_path, buffered)
+            buffered = []
+    n_rows += flush_submissions(db_path, buffered)
+    log.info("[cache/submissions] parsed %d files -> %d rows upserted", n_files, n_rows)
+
+    f_files = 0
+    f_rows = 0
+    for cik, _path, payload in edgar.iter_cached_payloads(raw_dir, "companyfacts"):
+        try:
+            rows = edgar.EdgarClient.extract_facts(payload, cik, concept_chains)
+        except Exception as e:
+            log.warning("[cache/companyfacts] CIK %d failed: %s", cik, e)
+            continue
+        f_files += 1
+        f_rows += flush_facts(db_path, rows)
+        if f_files % 100 == 0:
+            log.info("[cache/companyfacts] %d files (rows so far: %d)", f_files, f_rows)
+    log.info("[cache/companyfacts] parsed %d files -> %d rows upserted", f_files, f_rows)
+
+
+def coverage_summary(db_path: Path) -> None:
+    with store.connect(db_path, read_only=True) as con:
+        nf = con.execute("SELECT count(*) FROM edgar_facts").fetchone()[0]
+        nc = con.execute("SELECT count(DISTINCT cik) FROM edgar_facts").fetchone()[0]
+        log.info("[edgar_facts] %d rows across %d CIKs", nf, nc)
+        ns = con.execute("SELECT count(*) FROM edgar_submissions").fetchone()[0]
+        log.info("[edgar_submissions] %d rows", ns)
+        log.info("[coverage] facts per canonical concept:")
+        cov = con.execute("""
+            SELECT concept, count(DISTINCT cik) AS n_ciks, count(*) AS n_rows
+            FROM edgar_facts
+            GROUP BY concept
+            ORDER BY n_ciks DESC
+        """).fetchall()
+        for c, n_ciks, n_rows in cov:
+            log.info("  %-32s %d CIKs, %d rows", c, n_ciks, n_rows)
 
 
 def main() -> int:
@@ -144,10 +238,18 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--skip-submissions", action="store_true")
     parser.add_argument("--skip-companyfacts", action="store_true")
+    parser.add_argument("--from-cache", action="store_true",
+                        help="re-parse cached raw JSON into DuckDB; no network at all")
     args = parser.parse_args()
 
     cfg = Config.load()
     store.init_db(cfg.duckdb_path)
+    raw_dir = cfg.raw_dir / "edgar"
+
+    if args.from_cache:
+        reparse_from_cache(cfg.duckdb_path, raw_dir, cfg.edgar_concepts)
+        coverage_summary(cfg.duckdb_path)
+        return 0
 
     # 1. Build the ticker list
     tickers: list[str] = []
@@ -180,8 +282,6 @@ def main() -> int:
                     len(missing), missing[:10])
     log.info("[universe] %d CIKs resolved", len(universe_ciks))
 
-    raw_dir = cfg.raw_dir / "edgar"
-
     # 4. Submissions
     if not args.skip_submissions:
         n = upsert_submissions(client, universe_ciks, cfg.duckdb_path, raw_dir)
@@ -194,23 +294,7 @@ def main() -> int:
         log.info("[companyfacts] upserted %d fact rows", n)
 
     # 6. Coverage summary
-    with store.connect(cfg.duckdb_path, read_only=True) as con:
-        nf = con.execute("SELECT count(*) FROM edgar_facts").fetchone()[0]
-        nc = con.execute("SELECT count(DISTINCT cik) FROM edgar_facts").fetchone()[0]
-        log.info("[edgar_facts] %d rows across %d CIKs", nf, nc)
-        ns = con.execute("SELECT count(*) FROM edgar_submissions").fetchone()[0]
-        log.info("[edgar_submissions] %d rows", ns)
-        # Concept-chain coverage report
-        log.info("[coverage] facts per canonical concept:")
-        cov = con.execute("""
-            SELECT concept, count(DISTINCT cik) AS n_ciks, count(*) AS n_rows
-            FROM edgar_facts
-            GROUP BY concept
-            ORDER BY n_ciks DESC
-        """).fetchall()
-        for c, n_ciks, n_rows in cov:
-            log.info("  %-32s %d CIKs, %d rows", c, n_ciks, n_rows)
-
+    coverage_summary(cfg.duckdb_path)
     return 0
 
 
