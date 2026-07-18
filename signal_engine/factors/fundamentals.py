@@ -206,24 +206,35 @@ def latest_annual_snapshot(
     )
 
 
+_QUARTERLY_EPS_SCHEMA: dict[str, type[pl.DataType]] = {
+    "cik": pl.Int64, "period_end": pl.Date, "fy": pl.Int64,
+    "fp": pl.Utf8, "filed": pl.Date, "eps_diluted": pl.Float64,
+    "derived": pl.Boolean,
+}
+
+
 def quarterly_eps_series(
     con: duckdb.DuckDBPyConnection,
     as_of: date,
     cik: int,
     *,
     originals_only: bool = True,
+    derive_q4: bool = True,
 ) -> pl.DataFrame:
     """Standalone quarterly diluted EPS series for one CIK as of `as_of`.
 
-    Returns: cik, period_end, fy, fp, filed, eps_diluted.
+    Returns: cik, period_end, fy, fp, filed, eps_diluted, derived.
 
     Q1/Q2/Q3 are pulled directly from 10-Q filings (standalone period
-    length 60-100 days). Q4 is DERIVED from the 10-K:
-        eps_Q4 ≈ NI_FY / shares_FY - (eps_Q1 + eps_Q2 + eps_Q3)
-    This is an approximation that ignores intra-year changes in share
-    count; for SUE purposes (a YoY-difference signal) the bias is largely
-    constant across companies and washes out cross-sectionally. Use only
-    Q1/Q2/Q3 for production SUE if you want zero approximation.
+    length 60-100 days). Q4 is DERIVED from the 10-K's annual diluted EPS:
+        eps_Q4 = eps_FY - (eps_Q1 + eps_Q2 + eps_Q3)
+    with `filed` = the 10-K's filed date (the Q4 surprise becomes knowable
+    only when the annual report lands) and `derived = True`. The derivation
+    requires all three standalone quarters for that fy — partial years are
+    skipped rather than guessed. This ignores intra-year share-count drift;
+    for SUE (a YoY-difference signal) that bias is largely constant across
+    companies and washes out cross-sectionally. Pass `derive_q4=False` for
+    the zero-approximation Q1-Q3-only series.
 
     `originals_only=True` (default) excludes amended filings — restatements
     don't rewrite history. The PEAD/SUE path relies on this.
@@ -232,10 +243,7 @@ def quarterly_eps_series(
         con, as_of=as_of, cik=cik, originals_only=originals_only,
     )
     if facts.height == 0:
-        return pl.DataFrame(schema={
-            "cik": pl.Int64, "period_end": pl.Date, "fy": pl.Int64,
-            "fp": pl.Utf8, "filed": pl.Date, "eps_diluted": pl.Float64,
-        })
+        return pl.DataFrame(schema=_QUARTERLY_EPS_SCHEMA)
 
     facts_with_len = facts.with_columns(
         ((pl.col("period_end") - pl.col("period_start")).dt.total_days())
@@ -254,6 +262,45 @@ def quarterly_eps_series(
         )
         .select(["cik", "period_end", "fy", "fp", "filed", "value"])
         .rename({"value": "eps_diluted"})
+        .with_columns(pl.lit(False).alias("derived"))
+    )
+
+    if not derive_q4:
+        return quarterly.sort("period_end").select(list(_QUARTERLY_EPS_SCHEMA.keys()))
+
+    # Annual diluted EPS rows (10-K, ~365d period) provide the FY total.
+    annual = (
+        facts_with_len
+        .filter(
+            (pl.col("concept") == "eps_diluted")
+            & pl.col("_period_days").is_between(ANNUAL_MIN_DAYS, ANNUAL_MAX_DAYS)
+        )
+        .select(["cik", "period_end", "fy", "filed", "value"])
+        .rename({"value": "eps_fy"})
+        .drop_nulls(["eps_fy", "fy"])
+    )
+    # Sum of standalone quarters per fy — require all three, none null.
+    qsum = (
+        quarterly.drop_nulls(["eps_diluted", "fy"])
+        .group_by("fy")
+        .agg([
+            pl.col("eps_diluted").sum().alias("_eps_q123"),
+            pl.col("fp").n_unique().alias("_n_q"),
+        ])
+        .filter(pl.col("_n_q") == 3)
+        .select(["fy", "_eps_q123"])
+    )
+    q4 = (
+        annual.join(qsum, on="fy", how="inner")
+        .with_columns([
+            (pl.col("eps_fy") - pl.col("_eps_q123")).alias("eps_diluted"),
+            pl.lit("Q4").alias("fp"),
+            pl.lit(True).alias("derived"),
+        ])
+        .select(["cik", "period_end", "fy", "fp", "filed", "eps_diluted", "derived"])
+    )
+
+    return (
+        pl.concat([quarterly.select(list(_QUARTERLY_EPS_SCHEMA.keys())), q4], how="vertical_relaxed")
         .sort("period_end")
     )
-    return quarterly

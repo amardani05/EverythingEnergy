@@ -8,13 +8,13 @@ The 21-day skip avoids contamination from short-term reversal, which is
 particularly strong in small caps. The 252-day window captures the
 intermediate-term trend.
 
-Caveat for v1: we use raw close-to-close return, not total return.
-yfinance is stored with `auto_adjust=False`, so close is split-adjusted but
-NOT dividend-adjusted. For 12-1 momentum the bias is small (one year of
-dividend yield ≈ 1-3% across the cross-section, mostly orthogonal to the
-signal), but it IS a bias. Plan: when we ingest the yfinance dividend
-action stream, swap to dividend-adjusted return. The factor signature
-won't change.
+Total-return: when a `dividends` frame is supplied (ticker, date, value =
+cash per share on ex-date), momentum is computed on a per-ticker
+total-return index — daily gross return (close_t + div_t) / close_{t-1},
+cumulated — so the ex-date price drop no longer reads as negative
+momentum. Without dividends the TR index collapses to the close ratio and
+the result is identical to raw price momentum. Closes and yfinance
+dividend values are both split-adjusted, so the two series compose.
 
 Returns a tidy `(ticker, date, momentum)` frame. Cross-sectional
 neutralization happens in scoring/, not here.
@@ -51,29 +51,56 @@ class MomentumConfig:
 def compute_momentum(
     prices: pl.DataFrame,
     cfg: MomentumConfig = MomentumConfig(),
+    *,
+    dividends: pl.DataFrame | None = None,
 ) -> pl.DataFrame:
     """Compute 12-1 month momentum from a long-form price panel.
 
-    Input columns required: `ticker`, `date`, `close`.
+    Input columns required: `ticker`, `date`, `close`. Optional `dividends`:
+    `ticker`, `date`, `value` (cash per share on ex-date).
     Output columns: `ticker`, `date`, `momentum`.
 
-    Per ticker, momentum at row t = close[t - skip_days] / close[t - lookback_days] - 1.
-
-    The "as-of-t" feature is the price L days back relative to S days back —
-    so the value at t uses ONLY data known at t (no peek into the future).
-    Rows where either lag is missing (start of series) are dropped.
+    Per ticker, momentum at row t = index[t - skip_days] / index[t - lookback_days] - 1,
+    where `index` is the close itself (no dividends) or a total-return index
+    cumulated from daily gross returns (close_t + div_t) / close_{t-1}.
+    A dividend is knowable on its ex-date and affects only that date's
+    return, so the value at t uses ONLY data known at t (no peek into the
+    future). Rows where either lag is missing (start of series) are dropped.
     """
     required = {"ticker", "date", "close"}
     missing = required - set(prices.columns)
     if missing:
         raise ValueError(f"prices missing columns: {missing}")
 
+    panel = prices.sort(["ticker", "date"])
+    if dividends is not None and dividends.height > 0:
+        div = (
+            dividends.select(["ticker", "date", "value"])
+            .rename({"value": "_div"})
+            # One row per (ticker, ex-date) — sum in case of multiple entries.
+            .group_by(["ticker", "date"]).agg(pl.col("_div").sum())
+        )
+        panel = (
+            panel.join(div, on=["ticker", "date"], how="left")
+            .with_columns(pl.col("_div").fill_null(0.0))
+            .with_columns(
+                # Daily gross total return; first row per ticker has no prev
+                # close -> null -> seeded to 1.0 so cum_prod starts the index.
+                ((pl.col("close") + pl.col("_div"))
+                 / pl.col("close").shift(1).over("ticker")).alias("_gross")
+            )
+            .with_columns(
+                pl.col("_gross").fill_null(1.0).cum_prod().over("ticker").alias("_index")
+            )
+        )
+    else:
+        panel = panel.with_columns(pl.col("close").alias("_index"))
+
     return (
-        prices
-        .sort(["ticker", "date"])
+        panel
         .with_columns([
-            pl.col("close").shift(cfg.skip_days).over("ticker").alias("_skip_anchor"),
-            pl.col("close").shift(cfg.lookback_days).over("ticker").alias("_lookback_anchor"),
+            pl.col("_index").shift(cfg.skip_days).over("ticker").alias("_skip_anchor"),
+            pl.col("_index").shift(cfg.lookback_days).over("ticker").alias("_lookback_anchor"),
         ])
         .with_columns(
             (pl.col("_skip_anchor") / pl.col("_lookback_anchor") - 1.0).alias("momentum")
@@ -90,6 +117,7 @@ def momentum_as_of(
     tickers: list[str] | None = None,
     cfg: MomentumConfig = MomentumConfig(),
     history_buffer_days: int = 50,
+    total_return: bool = True,
 ) -> pl.DataFrame:
     """Read prices through the bitemporal API, compute momentum, and return
     only the row for `as_of` (one momentum per ticker).
@@ -97,10 +125,18 @@ def momentum_as_of(
     The lookback panel is loaded for `as_of - lookback - buffer` through
     `as_of`. We over-pull by `history_buffer_days` to absorb holidays and
     early-listing gaps without losing signals.
-    """
-    from signal_engine.data.store import as_of_prices
 
-    earliest_needed = as_of - timedelta(days=cfg.lookback_days + history_buffer_days)
+    `total_return=True` (default) folds cash dividends from the
+    corporate_actions table into the return index via the PIT accessor.
+    """
+    from signal_engine.data.store import as_of_corporate_actions, as_of_prices
+
+    # lookback_days counts TRADING rows; the panel window is CALENDAR days.
+    # ~252 trading days span ~365 calendar days (5/7 week + holidays), so
+    # scale by 7/5 before adding the buffer — a plain lookback+buffer window
+    # leaves the 252-row shift permanently unfilled on real data.
+    calendar_span = int(cfg.lookback_days * 7 / 5) + history_buffer_days
+    earliest_needed = as_of - timedelta(days=calendar_span)
     panel = (
         as_of_prices(con, as_of=as_of)
         .filter(pl.col("date") >= earliest_needed)
@@ -108,5 +144,14 @@ def momentum_as_of(
     if tickers is not None:
         panel = panel.filter(pl.col("ticker").is_in(tickers))
 
-    mom = compute_momentum(panel, cfg)
+    dividends: pl.DataFrame | None = None
+    if total_return:
+        dividends = (
+            as_of_corporate_actions(con, as_of=as_of, kind="dividend")
+            .filter(pl.col("date") >= earliest_needed)
+        )
+        if tickers is not None:
+            dividends = dividends.filter(pl.col("ticker").is_in(tickers))
+
+    mom = compute_momentum(panel, cfg, dividends=dividends)
     return mom.filter(pl.col("date") == as_of)

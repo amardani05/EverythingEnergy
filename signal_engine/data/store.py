@@ -253,6 +253,31 @@ def as_of_prices(
     return con.execute(sql, params).pl()
 
 
+def as_of_corporate_actions(
+    con: duckdb.DuckDBPyConnection,
+    as_of: date,
+    *,
+    ticker: str | None = None,
+    kind: str | None = None,
+) -> pl.DataFrame:
+    """All corporate-action rows with `date <= as_of`.
+
+    A dividend/split is public knowledge on its ex-date, so the trade date
+    is the knowledge date — no separate vintage axis needed. Factor code
+    reads dividends ONLY through this helper (leakage contract)."""
+    where_parts = ["date <= ?"]
+    params: list[object] = [as_of]
+    if ticker is not None:
+        where_parts.append("ticker = ?")
+        params.append(ticker)
+    if kind is not None:
+        where_parts.append("kind = ?")
+        params.append(kind)
+    where = " AND ".join(where_parts)
+    sql = f"SELECT ticker, date, kind, value, source FROM corporate_actions WHERE {where}"
+    return con.execute(sql, params).pl()
+
+
 def as_of_macro(
     con: duckdb.DuckDBPyConnection,
     as_of: date,

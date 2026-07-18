@@ -82,3 +82,22 @@ def test_originals_only_never_returns_amendments(tmp_con: duckdb.DuckDBPyConnect
     assert v.height == 1, "exactly one original row expected"
     assert v["value"].item() == 1.10
     assert v["is_amendment"].item() is False
+
+
+def test_as_of_corporate_actions_hides_future_ex_dates(tmp_con) -> None:
+    """A dividend with ex-date after as_of must be invisible — the ex-date
+    is the knowledge date for corporate actions."""
+    from datetime import date
+
+    from signal_engine.data.store import as_of_corporate_actions
+
+    for d, v in [(date(2024, 3, 1), 0.25), (date(2024, 9, 1), 0.30)]:
+        tmp_con.execute(
+            "INSERT INTO corporate_actions (ticker, date, kind, value, source) "
+            "VALUES ('AAA', ?, 'dividend', ?, 'yfinance')", [d, v],
+        )
+    visible = as_of_corporate_actions(tmp_con, as_of=date(2024, 6, 1))
+    assert visible.height == 1
+    assert visible.row(0, named=True)["value"] == 0.25
+    both = as_of_corporate_actions(tmp_con, as_of=date(2024, 12, 31), kind="dividend")
+    assert both.height == 2

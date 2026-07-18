@@ -9,7 +9,7 @@ import pytest
 
 from signal_engine.factors.fundamentals import quarterly_eps_series
 from signal_engine.factors.pead import SueConfig, compute_sue, compute_sue_series
-from tests.factor_fixtures import insert_quarterly_eps
+from tests.factor_fixtures import insert_annual_bundle, insert_quarterly_eps
 
 
 def _q1(year: int) -> date:
@@ -68,6 +68,67 @@ def test_sue_algebra_on_synthetic_series(tmp_con: duckdb.DuckDBPyConnection) -> 
     import statistics
     expected_sd = statistics.pstdev([0.05, 0.05, 0.05, -0.05, 0.10])
     assert spike["sue"] == pytest.approx(0.80 / expected_sd, rel=0.01)
+
+
+def _seed_full_year(con: duckdb.DuckDBPyConnection, cik: int, fy: int,
+                    q_eps: tuple[float, float, float], fy_eps: float,
+                    tenk_filed: date) -> None:
+    """Q1/Q2/Q3 10-Qs plus the FY annual EPS row from the 10-K."""
+    from datetime import timedelta
+    for fp, month_day, eps in [("Q1", (3, 31), q_eps[0]), ("Q2", (6, 30), q_eps[1]),
+                               ("Q3", (9, 30), q_eps[2])]:
+        pe = date(fy, *month_day)
+        insert_quarterly_eps(con, cik=cik, period_end=pe, fy=fy, fp=fp, eps=eps,
+                             filed=pe + timedelta(days=40), accession=f"{cik}-{fy}-{fp}")
+    insert_annual_bundle(con, cik=cik, fy=fy, period_end=date(fy, 12, 31),
+                         filed=tenk_filed, values={"eps_diluted": fy_eps},
+                         accession_prefix=f"{cik}-FY-")
+
+
+def test_q4_derived_from_fy_minus_quarters(tmp_con: duckdb.DuckDBPyConnection) -> None:
+    """Q4 EPS = FY EPS - (Q1+Q2+Q3), filed on the 10-K date, derived=True."""
+    cik = 3000020
+    _seed_full_year(tmp_con, cik, 2023, q_eps=(0.30, 0.25, 0.20), fy_eps=1.00,
+                    tenk_filed=date(2024, 2, 15))
+    eps = quarterly_eps_series(tmp_con, as_of=date(2026, 1, 1), cik=cik)
+    q4 = eps.filter(eps["fp"] == "Q4")
+    assert q4.height == 1
+    row = q4.row(0, named=True)
+    assert row["eps_diluted"] == pytest.approx(0.25)   # 1.00 - 0.75
+    assert row["filed"] == date(2024, 2, 15)           # knowable only at the 10-K
+    assert row["period_end"] == date(2023, 12, 31)
+    assert row["derived"] is True
+    # Q1-Q3 are direct, not derived.
+    assert eps.filter(eps["fp"] != "Q4")["derived"].any() is False
+    # Opt-out path returns the zero-approximation series.
+    eps_no_q4 = quarterly_eps_series(tmp_con, as_of=date(2026, 1, 1), cik=cik,
+                                     derive_q4=False)
+    assert eps_no_q4.filter(eps_no_q4["fp"] == "Q4").height == 0
+
+
+def test_q4_not_derived_when_a_quarter_is_missing(tmp_con: duckdb.DuckDBPyConnection) -> None:
+    """Partial years are skipped, never guessed."""
+    from datetime import timedelta
+    cik = 3000021
+    for fp, month_day, eps in [("Q1", (3, 31), 0.30), ("Q2", (6, 30), 0.25)]:
+        pe = date(2023, *month_day)
+        insert_quarterly_eps(tmp_con, cik=cik, period_end=pe, fy=2023, fp=fp, eps=eps,
+                             filed=pe + timedelta(days=40), accession=f"{cik}-2023-{fp}")
+    insert_annual_bundle(tmp_con, cik=cik, fy=2023, period_end=date(2023, 12, 31),
+                         filed=date(2024, 2, 15), values={"eps_diluted": 1.00})
+    eps = quarterly_eps_series(tmp_con, as_of=date(2026, 1, 1), cik=cik)
+    assert eps.filter(eps["fp"] == "Q4").height == 0
+
+
+def test_q4_invisible_before_tenk_filed(tmp_con: duckdb.DuckDBPyConnection) -> None:
+    """PIT: the derived Q4 must not exist at an as_of before the 10-K filed,
+    even though all three quarters are already public."""
+    cik = 3000022
+    _seed_full_year(tmp_con, cik, 2023, q_eps=(0.30, 0.25, 0.20), fy_eps=1.00,
+                    tenk_filed=date(2024, 2, 15))
+    eps = quarterly_eps_series(tmp_con, as_of=date(2024, 1, 31), cik=cik)
+    assert eps.filter(eps["fp"] == "Q4").height == 0
+    assert eps.filter(eps["fp"] == "Q3").height == 1   # quarters themselves visible
 
 
 def test_sue_series_all_none_keeps_float_dtype(tmp_con: duckdb.DuckDBPyConnection) -> None:
