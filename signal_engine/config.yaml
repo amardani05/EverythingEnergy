@@ -15,19 +15,23 @@ universe:
 # Spreads/ADV will be revisited only if a position-sizing layer needs them.
 
 signals:
-  # Selection signals — sector-neutralized, equal-weight composite.
+  # Selection signals — sector-neutralized, weighted composite (scoring/).
+  # Enablement + component choices follow docs/baselines.md (2026-07-17):
+  # PEAD, EV/EBITDA, and momentum carry real IC; the rest were noise raw.
   selection:
     - name: value
-      enabled: false      # implemented later
+      enabled: true
       weight: 1.0
+      components: [ev_ebitda]   # fcf_yield excluded — ~0 IC in baseline
     - name: quality
-      enabled: false      # implemented later
-      weight: 1.0
+      enabled: false            # ROIC/accruals/margin-stability ~0 IC raw;
+      weight: 1.0               # revisit after sector-neutralization
+      components: [roic, accruals, margin_stability]
     - name: momentum
-      enabled: false      # implemented first (step 2)
+      enabled: true
       weight: 1.0
     - name: pead
-      enabled: false      # implemented last (step 3, with SUE-datekey test)
+      enabled: true
       weight: 1.0
   # Macro sleeve — separate ranked sleeve, NOT in the composite.
   macro:
