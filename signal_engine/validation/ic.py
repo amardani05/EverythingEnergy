@@ -20,8 +20,8 @@ This file is the IC primitive that the driver calls.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 import numpy as np
 import polars as pl
@@ -36,17 +36,49 @@ class IcSummary:
     n_dates: int           # number of date cross-sections that had valid IC
     mean: float
     std: float
-    t_stat: float          # mean / (std / sqrt(n))
+    t_stat: float          # mean / (std / sqrt(n)) — iid assumption
     hit_rate: float        # fraction of dates with IC > 0
     sample_size_mean: float  # average names per cross-section
+    t_stat_nw: float = 0.0  # Newey-West t (lag = horizon); the honest one
+                            # for overlapping-horizon IC series
 
     def __str__(self) -> str:
         return (
             f"H={self.horizon:>3}d  n={self.n_dates:>4}  "
             f"IC={self.mean:+.4f}  std={self.std:.4f}  "
-            f"t={self.t_stat:+.2f}  hit={self.hit_rate:.2f}  "
+            f"t={self.t_stat:+.2f}  t_nw={self.t_stat_nw:+.2f}  "
+            f"hit={self.hit_rate:.2f}  "
             f"avg_xs_size={self.sample_size_mean:.0f}"
         )
+
+
+def newey_west_t(series: np.ndarray, n_lags: int) -> float:
+    """t-stat of the series mean with a Newey-West (Bartlett-kernel) HAC
+    variance. For an H-day-forward IC computed daily, consecutive ICs share
+    H-1 days of return data — the iid t overstates significance by roughly
+    sqrt(H). Standard practice: n_lags = horizon.
+
+    var_NW = gamma_0 + 2 * sum_{k=1..L} w_k * gamma_k,  w_k = 1 - k/(L+1)
+    with gamma_k the lag-k autocovariance of the demeaned series.
+    """
+    n = series.size
+    if n < 2:
+        return 0.0
+    lags = min(n_lags, n - 1)
+    demeaned = series - series.mean()
+    gamma0 = float(np.dot(demeaned, demeaned)) / n
+    var_nw = gamma0
+    for k in range(1, lags + 1):
+        gamma_k = float(np.dot(demeaned[k:], demeaned[:-k])) / n
+        var_nw += 2.0 * (1.0 - k / (lags + 1)) * gamma_k
+    if var_nw <= 0:
+        # Degenerate (constant series or pathological autocovariance):
+        # fall back to iid variance rather than emitting inf.
+        var_nw = gamma0
+    if var_nw <= 0:
+        return 0.0
+    se = np.sqrt(var_nw / n)
+    return float(series.mean() / se)
 
 
 def forward_returns(prices: pl.DataFrame, horizon: int) -> pl.DataFrame:
@@ -137,6 +169,7 @@ def summarize(ic_daily: pl.DataFrame, horizon: int) -> IcSummary:
         t_stat=float(t),
         hit_rate=float((arr > 0).mean()),
         sample_size_mean=n_mean,
+        t_stat_nw=newey_west_t(arr, n_lags=horizon),
     )
 
 

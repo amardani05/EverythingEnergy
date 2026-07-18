@@ -8,7 +8,7 @@ horizon H. If it doesn't, the PIT plumbing in validation/ic.py has a hole.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 
 import numpy as np
 import polars as pl
@@ -88,3 +88,63 @@ def test_ic_summary_empty_panel() -> None:
     s = summarize(empty, horizon=21)
     assert s.n_dates == 0
     assert s.mean == 0.0 and s.std == 0.0 and s.t_stat == 0.0
+
+
+# ---------- Newey-West t ----------
+
+def test_nw_t_close_to_iid_t_on_iid_series() -> None:
+    """With no autocorrelation, NW variance ~ iid variance, so the two
+    t-stats should be within ~25% of each other."""
+    import numpy as np
+
+    from signal_engine.validation.ic import newey_west_t
+
+    rng = np.random.default_rng(7)
+    series = rng.normal(loc=0.02, scale=0.1, size=500)
+    iid_t = series.mean() / (series.std(ddof=1) / np.sqrt(series.size))
+    nw_t = newey_west_t(series, n_lags=5)
+    assert nw_t == pytest.approx(iid_t, rel=0.25)
+    assert nw_t > 0
+
+
+def test_nw_t_shrinks_under_overlap_autocorrelation() -> None:
+    """A moving-average(H) of white noise mimics an H-day overlapping IC
+    series. NW with lag H must report materially LESS significance than the
+    iid t — that's the whole point."""
+    import numpy as np
+
+    from signal_engine.validation.ic import newey_west_t
+
+    rng = np.random.default_rng(11)
+    h = 21
+    base = rng.normal(loc=0.005, scale=0.05, size=1000 + h)
+    overlapped = np.convolve(base, np.ones(h) / h, mode="valid")  # heavy autocorr
+    iid_t = overlapped.mean() / (overlapped.std(ddof=1) / np.sqrt(overlapped.size))
+    nw_t = newey_west_t(overlapped, n_lags=h)
+    assert abs(nw_t) < abs(iid_t) / 2, (
+        f"NW t ({nw_t:.2f}) should be far below iid t ({iid_t:.2f}) under overlap"
+    )
+
+
+def test_nw_t_degenerate_cases() -> None:
+    import numpy as np
+
+    from signal_engine.validation.ic import newey_west_t
+
+    assert newey_west_t(np.array([0.5]), n_lags=5) == 0.0        # n < 2
+    assert newey_west_t(np.array([]), n_lags=5) == 0.0           # empty
+    assert newey_west_t(np.zeros(50), n_lags=5) == 0.0           # constant zero
+
+
+def test_summarize_populates_nw_t() -> None:
+    """ic_scorecard/summarize must carry the NW t through."""
+    from signal_engine.validation.ic import summarize
+
+    ics = pl.DataFrame({
+        "date": [date(2024, 1, 1) + timedelta(days=i) for i in range(60)],
+        "ic": [0.05 + 0.01 * ((-1) ** i) for i in range(60)],
+        "n": [100] * 60,
+    })
+    s = summarize(ics, horizon=5)
+    assert s.t_stat_nw != 0.0
+    assert "t_nw=" in str(s)
