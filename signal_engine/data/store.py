@@ -9,6 +9,11 @@ Schema decisions (see turn 5/7 design notes):
   * Prices (Stooq + yfinance fallback) are wide per (ticker, date, source).
     `source` is in the PK so we keep both feeds for cross-checks.
 
+  * Corporate actions (dividends / splits) are stored raw per
+    (ticker, date, kind, source) so total-return series are built explicitly
+    from unadjusted closes + cash dividends, never trusted from a source's
+    pre-adjusted close.
+
   * IJR holdings are snapshotted nightly: PK (snapshot_date, ticker).
 
   * EIA / FRED series are bitemporal because both publishers revise:
@@ -26,10 +31,10 @@ enforces this contract.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
-from typing import Iterator
 
 import duckdb
 import polars as pl
@@ -97,6 +102,17 @@ DDL: dict[str, str] = {
             split_adjusted BOOLEAN,
             ingest_ts   TIMESTAMP NOT NULL DEFAULT now(),
             PRIMARY KEY (ticker, date, source)
+        );
+    """,
+    "corporate_actions": """
+        CREATE TABLE IF NOT EXISTS corporate_actions (
+            ticker      VARCHAR NOT NULL,
+            date        DATE    NOT NULL,     -- ex-date as delivered by the source
+            kind        VARCHAR NOT NULL,     -- 'dividend' (cash per share) | 'split' (new/old ratio)
+            value       DOUBLE  NOT NULL,
+            source      VARCHAR NOT NULL,     -- 'yfinance' | 'stooq' | ...
+            ingest_ts   TIMESTAMP NOT NULL DEFAULT now(),
+            PRIMARY KEY (ticker, date, kind, source)
         );
     """,
     "ijr_holdings": """

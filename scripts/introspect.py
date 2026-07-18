@@ -69,8 +69,9 @@ def main() -> int:
 
     # 4. yfinance — primary v1 path
     hr("yfinance(AAON) recent history")
-    yf = prices.yfinance_history("AAON", start="2025-01-01")
+    yf, yf_actions = prices.yfinance_history("AAON", start="2025-01-01")
     print(f"rows: {yf.height}; columns: {yf.columns}")
+    print(f"corporate actions rows: {yf_actions.height}")
     if yf.height > 0:
         print("first 3 rows:")
         print(yf.head(3))
@@ -102,7 +103,7 @@ def main() -> int:
             print(f"count: {obs.get('count')}")
             print(f"first obs: {obs.get('observations', [{}])[0]}")
             print(f"last  obs: {obs.get('observations', [{}])[-1]}")
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             print(f"FRED ping failed: {e}")
 
     hr("done")

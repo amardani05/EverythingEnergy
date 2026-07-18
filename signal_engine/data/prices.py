@@ -18,12 +18,16 @@ import io
 import logging
 import time
 import zipfile
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import TYPE_CHECKING, Any
 
 import polars as pl
 import requests
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 log = logging.getLogger(__name__)
 
@@ -41,26 +45,86 @@ PRICES_SCHEMA: dict[str, Any] = {
     "split_adjusted": pl.Boolean,
 }
 
+# Mirrors the corporate_actions table in store.py.
+ACTIONS_SCHEMA: dict[str, Any] = {
+    "ticker": pl.Utf8,
+    "date": pl.Date,
+    "kind": pl.Utf8,        # 'dividend' | 'split'
+    "value": pl.Float64,    # cash per share | new/old ratio
+    "source": pl.Utf8,
+}
+
 
 def _empty_prices_frame() -> pl.DataFrame:
     return pl.DataFrame(schema=PRICES_SCHEMA)
 
 
+def _empty_actions_frame() -> pl.DataFrame:
+    return pl.DataFrame(schema=ACTIONS_SCHEMA)
+
+
 # ---------- yfinance: PRIMARY in v1 ----------
+
+def parse_yf_history(yf_df: pd.DataFrame | None, ticker: str) -> tuple[pl.DataFrame, pl.DataFrame]:
+    """Convert one yfinance `history()` frame (auto_adjust=False, actions=True)
+    into `(prices, corporate_actions)` polars frames.
+
+    Pure function — tests drive it with a synthetic pandas frame, no network.
+    Dividend rows are days where `Dividends != 0` (cash per share on ex-date);
+    split rows are days where `Stock Splits != 0` (new/old ratio, e.g. 2.0).
+    """
+    if yf_df is None or yf_df.empty:
+        return _empty_prices_frame(), _empty_actions_frame()
+    base = (
+        pl.from_pandas(yf_df.reset_index().rename(columns={
+            "Date": "date", "Open": "open", "High": "high", "Low": "low",
+            "Close": "close", "Volume": "volume",
+            "Dividends": "dividends", "Stock Splits": "splits",
+        }))
+        .with_columns(pl.col("date").cast(pl.Date))
+    )
+    prices = (
+        base.select(["date", "open", "high", "low", "close", "volume"])
+        .with_columns([
+            pl.col("volume").cast(pl.Float64),
+            pl.lit(ticker.upper()).alias("ticker"),
+            pl.lit("yfinance").alias("source"),
+            pl.lit(False).alias("div_adjusted"),    # auto_adjust=False
+            pl.lit(True).alias("split_adjusted"),   # yfinance always splits
+        ])
+        .select(list(PRICES_SCHEMA.keys()))
+    )
+    action_frames: list[pl.DataFrame] = []
+    for col, kind in (("dividends", "dividend"), ("splits", "split")):
+        if col not in base.columns:
+            continue
+        f = base.filter(pl.col(col).fill_null(0.0) != 0.0).select([
+            pl.lit(ticker.upper()).alias("ticker"),
+            pl.col("date"),
+            pl.lit(kind).alias("kind"),
+            pl.col(col).cast(pl.Float64).alias("value"),
+            pl.lit("yfinance").alias("source"),
+        ])
+        if f.height:
+            action_frames.append(f)
+    actions = pl.concat(action_frames) if action_frames else _empty_actions_frame()
+    return prices, actions
+
 
 def yfinance_history(
     ticker: str,
     *,
     start: str | None = None,
     end: str | None = None,
-) -> pl.DataFrame:
+) -> tuple[pl.DataFrame, pl.DataFrame]:
     """Pull full split-adjusted (NOT div-adjusted) daily history from yfinance.
+    Returns `(prices, corporate_actions)`.
 
     Why auto_adjust=False: yfinance's "adjusted close" lumps splits AND
     dividends into one number, which silently changes when a future
-    dividend is paid (forward-adjusted). We want unadjusted closes + an
-    explicit dividend series so total-return calculations are explicit and
-    auditable.
+    dividend is paid (forward-adjusted). We store unadjusted closes + the
+    explicit dividend/split series so total-return calculations are explicit
+    and auditable.
     """
     import yfinance as yf
 
@@ -70,23 +134,7 @@ def yfinance_history(
         auto_adjust=False,
         actions=True,
     )
-    if yf_df is None or yf_df.empty:
-        return _empty_prices_frame()
-    yf_df = yf_df.reset_index()
-    return (
-        pl.from_pandas(yf_df.rename(columns={
-            "Date": "date", "Open": "open", "High": "high", "Low": "low",
-            "Close": "close", "Volume": "volume",
-        })[["date", "open", "high", "low", "close", "volume"]])
-        .with_columns([
-            pl.col("date").cast(pl.Date),
-            pl.lit(ticker.upper()).alias("ticker"),
-            pl.lit("yfinance").alias("source"),
-            pl.lit(False).alias("div_adjusted"),    # auto_adjust=False
-            pl.lit(True).alias("split_adjusted"),   # yfinance always splits
-        ])
-        .select(list(PRICES_SCHEMA.keys()))
-    )
+    return parse_yf_history(yf_df, ticker)
 
 
 def yfinance_batch(
@@ -95,22 +143,25 @@ def yfinance_batch(
     start: str | None = None,
     end: str | None = None,
     throttle_sec: float = 0.1,
-) -> pl.DataFrame:
+) -> tuple[pl.DataFrame, pl.DataFrame]:
     """Per-ticker pull with a small inter-call throttle (yfinance has no
-    official rate limit but does ban hammer at scale). Returns one
-    concatenated frame across all tickers; misses are skipped silently
-    but logged. Caller is responsible for writing to DuckDB.
+    official rate limit but does ban hammer at scale). Returns
+    `(prices, corporate_actions)` concatenated across all tickers; misses are
+    skipped silently but logged. Caller is responsible for writing to DuckDB.
     """
-    frames: list[pl.DataFrame] = []
+    price_frames: list[pl.DataFrame] = []
+    action_frames: list[pl.DataFrame] = []
     skipped: list[str] = []
     for i, t in enumerate(tickers, start=1):
         try:
-            df = yfinance_history(t, start=start, end=end)
-            if df.height == 0:
+            prices, actions = yfinance_history(t, start=start, end=end)
+            if prices.height == 0:
                 skipped.append(t)
             else:
-                frames.append(df)
-        except Exception as e:  # noqa: BLE001
+                price_frames.append(prices)
+                if actions.height:
+                    action_frames.append(actions)
+        except Exception as e:
             log.warning("[yfinance] %s failed: %s", t, e)
             skipped.append(t)
         if i % 50 == 0:
@@ -119,9 +170,9 @@ def yfinance_batch(
     if skipped:
         log.info("[yfinance] %d tickers returned no data: %s", len(skipped),
                  skipped[:20] + (["..."] if len(skipped) > 20 else []))
-    if not frames:
-        return _empty_prices_frame()
-    return pl.concat(frames)
+    prices_out = pl.concat(price_frames) if price_frames else _empty_prices_frame()
+    actions_out = pl.concat(action_frames) if action_frames else _empty_actions_frame()
+    return prices_out, actions_out
 
 
 # ---------- Stooq: future cross-check, NOT used in v1 ----------

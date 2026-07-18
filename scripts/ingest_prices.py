@@ -70,6 +70,23 @@ def write_prices(db_path, df: pl.DataFrame) -> int:
         return int(after - before)
 
 
+def write_actions(db_path, df: pl.DataFrame) -> int:
+    """Upsert corporate actions (dividends/splits), returning new-row count."""
+    if df.height == 0:
+        return 0
+    with store.connect(db_path) as con:
+        before = con.execute("SELECT count(*) FROM corporate_actions").fetchone()[0]
+        con.register("incoming_actions", df)
+        con.execute("""
+            INSERT INTO corporate_actions (ticker, date, kind, value, source)
+            SELECT ticker, date, kind, value, source
+            FROM incoming_actions
+            ON CONFLICT DO NOTHING;
+        """)
+        after = con.execute("SELECT count(*) FROM corporate_actions").fetchone()[0]
+        return int(after - before)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -107,11 +124,13 @@ def main() -> int:
              len(tickers), args.start, args.throttle)
     log.info("[ingest] estimated wall-clock: %.1f min", len(tickers) * (args.throttle + 0.4) / 60)
 
-    df = yfinance_batch(tickers, start=args.start, throttle_sec=args.throttle)
-    log.info("[ingest] pulled %d total rows", df.height)
+    prices_df, actions_df = yfinance_batch(tickers, start=args.start, throttle_sec=args.throttle)
+    log.info("[ingest] pulled %d price rows, %d action rows", prices_df.height, actions_df.height)
 
-    new_rows = write_prices(cfg.duckdb_path, df)
+    new_rows = write_prices(cfg.duckdb_path, prices_df)
     log.info("[ingest] inserted %d new rows into prices (rest were duplicates)", new_rows)
+    new_actions = write_actions(cfg.duckdb_path, actions_df)
+    log.info("[ingest] inserted %d new rows into corporate_actions", new_actions)
 
     # Coverage summary
     with store.connect(cfg.duckdb_path, read_only=True) as con:
@@ -126,6 +145,12 @@ def main() -> int:
         """).fetchone()
         log.info("[coverage] yfinance: %d tickers, %s -> %s, %d rows",
                  cov[0], cov[1], cov[2], cov[3])
+        acov = con.execute("""
+            SELECT kind, count(DISTINCT ticker), count(*)
+            FROM corporate_actions GROUP BY kind ORDER BY kind
+        """).fetchall()
+        for kind, n_tickers, n_rows in acov:
+            log.info("[coverage] corporate_actions/%s: %d tickers, %d rows", kind, n_tickers, n_rows)
 
     log.info("[ingest] done at %s", date.today())
     return 0
