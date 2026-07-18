@@ -38,6 +38,16 @@ log = logging.getLogger(__name__)
 MIN_YOY_PAIRS_FOR_DENOMINATOR = 5
 DEFAULT_YOY_HISTORY_QUARTERS = 8
 
+# One declared schema for every compute_sue_series return path. Applied even
+# to the non-empty frame: a company whose same-quarter EPS never varies yields
+# sd==0 -> sue=None for every row, which Polars would otherwise infer as a Null
+# dtype, breaking the pl.concat over tickers in compute_sue.
+_SUE_SERIES_SCHEMA: dict[str, type[pl.DataType]] = {
+    "cik": pl.Int64, "period_end": pl.Date, "fy": pl.Int64,
+    "fp": pl.Utf8, "filed": pl.Date, "eps_diluted": pl.Float64,
+    "eps_yoy_diff": pl.Float64, "sue": pl.Float64,
+}
+
 
 @dataclass(frozen=True)
 class SueConfig:
@@ -63,11 +73,7 @@ def compute_sue_series(
     that.
     """
     if eps_quarterly.height == 0:
-        return pl.DataFrame(schema={
-            "cik": pl.Int64, "period_end": pl.Date, "fy": pl.Int64,
-            "fp": pl.Utf8, "filed": pl.Date, "eps_diluted": pl.Float64,
-            "eps_yoy_diff": pl.Float64, "sue": pl.Float64,
-        })
+        return pl.DataFrame(schema=_SUE_SERIES_SCHEMA)
 
     df = eps_quarterly.sort("period_end").to_dicts()
     by_fp: dict[str, list[dict]] = {}
@@ -124,12 +130,9 @@ def compute_sue_series(
             })
 
     if not out_rows:
-        return pl.DataFrame(schema={
-            "cik": pl.Int64, "period_end": pl.Date, "fy": pl.Int64,
-            "fp": pl.Utf8, "filed": pl.Date, "eps_diluted": pl.Float64,
-            "eps_yoy_diff": pl.Float64, "sue": pl.Float64,
-        })
-    return pl.DataFrame(out_rows).sort(["cik", "period_end"])
+        return pl.DataFrame(schema=_SUE_SERIES_SCHEMA)
+    # Pass the schema explicitly so an all-None `sue` column is Float64, not Null.
+    return pl.DataFrame(out_rows, schema=_SUE_SERIES_SCHEMA).sort(["cik", "period_end"])
 
 
 def compute_sue(

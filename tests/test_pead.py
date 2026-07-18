@@ -70,6 +70,48 @@ def test_sue_algebra_on_synthetic_series(tmp_con: duckdb.DuckDBPyConnection) -> 
     assert spike["sue"] == pytest.approx(0.80 / expected_sd, rel=0.01)
 
 
+def test_sue_series_all_none_keeps_float_dtype(tmp_con: duckdb.DuckDBPyConnection) -> None:
+    """A company whose Q1 EPS grows by a constant step has zero-variance YoY
+    diffs -> pstdev == 0 -> sue == None on every emitted row. The frame must
+    still type `sue` as Float64 (not Null), or the pl.concat over tickers in
+    compute_sue explodes. Regression for the 2026-07 live-baseline crash."""
+    import polars as pl
+    cik = 3000010
+    # Perfectly flat EPS 2012..2024: every YoY diff is EXACTLY 0.0, so
+    # pstdev == 0.0 and sue == None on every emitted row (not a float epsilon).
+    _seed_q1_history(tmp_con, cik,
+                     years_to_eps={y: 1.00 for y in range(2012, 2025)})
+    eps = quarterly_eps_series(tmp_con, as_of=date(2026, 1, 1), cik=cik)
+    sue_df = compute_sue_series(eps, SueConfig(history_quarters=8, min_pairs=5))
+    assert sue_df.height > 0, "rows should still be emitted with sue=None"
+    assert sue_df["sue"].dtype == pl.Float64
+    assert sue_df["sue"].null_count() == sue_df.height, "every sue must be None here"
+
+
+def test_compute_sue_mixes_all_none_and_valued_tickers(tmp_con: duckdb.DuckDBPyConnection) -> None:
+    """compute_sue must vstack a flat-EPS ticker (all sue None) with a
+    shocked ticker (real Float64 sue) without a SchemaError."""
+    import polars as pl
+    flat_cik, shock_cik = 3000011, 3000012
+    # Perfectly flat EPS -> pstdev exactly 0 -> all-None sue (Null dtype pre-fix).
+    _seed_q1_history(tmp_con, flat_cik,
+                     years_to_eps={y: 2.00 for y in range(2012, 2025)})
+    # Shocked series -> at least one real sue.
+    insert_quarterly_eps(tmp_con, cik=shock_cik, period_end=_q1(2018), fy=2018,
+                         fp="Q1", eps=1.00, filed=_q1(2018), accession="S0")
+    for fy, eps_val in [(2019, 1.05), (2020, 1.10), (2021, 1.15), (2022, 1.10),
+                        (2023, 1.20), (2024, 2.00)]:
+        insert_quarterly_eps(tmp_con, cik=shock_cik, period_end=_q1(fy), fy=fy,
+                             fp="Q1", eps=eps_val, filed=_q1(fy), accession=f"S-{fy}")
+
+    out = compute_sue(tmp_con, as_of=date(2026, 1, 1),
+                      ticker_to_cik={"FLAT": flat_cik, "SHOCK": shock_cik},
+                      cfg=SueConfig(history_quarters=8, min_pairs=5))
+    assert out["sue"].dtype == pl.Float64
+    assert {"FLAT", "SHOCK"} <= set(out["ticker"].to_list())
+    assert out.filter(out["ticker"] == "SHOCK")["sue"].drop_nulls().len() > 0
+
+
 def test_originals_only_excludes_amendments(tmp_con: duckdb.DuckDBPyConnection) -> None:
     """If a 10-Q/A is filed later with a different EPS, the original
     EPS is what SUE uses — restatements never rewrite history."""
