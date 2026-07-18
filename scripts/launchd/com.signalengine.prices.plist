@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Nightly yfinance price + corporate-action refresh.
+
+  Full-history re-pull (~15 min at the default throttle); ON CONFLICT DO
+  NOTHING means only new rows land. Scheduled at 21:00 local — after the
+  18:30 IJR snapshot job — so the two never contend for the DuckDB write
+  lock. (Incremental/watermark ingest is roadmap Phase 3.3.)
+
+  Install (one-time):
+    cp scripts/launchd/com.signalengine.prices.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.signalengine.prices.plist
+
+  Status / logs:
+    launchctl list | grep signalengine
+    tail -f data_store/logs/prices.{stdout,stderr}.log
+
+  Uninstall:
+    launchctl unload ~/Library/LaunchAgents/com.signalengine.prices.plist
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.signalengine.prices</string>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/amardani/EverythingEnergy</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/amardani/EverythingEnergy/.venv/bin/python</string>
+    <string>/Users/amardani/EverythingEnergy/scripts/ingest_prices.py</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>21</integer>
+    <key>Minute</key><integer>0</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/amardani/EverythingEnergy/data_store/logs/prices.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/amardani/EverythingEnergy/data_store/logs/prices.stderr.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

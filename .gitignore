@@ -1,0 +1,23 @@
+.vercel
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Signal engine data store — heavy + regenerable; commit code/schema, not bytes
+data_store/
+!data_store/.gitkeep
+
+# environment / secrets
+.env
+.env.local
+
+# editor
+.vscode/
+.idea/
