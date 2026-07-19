@@ -484,6 +484,33 @@
     window.ATLAS_META = data.meta || {};
     window.ATLAS_RAW = data;
 
+    /* Data-freshness: one computed record every surface reuses. Time-
+       relevance is signal-relevance — a residual z or pair signal computed
+       on stale prices is a different (worse) object than a fresh one, so
+       the age is shown wherever numbers are shown. */
+    (function stampFreshness() {
+      const iso = (data.meta || {}).generated_at || null;
+      let label = "data: unknown vintage", cls = "asof-stale", ageDays = null, pretty = "";
+      if (iso) {
+        const gen = new Date(iso);
+        ageDays = Math.floor((Date.now() - gen.getTime()) / 86400000);
+        pretty = gen.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        const age = ageDays <= 0 ? "today" : ageDays === 1 ? "1d old" : `${ageDays}d old`;
+        label = `data: ${pretty} · ${age}`;
+        cls = ageDays < 2 ? "asof-fresh" : ageDays < 7 ? "asof-warn" : "asof-stale";
+      }
+      window.DATA_ASOF = { iso, ageDays, label, cls, pretty };
+      const chip = document.getElementById("data-asof");
+      if (chip) {
+        chip.classList.remove("asof-fresh", "asof-warn", "asof-stale");
+        chip.classList.add(cls);
+        chip.innerHTML = '<span class="asof-dot"></span>' + label;
+        chip.title = iso
+          ? `dashboard_data.json generated ${iso}. Rebuild via the analysis pipeline (see Methodology).`
+          : "dashboard_data.json carries no meta.generated_at — rebuild via consolidate_data.py";
+      }
+    })();
+
     console.log(`[atlas] hydrated: ${NODES.length} nodes, ${ALL_PAIRS.length} pairs (${SIGNAL_PAIRS.length} live signals), ${NODE_CORR_PAIRS.length} corr pairs, ${(data.regime_alerts || []).length} regime alerts, ${ALL_TICKERS.length} tickers`);
 
     // Hide (don't remove) the boot loading screen so we can re-use the same

@@ -908,6 +908,7 @@ function SignalStack({ node, onSelectBasket }) {
       <div className="sig-density">
         <div className="sig-density-label">
           Signal density · <span className="accent">{firingCount}</span> of 6 firing
+          {" "}<AsOfChip inline />
         </div>
         <div className="sig-density-bar">
           {signals.map(s => (
@@ -1036,6 +1037,20 @@ function SignalStack({ node, onSelectBasket }) {
 }
 
 /* ---------------- Side pane: drawer + screener ---------------- */
+/* Data-freshness chip · reads the record atlas.jsx computed at hydration.
+   Rendered wherever numbers whose meaning decays with time are shown —
+   drawers, signal strips, density header. `inline` = compact variant. */
+function AsOfChip({ inline }) {
+  const a = window.DATA_ASOF;
+  if (!a) return null;
+  return (
+    <span className={"asof-chip " + (inline ? "asof-inline " : "") + a.cls}
+          title={a.iso ? `dashboard_data.json generated ${a.iso}` : "no timestamp in data"}>
+      <span className="asof-dot"></span>{a.label}
+    </span>
+  );
+}
+
 function Drawer({ node, onClose, onSelectStock, onSelectBasket }) {
   const [tab, setTab] = useState("overview");
   if (!node) return null;
@@ -1057,6 +1072,7 @@ function Drawer({ node, onClose, onSelectStock, onSelectBasket }) {
       <div className="ticker-big">{node.ticker}</div>
       <h2><em>{node.name}</em></h2>
       <div className="desc-blk">{DESCRIPTIONS[node.id] || ""}</div>
+      <div style={{ margin: "6px 0 2px" }}><AsOfChip inline /></div>
       
       {/* Tab bar — Lookup retired; the global search in the top bar replaces it. */}
       <div className="drawer-tabs">
@@ -1309,6 +1325,7 @@ function SignalsStrip({ onSelect, onSeedLab, onSelectStock }) {
       <div className="signals-head">
         <div className="signals-title">Active Signals</div>
         <div className="signals-sub">between groups + between names · top 4 each</div>
+        <AsOfChip inline />
       </div>
 
       {/* Basket ↔ Basket · z-scored pair signals */}
@@ -2028,6 +2045,7 @@ function StockDrawer({ ticker, onClose, onSelectBasket }) {
   );
 
   const node = NODE_BY_ID[c.node_id];
+  const asOfRow = <div style={{ margin: "6px 0 2px" }}><AsOfChip inline /></div>;
   const fmtPct = (v) => v == null ? "·" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
   const fmtZ = (v) => v == null ? "·" : (v >= 0 ? "+" : "") + v.toFixed(2);
   const z = c.residual_z60d;
@@ -2058,6 +2076,7 @@ function StockDrawer({ ticker, onClose, onSelectBasket }) {
       <div className="layer-tag">Stock</div>
       <div className="ticker-big">{c.ticker}</div>
       <h2><em>{c.name}</em></h2>
+      {asOfRow}
       <button className="close" style={{marginTop:12}}
         onClick={() => onSelectBasket && onSelectBasket(c.node_id)}>
         ‹ Back to {node ? node.name : c.node_id}
@@ -3656,6 +3675,7 @@ function ViewNav({ view, setView }) {
           {label}
         </button>
       ))}
+      <a className="view-nav-btn" href="methodology.html">Methodology</a>
     </div>
   );
 }

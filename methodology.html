@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methodology — Everything Energy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0d12'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='18' font-weight='600' fill='%23d4af37'%3EE%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:   #0a0d12;
+  --bg:        #11151c;
+  --bg-card:   #161b25;
+  --border:    #232a3a;
+  --border-hi: #344056;
+  --text:      #dde1e8;
+  --text-mute: #98a0b0;
+  --text-dim:  #737b8c;
+  --accent:    #d4af37;
+  --pos:       #3fb96f;
+  --neg:       #d05252;
+  --serif: "EB Garamond", Georgia, serif;
+  --sans:  "Inter", system-ui, sans-serif;
+  --mono:  "IBM Plex Mono", "SF Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-deep); color: var(--text);
+  font-family: var(--sans); font-weight: 300; font-size: 15.5px; line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.top-bar {
+  display: flex; align-items: center; gap: 28px;
+  padding: 18px 32px; border-bottom: 1px solid var(--border); height: 72px;
+  position: sticky; top: 0; background: rgba(10,13,18,0.92); backdrop-filter: blur(6px); z-index: 10;
+}
+.brand { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 22px; letter-spacing: 0.01em; }
+.brand .gold { color: var(--accent); }
+.back-link {
+  font-family: var(--sans); font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-mute); text-decoration: none;
+  border-bottom: 1px solid transparent; padding-bottom: 2px;
+}
+.back-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.asof-chip {
+  margin-left: auto; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+  color: var(--text-mute); padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: 3px; background: rgba(15,20,28,0.6); white-space: nowrap;
+}
+.asof-chip .asof-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; background: var(--text-dim); }
+.asof-chip.asof-fresh .asof-dot { background: var(--pos); }
+.asof-chip.asof-warn  .asof-dot { background: var(--accent); }
+.asof-chip.asof-stale .asof-dot { background: var(--neg); }
+.asof-chip.asof-stale { color: var(--neg); border-color: rgba(208,82,82,0.45); }
+
+main { max-width: 900px; margin: 0 auto; padding: 56px 32px 120px; }
+h1 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 40px; line-height: 1.15; margin-bottom: 10px; }
+.subtitle { color: var(--text-mute); font-size: 15px; max-width: 640px; margin-bottom: 40px; }
+h2 {
+  font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 26px;
+  margin: 56px 0 6px; padding-top: 18px; border-top: 1px solid var(--border);
+}
+h2 .secno { font-family: var(--mono); font-style: normal; font-size: 13px; color: var(--accent); letter-spacing: 0.12em; margin-right: 14px; vertical-align: 3px; }
+h3 { font-family: var(--sans); font-weight: 600; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mute); margin: 30px 0 8px; }
+p { margin: 12px 0; max-width: 76ch; }
+p, li { color: var(--text); }
+strong { font-weight: 600; }
+em { font-family: var(--serif); font-size: 1.06em; }
+ul, ol { margin: 12px 0 12px 22px; max-width: 74ch; }
+li { margin: 6px 0; }
+code, .m {
+  font-family: var(--mono); font-size: 0.86em; color: var(--accent);
+  background: rgba(212,175,55,0.07); padding: 1px 5px; border-radius: 3px;
+}
+.formula {
+  font-family: var(--mono); font-size: 13.5px; color: var(--text);
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 2px solid var(--accent);
+  padding: 12px 18px; margin: 14px 0; border-radius: 3px; overflow-x: auto; white-space: pre;
+}
+table { border-collapse: collapse; margin: 16px 0; width: 100%; font-size: 13.5px; }
+th {
+  font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-mute); text-align: left;
+  padding: 8px 14px 8px 0; border-bottom: 1px solid var(--border-hi);
+}
+td { font-family: var(--mono); font-size: 12.5px; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+td.sans { font-family: var(--sans); font-size: 13px; }
+td .pos { color: var(--pos); } td .neg { color: var(--neg); }
+.toc {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
+  padding: 20px 26px; margin: 28px 0 12px; columns: 2; column-gap: 40px; font-size: 13.5px;
+}
+.toc a { color: var(--text-mute); text-decoration: none; display: block; padding: 3px 0; break-inside: avoid; }
+.toc a:hover { color: var(--accent); }
+.toc a .secno { font-family: var(--mono); color: var(--accent); font-size: 11px; margin-right: 10px; }
+.callout {
+  border: 1px solid var(--border); border-left: 2px solid var(--neg);
+  background: rgba(208,82,82,0.05); padding: 14px 18px; margin: 16px 0; border-radius: 3px;
+  font-size: 14px; max-width: 76ch;
+}
+.callout.note { border-left-color: var(--accent); background: rgba(212,175,55,0.05); }
+.foot { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 12.5px; font-family: var(--mono); }
+@media (max-width: 720px) { .toc { columns: 1; } h1 { font-size: 32px; } }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="brand">Everything <span class="gold">Energy</span></div>
+  <a class="back-link" href="dashboard.html">‹ Dashboard</a>
+  <div class="asof-chip" id="data-asof">data: loading…</div>
+</div>
+
+<main>
+  <h1>Model Methodology</h1>
+  <p class="subtitle">
+    Full documentation of how every number on this site is produced: sources, transformations,
+    statistical assumptions, and — just as important — the known biases and what has <em>not</em> been
+    validated yet. Written in the spirit of a sell-side model methodology annex: if a number appears
+    on the dashboard, its recipe appears here.
+  </p>
+
+  <div class="toc">
+    <a href="#scope"><span class="secno">§1</span>Scope · two systems</a>
+    <a href="#data"><span class="secno">§2</span>Data sources &amp; freshness</a>
+    <a href="#universe"><span class="secno">§3</span>Universe construction</a>
+    <a href="#atlas"><span class="secno">§4</span>Atlas analytics</a>
+    <a href="#engine"><span class="secno">§5</span>Signal engine · factors</a>
+    <a href="#scoring"><span class="secno">§6</span>Composite scoring</a>
+    <a href="#validation"><span class="secno">§7</span>Validation &amp; significance</a>
+    <a href="#baselines"><span class="secno">§8</span>Current baseline evidence</a>
+    <a href="#limits"><span class="secno">§9</span>Limitations &amp; biases</a>
+    <a href="#cadence"><span class="secno">§10</span>Update cadence &amp; versioning</a>
+  </div>
+
+  <h2 id="scope"><span class="secno">§1</span>Scope — two systems, one taxonomy</h2>
+  <p>
+    This site is fed by two related but separate research systems that share one source of truth,
+    the energy taxonomy (<code>energy_taxonomy.yaml</code>, ~190 names in 23 sub-industry baskets across 10 districts):
+  </p>
+  <ul>
+    <li><strong>The Atlas dashboard</strong> (what you are looking at): basket cohesion, commodity-driver
+      regressions, residual stretches, pair signals, regime alerts, and factor-vs-idiosyncratic attribution
+      for the energy complex. Descriptive and screening-oriented.</li>
+    <li><strong>The signal engine</strong> (<code>signal_engine/</code>): a cross-sectional, point-in-time
+      factor model over the S&amp;P 600 small-cap universe (~600 names) producing a ranked daily composite from
+      momentum, value, and earnings-drift signals. Prediction-oriented, built for backtesting.</li>
+  </ul>
+
+  <h2 id="data"><span class="secno">§2</span>Data sources &amp; freshness</h2>
+  <table>
+    <tr><th>Source</th><th>Provides</th><th>Cadence</th><th>Point-in-time handling</th></tr>
+    <tr><td>SEC EDGAR XBRL</td><td class="sans">All reported fundamentals (18 canonical concepts with fallback tag chains), filing metadata, SIC codes</td><td>weekly (cron)</td><td class="sans"><code>filed</code> date = knowledge date; restatements stored as new rows, never overwriting; amendments flagged</td></tr>
+    <tr><td>yfinance</td><td class="sans">Daily OHLCV (split-adjusted, NOT dividend-adjusted) + cash dividends + splits</td><td>nightly (cron)</td><td class="sans">Trade date = knowledge date; dividends stored separately so total-return is explicit, not baked in</td></tr>
+    <tr><td>iShares IJR</td><td class="sans">S&amp;P 600 membership snapshots (universe definition)</td><td>manual CSV drop + nightly ingest</td><td class="sans">Snapshot-dated; history accumulates from 2026-06 forward</td></tr>
+    <tr><td>Yahoo (dashboard)</td><td class="sans">Price cache behind the Atlas correlation/regression pipeline</td><td>on pipeline rebuild</td><td class="sans">Not PIT — descriptive analytics only</td></tr>
+    <tr><td>FINRA / EIA / FRED</td><td class="sans">Short interest, energy fundamentals, macro series</td><td>planned</td><td class="sans">Bitemporal schema ready (vintage-keyed); ingestion not yet live</td></tr>
+  </table>
+  <p>
+    <strong>Freshness is displayed wherever numbers are displayed.</strong> The chip in the top bar — and inside
+    every drawer, the signals strip, and the signal-density header — shows the generation date of the data
+    behind the page and its age: green &lt; 2 days, gold &lt; 7 days, red beyond. A residual z-score computed on
+    stale prices is a different (worse) object than a fresh one; the UI refuses to let you forget that.
+  </p>
+
+  <h2 id="universe"><span class="secno">§3</span>Universe construction</h2>
+  <p>
+    <strong>Atlas:</strong> constituents are hand-curated in the taxonomy with basket assignments
+    (e.g. <em>offshore drillers</em>, <em>LNG terminals</em>, <em>uranium</em>), each basket placed in a district on the map.
+    Baskets, not GICS, are the unit of analysis — the taxonomy encodes commodity-flow relationships GICS ignores.
+  </p>
+  <p>
+    <strong>Signal engine:</strong> the latest IJR (S&amp;P 600) holdings snapshot resolved to SEC CIKs
+    (~600 names), requiring ≥ 252 trading days of price history.
+  </p>
+  <div class="callout">
+    <strong>Survivorship disclosure.</strong> The engine currently applies <em>today's</em> IJR membership to all
+    history (<code>ijr_current</code> mode). Names that fell out of the index are absent from backtests, which
+    biases historical return estimates upward. Every engine output row carries
+    <code>survivorship_clean = false</code> until enough point-in-time membership snapshots accumulate.
+  </div>
+
+  <h2 id="atlas"><span class="secno">§4</span>Atlas analytics</h2>
+  <h3>Driver regressions</h3>
+  <p>
+    Weekly basket and single-name returns are regressed (OLS) on eight tradable drivers:
+    <code>CL</code> (WTI), <code>NG</code> (Henry Hub), <code>CRACK 3-2-1</code>, <code>WTI–BRENT</code>,
+    <code>SPX</code>, <code>TNX</code> (10y yield), <code>URA</code> (uranium), <code>BDRY</code> (dry bulk freight).
+    Reported per basket: betas with t-stats, R², and the dominant driver. Variance shares decompose R² by driver.
+  </p>
+  <h3>Residual z-scores</h3>
+  <div class="formula">resid_z60(i) = ( r_i − r̂_i(drivers) ) 60-day cumulative residual, standardized over the trailing window</div>
+  <p>
+    A name trading rich or cheap to what its factor exposures explain. |z| &gt; 1.5 is highlighted as a
+    mean-reversion candidate; the screener sorts on it.
+  </p>
+  <h3>Pair signals</h3>
+  <p>
+    Taxonomy-related basket pairs are monitored on the 60-day residual spread; |z| ≥ 0.5 is a watch,
+    |z| ≥ 1.5 is a stretched signal with a thesis line. Signal density (the <em>N of 6 firing</em> header)
+    counts how many of the six signal families — pair, residual, IVR, regime, dispersion, momentum — are
+    currently active for the selected basket.
+  </p>
+  <h3>Implied vs realized (IVR) &amp; attribution</h3>
+  <p>
+    Factor-implied volatility (from driver betas × driver vols) is compared to realized; the gap flags
+    baskets whose idiosyncratic component is expanding. Attribution splits 1m/3m/YTD/1y returns into
+    per-driver contributions plus an idiosyncratic remainder.
+  </p>
+  <div class="callout note">
+    Atlas statistics are <strong>descriptive screens</strong>, not validated alpha. They have no
+    point-in-time discipline, no transaction-cost model, and no out-of-sample test. Treat them as a
+    structured watchlist generator. The signal engine (§5–§8) is the part held to a predictive standard.
+  </div>
+
+  <h2 id="engine"><span class="secno">§5</span>Signal engine — factor definitions</h2>
+  <p>
+    All fundamentals are read through a bitemporal store: a fact enters the information set on its SEC
+    <code>filed</code> date, never before, and restatements cannot rewrite what was known at the time.
+    A leakage canary test plants a future-dated filing and asserts the entire pipeline output is unchanged.
+  </p>
+  <table>
+    <tr><th>Factor</th><th>Definition</th><th>Notes</th></tr>
+    <tr><td>Momentum 12-1</td><td class="sans">Total-return index ratio: <code>TR[t−21] / TR[t−252] − 1</code>, TR built from unadjusted closes + cash dividends</td><td class="sans">21-day skip avoids short-term reversal; dividend-adjusted as of 2026-07</td></tr>
+    <tr><td>Value · EV/EBITDA</td><td class="sans"><code>(mcap + LT debt − cash) / EBITDA</code>, EBITDA = NI + interest + tax + D&amp;A (street formula), latest 10-K, lower = better</td><td class="sans">Negative-EBITDA names excluded rather than sign-flipped</td></tr>
+    <tr><td>Value · FCF yield</td><td class="sans"><code>(OCF − capex) / mcap</code></td><td class="sans">Computed but <strong>excluded from the composite</strong> — no IC evidence (§8)</td></tr>
+    <tr><td>Quality</td><td class="sans">ROIC, accruals (Sloan), operating-margin stability</td><td class="sans">Computed but <strong>disabled</strong> — raw IC indistinguishable from noise (§8)</td></tr>
+    <tr><td>PEAD / SUE</td><td class="sans">Earnings surprise vs seasonal random walk: <code>(EPS_q − EPS_q−4) / σ(trailing same-quarter YoY diffs)</code>, ≥ 5 pairs required; signal lives for ~63 trading days after the filing</td><td class="sans">Q4 derived as FY − ΣQ1..Q3, dated to the 10-K; amendments never rewrite a surprise</td></tr>
+  </table>
+
+  <h2 id="scoring"><span class="secno">§6</span>Composite scoring</h2>
+  <p>Per config, executed daily by the signals runner:</p>
+  <ol>
+    <li><strong>Orient</strong> — lower-is-better components (EV/EBITDA, accruals) are sign-flipped.</li>
+    <li><strong>Winsorize</strong> — clip at the 1st/99th cross-sectional percentiles.</li>
+    <li><strong>Z-score within sector</strong> — sectors from SEC SIC codes; sectors with &lt; 8 names fall back
+      to the global z so a 3-name sector can't mint ±1.7σ from noise.</li>
+    <li><strong>Family scores</strong> — mean of component z's per family (value, momentum, pead).</li>
+    <li><strong>Composite</strong> — weight-renormalized mean over the families available for each name;
+      names with fewer than 2 families are not ranked. A name with no recent earnings event simply has no
+      PEAD family (no news ≠ zero surprise).</li>
+  </ol>
+  <p>
+    Enabled set (evidence-driven, §8): <strong>momentum + EV/EBITDA + PEAD</strong>, equal weights.
+    Their pairwise Spearman correlations run |ρ| ≤ 0.23 — genuinely diversifying, not three names for one bet.
+  </p>
+
+  <h2 id="validation"><span class="secno">§7</span>Validation &amp; significance</h2>
+  <p>
+    The primitive is the forward information coefficient: Spearman rank correlation between the signal at
+    close <em>t</em> and the forward return entered at close <em>t+1</em> (no formation-day return) over
+    horizons of 1/5/21/63 days.
+  </p>
+  <div class="formula">IC(t, H) = spearman( signal(t), close[t+H+1]/close[t+1] − 1 )   cross-sectionally, ≥ 20 names</div>
+  <p>
+    <strong>Significance is reported two ways</strong>: the naive iid t-stat, and a Newey–West t
+    (Bartlett kernel, lag = horizon). Daily ICs at 21/63-day horizons share almost all of their return
+    window with their neighbors; the iid t overstates significance by roughly √H. Where the two disagree,
+    <em>only the Newey–West number is treated as evidence</em> — this revision materially changed the
+    conclusions in §8.
+  </p>
+  <p>
+    Two leakage canaries run in CI: a poisoned signal equal to the realized forward return must produce
+    IC ≈ 1 (proves the harness can see leaks), and a future-filed fundamental must leave the composite
+    byte-identical (proves the scoring pipeline can't consume one).
+  </p>
+
+  <h2 id="baselines"><span class="secno">§8</span>Current baseline evidence <span style="font-family:var(--mono);font-size:12px;color:var(--text-dim)">(2026-07-19, pre-cost, single-factor)</span></h2>
+  <table>
+    <tr><th>Signal</th><th>63d IC</th><th>NW t</th><th>Verdict</th></tr>
+    <tr><td>PEAD / SUE</td><td><span class="pos">+0.123</span></td><td>+2.97</td><td class="sans"><strong>Strongest.</strong> Monotone IC growth 1d→63d, hit rate 0.76 at 21d — textbook drift. Low breadth (~30-40 names/day).</td></tr>
+    <tr><td>Value · EV/EBITDA</td><td><span class="pos">+0.040</span></td><td>+2.51</td><td class="sans"><strong>Most robust slow signal.</strong> Monthly grid ⇒ little overlap; NW barely moves it.</td></tr>
+    <tr><td>Momentum 12-1 (TR)</td><td>+0.010</td><td>+0.52</td><td class="sans"><strong>Short-horizon only.</strong> 1d NW t = 2.7 is real; the 21/63d "consistency" was an overlapping-window artifact. Kept for diversification.</td></tr>
+    <tr><td>FCF yield · quality</td><td>~0</td><td>&lt; 1.8</td><td class="sans">Noise in this small-cap window; disabled pending sector-neutralized re-test.</td></tr>
+  </table>
+  <div class="callout note">
+    These are <strong>information coefficients, not P&amp;L</strong>. No transaction costs, no portfolio
+    construction, no walk-forward discipline yet — that is the next phase of the roadmap. Numbers here
+    should move DOWN once costs and honest out-of-sample evaluation are applied.
+  </div>
+
+  <h2 id="limits"><span class="secno">§9</span>Known limitations &amp; biases</h2>
+  <ol>
+    <li><strong>Survivorship</strong> — engine backtests use today's index membership (§3 disclosure).</li>
+    <li><strong>Single price source</strong> — yfinance only; unofficial, occasionally revised, no second feed to cross-check against yet.</li>
+    <li><strong>No cost model applied</strong> — S&amp;P 600 spreads are material; net-of-cost validation pending.</li>
+    <li><strong>Sector map is slowly-varying, not strictly PIT</strong> — SIC reclassifications are rare and carry no forward return information, but the shortcut is documented.</li>
+    <li><strong>Atlas pipeline is not PIT at all</strong> — descriptive layer only (§4 callout).</li>
+    <li><strong>Multiple-testing exposure</strong> — several factor variants were examined to produce §8; family-wise error control arrives with the backtest harness.</li>
+    <li><strong>Q4 SUE approximation</strong> — FY − ΣQ1..Q3 ignores intra-year share-count drift; roughly constant cross-sectionally, so it washes out of ranks.</li>
+  </ol>
+
+  <h2 id="cadence"><span class="secno">§10</span>Update cadence &amp; versioning</h2>
+  <table>
+    <tr><th>Job</th><th>Schedule</th><th>What it refreshes</th></tr>
+    <tr><td>prices + corporate actions</td><td>nightly 21:00</td><td class="sans">yfinance OHLCV, dividends, splits for the ~770-name union universe</td></tr>
+    <tr><td>EDGAR fundamentals</td><td>weekly Sun 09:00</td><td class="sans">companyfacts + submissions for all universe CIKs</td></tr>
+    <tr><td>IJR snapshot</td><td>nightly 18:30 (manual CSV drop)</td><td class="sans">S&amp;P 600 membership history accumulation</td></tr>
+    <tr><td>dashboard data</td><td>on pipeline rebuild</td><td class="sans"><code>dashboard_data.json</code> — the timestamp shown in every freshness chip</td></tr>
+  </table>
+  <p>
+    Engine results are versioned by git SHA + data watermarks stamped into every generated report; the
+    full change history, phase status, and the baseline scorecard live in the repository
+    (<code>ROADMAP.md</code>, <code>docs/baselines.md</code>).
+  </p>
+
+  <div class="foot">
+    Everything Energy · research tooling, not investment advice. Every number is conditional on the data
+    vintage shown in the freshness chip. Model code and this methodology are versioned together.
+  </div>
+</main>
+
+<script>
+/* Freshness chip: same contract as the dashboard — reads meta.generated_at
+   from dashboard_data.json so both pages report the same vintage. */
+fetch("dashboard_data.json")
+  .then(r => r.ok ? r.json() : null)
+  .then(data => {
+    const chip = document.getElementById("data-asof");
+    if (!chip) return;
+    const iso = data && data.meta && data.meta.generated_at;
+    if (!iso) { chip.textContent = "data: unknown vintage"; chip.classList.add("asof-stale"); return; }
+    const gen = new Date(iso);
+    const ageDays = Math.floor((Date.now() - gen.getTime()) / 86400000);
+    const pretty = gen.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const age = ageDays <= 0 ? "today" : ageDays === 1 ? "1d old" : ageDays + "d old";
+    chip.classList.add(ageDays < 2 ? "asof-fresh" : ageDays < 7 ? "asof-warn" : "asof-stale");
+    chip.innerHTML = '<span class="asof-dot"></span>data: ' + pretty + " · " + age;
+    chip.title = "dashboard_data.json generated " + iso;
+  })
+  .catch(() => {});
+</script>
+</body>
+</html>
