@@ -46,15 +46,17 @@ The repo holds two disjoint systems: the legacy **IMA Energy Atlas** dashboard (
 *Goal: `signals --as-of 2026-07-15` produces a ranked, sector-neutral composite cross-section — the config spec at `config.yaml:17-44` finally executes.*
 
 - **1.1 Build `scoring/`** (currently 0 bytes) exactly to the spec already written in config: winsorize [1%, 99%] → cross-sectional z **within sector** → sign conventions (flip accruals) → equal-weight composite over enabled signals. Wire `data/sectors.py` (`sic_to_sector` exists but nothing calls it) via `edgar_submissions.sic`. Emit both raw and sector-relative variants (`emit_sector_relative: true`).
-- **1.2 Make config real.** `signals.*.enabled`, `weights`, `universe.membership_mode`, `min_price_history_days`, winsorize bounds — none are read by any code today. The scoring layer and runner should consume them so config edits change behavior.
-- **1.3 Known factor-correctness fixes (cheap now, land before results accumulate):**
-  - **SUE silently skips Q4.** `quarterly_eps_series` filters `fp ∈ {Q1,Q2,Q3}` and never derives Q4 = FY − ΣQ1..Q3 despite the docstring claiming it does (`factors/fundamentals.py:12-14,253`). That's ~25% of PEAD events missing. Derive Q4 or make the exclusion explicit and tested.
-  - **Momentum on non-div-adjusted closes** (`factors/momentum.py:11-17`) — fix once 0.2 stores dividends.
-  - **Coalesce `shares_outstanding` chains** (dei + us-gaap fallback are two separate concepts in `config.yaml:125-130`; factor code must merge them).
-- **1.4 Statistical hygiene in the IC harness:** the t-stat treats daily ICs as iid (`validation/ic.py:129`), but 21/63-day horizons overlap heavily — add Newey–West (lag ≈ horizon) or non-overlapping sampling. Current long-horizon t-stats are overstated, possibly badly.
-- **1.5 Build `output/`** (currently 0 bytes) to the config spec: signal snapshot per run into `data_store/snapshots/`, plus day-over-day diff (new top-decile entrants, rank jumps ≥50pctl) — this is the daily artifact you'll actually read.
-- **1.6 Extend the leakage canary through the new layers.** `tests/test_leakage.py`'s poisoned-signal pattern is the best idea in the test suite — assert the composite/scoring path also lights up on `FutureLeakSynthetic`, so scoring can never silently introduce lookahead.
-- **Acceptance:** one command emits a ranked composite for the latest date; diff artifact renders; leakage canary passes through composite; factor–factor correlation matrix emitted alongside.
+- **1.2 Make config real.** ✅ Done. `scoring/composite.py` reads `signals.selection` (enabled/weight/components), `scoring.winsorize_pct`, `emit_sector_relative`, and `universe.min_price_history_days`. Per baselines, config now enables **momentum + value(`ev_ebitda` only) + pead**; quality stays off pending neutralization evidence.
+- **1.3 Known factor-correctness fixes:** ✅ Done (first two; third folded in).
+  - **SUE Q4 derivation** — `quarterly_eps_series` now derives Q4 = FY − ΣQ1..Q3 from the 10-K's annual EPS, `filed` = the 10-K date, `derived=True` flag, partial years skipped. 3 PIT-shaped tests. Live effect: PEAD coverage in the composite rose 61 → 92 names.
+  - **Total-return momentum** — `compute_momentum(dividends=...)` builds a per-ticker TR index from unadjusted closes + cash dividends (new `store.as_of_corporate_actions` PIT accessor); identical to price momentum when no dividends. **Bonus live-data bug found & fixed:** `momentum_as_of`'s panel window treated 252 *trading* days as 252 *calendar* days, so on real 5-day weeks the 252-row shift never filled and every name silently got null momentum — masked in tests by contiguous-calendar fixtures. Window now scales by 7/5; weekday-only regression test added.
+  - `shares_outstanding` coalesce deferred: `latest_annual_snapshot` reads the dei chain; the us-gaap fallback merge moves to the Phase 2 vectorized fundamentals read.
+- **1.4 Statistical hygiene:** ✅ Done. `newey_west_t` (Bartlett kernel, lag = horizon) in `validation/ic.py`; `IcSummary` now carries `t_stat_nw` beside the iid t, and the baseline report prints both. Test asserts NW cuts inflated |t| by >2× on a 21-day-overlap series.
+- **1.5 Build `output/`:** ✅ Done. `output/snapshots.py`: parquet snapshot per run into `data_store/snapshots/`, diff vs the latest prior snapshot (top-decile entrants/exits, rank moves ≥ threshold) rendered to markdown.
+- **1.6 Leakage canary through scoring:** ✅ Done. `tests/test_scoring.py::test_composite_pit_canary` plants absurd fundamentals filed *after* as_of and asserts the entire composite frame is byte-identical — PIT holds through winsorize/z/composite, not just at the store.
+- **Acceptance:** ✅ Met. `scripts/signals.py [--as-of]` emits the ranked composite (381/600 ranked at 2026-07-17), writes snapshot + rendered diff, prints the family Spearman-correlation matrix (value↔momentum −0.12, momentum↔pead +0.23 — genuine diversification) and per-family coverage.
+
+**Phase 1 residue carried forward:** `compute_value`/`compute_quality` still query per-ticker (single-date composite ≈ 13s — fine for the daily runner; the walk-forward backtest needs the vectorized batched as-of read, now a Phase 2.1 prerequisite). Quality family stays disabled until sector-neutralized IC evidence says otherwise.
 
 ---
 

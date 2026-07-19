@@ -12,10 +12,10 @@ Panels:
   * quality   — month-end grid (roic; accruals sign-flipped; margin_stability)
   * pead      — SUE events broadcast forward over a 63-trading-day hold
 
-Known caveats stamped into the report (fix before trusting long-horizon
-numbers): iid t-stats (no Newey-West; overlapping horizons overstate |t|),
-ijr_current survivorship bias, momentum on non-div-adjusted closes, SUE
-missing Q4 events.
+Phase 1 upgrades folded in: Newey-West t (lag = horizon) reported next to
+the iid t, momentum is total-return, SUE includes derived Q4 events.
+Remaining caveats stamped into the report: no costs, no neutralization,
+ijr_current survivorship bias.
 
 Usage:
   .venv/bin/python scripts/baseline_ic.py                 # full run (~10-15 min)
@@ -153,12 +153,13 @@ def run_grid_factor(
 
 def scorecard_lines(name: str, summaries: list[IcSummary]) -> list[str]:
     lines = [f"### {name}", "",
-             "| horizon | n dates | mean IC | std | t (iid) | hit rate | avg breadth |",
-             "|---|---|---|---|---|---|---|"]
+             "| horizon | n dates | mean IC | std | t (iid) | t (NW) | hit rate | avg breadth |",
+             "|---|---|---|---|---|---|---|---|"]
     for s in summaries:
         lines.append(
             f"| {s.horizon}d | {s.n_dates} | {s.mean:+.4f} | {s.std:.4f} "
-            f"| {s.t_stat:+.2f} | {s.hit_rate:.2f} | {s.sample_size_mean:.0f} |"
+            f"| {s.t_stat:+.2f} | {s.t_stat_nw:+.2f} | {s.hit_rate:.2f} "
+            f"| {s.sample_size_mean:.0f} |"
         )
     lines.append("")
     return lines
@@ -197,9 +198,14 @@ def main() -> int:
 
         if "momentum" in wanted:
             t0 = time.monotonic()
-            mom = compute_momentum(panel).rename({"momentum": "value"})
-            results["momentum (12-1, daily)"] = ic_scorecard(mom, panel)
-            log.info("[momentum] %d signal rows in %.0fs", mom.height, time.monotonic() - t0)
+            from signal_engine.data.store import as_of_corporate_actions
+            divs = as_of_corporate_actions(con, as_of=today, kind="dividend").filter(
+                pl.col("ticker").is_in(list(t2c.keys()))
+            )
+            mom = compute_momentum(panel, dividends=divs).rename({"momentum": "value"})
+            results["momentum (12-1 total-return, daily)"] = ic_scorecard(mom, panel)
+            log.info("[momentum] %d signal rows (%d div rows) in %.0fs",
+                     mom.height, divs.height, time.monotonic() - t0)
 
         if "value" in wanted:
             for name, sig in run_grid_factor(con, grid, t2c, "value").items():
@@ -233,10 +239,12 @@ def main() -> int:
             f"*Data watermarks: prices through {trading_dates[-1]}, "
             f"edgar_facts = {n_facts:,} rows.*",
             "",
-            "**Caveats (roadmap Phase 1 fixes):** t-stats assume iid daily ICs — "
-            "overlapping 21/63d horizons overstate |t| until Newey-West lands; "
-            "momentum uses non-div-adjusted closes; SUE currently skips Q4 events; "
-            "no costs, no neutralization — raw single-factor IC only.",
+            "**Read `t (NW)`, not `t (iid)`:** overlapping 21/63d horizons make "
+            "daily ICs autocorrelated; the Newey-West column (lag = horizon) is "
+            "the honest significance. Momentum is total-return (dividends folded "
+            "in); SUE includes derived Q4 events (FY - sum(Q1..3), filed at the 10-K). "
+            "Remaining caveats: no costs, no neutralization — raw single-factor "
+            "IC only; `ijr_current` survivorship bias.",
             "",
         ]
         for name, summaries in results.items():
