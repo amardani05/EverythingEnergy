@@ -3,11 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Methodology — Everything Energy</title>
+<title>Methodology - Everything Energy</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0d12'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='18' font-weight='600' fill='%23d4af37'%3EE%3C/text%3E%3C/svg%3E"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ]});"></script>
 <style>
 :root {
   --bg-deep:   #0a0d12;
@@ -77,10 +84,12 @@ code, .m {
   background: rgba(212,175,55,0.07); padding: 1px 5px; border-radius: 3px;
 }
 .formula {
-  font-family: var(--mono); font-size: 13.5px; color: var(--text);
+  color: var(--text);
   background: var(--bg-card); border: 1px solid var(--border); border-left: 2px solid var(--accent);
-  padding: 12px 18px; margin: 14px 0; border-radius: 3px; overflow-x: auto; white-space: pre;
+  padding: 6px 18px; margin: 14px 0; border-radius: 3px; overflow-x: auto;
 }
+.formula .katex-display { margin: 10px 0; }
+.katex { font-size: 1.02em; }
 table { border-collapse: collapse; margin: 16px 0; width: 100%; font-size: 13.5px; }
 th {
   font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.1em;
@@ -119,7 +128,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
   <h1>Model Methodology</h1>
   <p class="subtitle">
     Full documentation of how every number on this site is produced: sources, transformations,
-    statistical assumptions, and — just as important — the known biases and what has <em>not</em> been
+    statistical assumptions, and - just as important - the known biases and what has <em>not</em> been
     validated yet. Written in the spirit of a sell-side model methodology annex: if a number appears
     on the dashboard, its recipe appears here.
   </p>
@@ -137,7 +146,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     <a href="#cadence"><span class="secno">§10</span>Update cadence &amp; versioning</a>
   </div>
 
-  <h2 id="scope"><span class="secno">§1</span>Scope — two systems, one taxonomy</h2>
+  <h2 id="scope"><span class="secno">§1</span>Scope - two systems, one taxonomy</h2>
   <p>
     This site is fed by two related but separate research systems that share one source of truth,
     the energy taxonomy (<code>energy_taxonomy.yaml</code>, ~190 names in 23 sub-industry baskets across 10 districts):
@@ -157,12 +166,12 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     <tr><td>SEC EDGAR XBRL</td><td class="sans">All reported fundamentals (18 canonical concepts with fallback tag chains), filing metadata, SIC codes</td><td>weekly (cron)</td><td class="sans"><code>filed</code> date = knowledge date; restatements stored as new rows, never overwriting; amendments flagged</td></tr>
     <tr><td>yfinance</td><td class="sans">Daily OHLCV (split-adjusted, NOT dividend-adjusted) + cash dividends + splits</td><td>nightly (cron)</td><td class="sans">Trade date = knowledge date; dividends stored separately so total-return is explicit, not baked in</td></tr>
     <tr><td>iShares IJR</td><td class="sans">S&amp;P 600 membership snapshots (universe definition)</td><td>manual CSV drop + nightly ingest</td><td class="sans">Snapshot-dated; history accumulates from 2026-06 forward</td></tr>
-    <tr><td>Yahoo (dashboard)</td><td class="sans">Price cache behind the Atlas correlation/regression pipeline</td><td>on pipeline rebuild</td><td class="sans">Not PIT — descriptive analytics only</td></tr>
+    <tr><td>Yahoo (dashboard)</td><td class="sans">Price cache behind the Atlas correlation/regression pipeline</td><td>on pipeline rebuild</td><td class="sans">Not PIT - descriptive analytics only</td></tr>
     <tr><td>FINRA / EIA / FRED</td><td class="sans">Short interest, energy fundamentals, macro series</td><td>planned</td><td class="sans">Bitemporal schema ready (vintage-keyed); ingestion not yet live</td></tr>
   </table>
   <p>
-    <strong>Freshness is displayed wherever numbers are displayed.</strong> The chip in the top bar — and inside
-    every drawer, the signals strip, and the signal-density header — shows the generation date of the data
+    <strong>Freshness is displayed wherever numbers are displayed.</strong> The chip in the top bar - and inside
+    every drawer, the signals strip, and the signal-density header - shows the generation date of the data
     behind the page and its age: green &lt; 2 days, gold &lt; 7 days, red beyond. A residual z-score computed on
     stale prices is a different (worse) object than a fresh one; the UI refuses to let you forget that.
   </p>
@@ -171,7 +180,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
   <p>
     <strong>Atlas:</strong> constituents are hand-curated in the taxonomy with basket assignments
     (e.g. <em>offshore drillers</em>, <em>LNG terminals</em>, <em>uranium</em>), each basket placed in a district on the map.
-    Baskets, not GICS, are the unit of analysis — the taxonomy encodes commodity-flow relationships GICS ignores.
+    Baskets, not GICS, are the unit of analysis - the taxonomy encodes commodity-flow relationships GICS ignores.
   </p>
   <p>
     <strong>Signal engine:</strong> the latest IJR (S&amp;P 600) holdings snapshot resolved to SEC CIKs
@@ -193,7 +202,11 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     Reported per basket: betas with t-stats, R², and the dominant driver. Variance shares decompose R² by driver.
   </p>
   <h3>Residual z-scores</h3>
-  <div class="formula">resid_z60(i) = ( r_i − r̂_i(drivers) ) 60-day cumulative residual, standardized over the trailing window</div>
+  <div class="formula">$$
+    z^{60\mathrm{d}}_{i,t} \;=\; \frac{\sum_{s=t-60}^{t}\left(r_{i,s}-\hat r_{i,s}\right)}{\hat\sigma^{60\mathrm{d}}_{i}},
+    \qquad
+    \hat r_{i,s} \;=\; \hat\alpha_i \;+\; \sum_{k}\hat\beta_{i,k}\,f_{k,s}
+  $$</div>
   <p>
     A name trading rich or cheap to what its factor exposures explain. |z| &gt; 1.5 is highlighted as a
     mean-reversion candidate; the screener sorts on it.
@@ -202,7 +215,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
   <p>
     Taxonomy-related basket pairs are monitored on the 60-day residual spread; |z| ≥ 0.5 is a watch,
     |z| ≥ 1.5 is a stretched signal with a thesis line. Signal density (the <em>N of 6 firing</em> header)
-    counts how many of the six signal families — pair, residual, IVR, regime, dispersion, momentum — are
+    counts how many of the six signal families - pair, residual, IVR, regime, dispersion, momentum - are
     currently active for the selected basket.
   </p>
   <h3>Implied vs realized (IVR) &amp; attribution</h3>
@@ -217,7 +230,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     structured watchlist generator. The signal engine (§5–§8) is the part held to a predictive standard.
   </div>
 
-  <h2 id="engine"><span class="secno">§5</span>Signal engine — factor definitions</h2>
+  <h2 id="engine"><span class="secno">§5</span>Signal engine - factor definitions</h2>
   <p>
     All fundamentals are read through a bitemporal store: a fact enters the information set on its SEC
     <code>filed</code> date, never before, and restatements cannot rewrite what was known at the time.
@@ -227,26 +240,69 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     <tr><th>Factor</th><th>Definition</th><th>Notes</th></tr>
     <tr><td>Momentum 12-1</td><td class="sans">Total-return index ratio: <code>TR[t−21] / TR[t−252] − 1</code>, TR built from unadjusted closes + cash dividends</td><td class="sans">21-day skip avoids short-term reversal; dividend-adjusted as of 2026-07</td></tr>
     <tr><td>Value · EV/EBITDA</td><td class="sans"><code>(mcap + LT debt − cash) / EBITDA</code>, EBITDA = NI + interest + tax + D&amp;A (street formula), latest 10-K, lower = better</td><td class="sans">Negative-EBITDA names excluded rather than sign-flipped</td></tr>
-    <tr><td>Value · FCF yield</td><td class="sans"><code>(OCF − capex) / mcap</code></td><td class="sans">Computed but <strong>excluded from the composite</strong> — no IC evidence (§8)</td></tr>
-    <tr><td>Quality</td><td class="sans">ROIC, accruals (Sloan), operating-margin stability</td><td class="sans">Computed but <strong>disabled</strong> — raw IC indistinguishable from noise (§8)</td></tr>
-    <tr><td>PEAD / SUE</td><td class="sans">Earnings surprise vs seasonal random walk: <code>(EPS_q − EPS_q−4) / σ(trailing same-quarter YoY diffs)</code>, ≥ 5 pairs required; signal lives for ~63 trading days after the filing</td><td class="sans">Q4 derived as FY − ΣQ1..Q3, dated to the 10-K; amendments never rewrite a surprise</td></tr>
+    <tr><td>Value · FCF yield</td><td class="sans"><code>(OCF − capex) / mcap</code></td><td class="sans">Computed but <strong>excluded from the composite</strong> - no IC evidence (§8)</td></tr>
+    <tr><td>Quality</td><td class="sans">ROIC, accruals (Sloan), operating-margin stability</td><td class="sans">Computed but <strong>disabled</strong> - raw IC indistinguishable from noise (§8)</td></tr>
+    <tr><td>PEAD / SUE</td><td class="sans">Earnings surprise vs seasonal random walk, ≥ 5 YoY pairs required; signal lives for ~63 trading days after the filing</td><td class="sans">Q4 derived as FY − ΣQ1..Q3, dated to the 10-K; amendments never rewrite a surprise</td></tr>
   </table>
+  <div class="formula">$$
+    \mathrm{mom}_{i,t} = \frac{TR_{i,\,t-21}}{TR_{i,\,t-252}} - 1,
+    \qquad
+    TR_{i,t} = TR_{i,t-1}\cdot\frac{P_{i,t} + D_{i,t}}{P_{i,t-1}}
+  $$</div>
+  <div class="formula">$$
+    \frac{EV}{EBITDA} = \frac{P_t\,S_t + \text{LT debt} - \text{cash}}{NI + \text{int} + \text{tax} + \text{DA}},
+    \qquad
+    \mathrm{SUE}_{i,q} = \frac{E_{i,q} - E_{i,q-4}}{\sigma\!\left(\left\{E_{i,k} - E_{i,k-4}\right\}_{k\,\in\,\text{trailing 8}}\right)}
+  $$</div>
+
+  <h3>Graph propagation (experimental sleeve, first read 2026-07-19)</h3>
+  <p>
+    The taxonomy's <code>feeds_into</code> edges form a directed commodity-flow graph over the 23
+    baskets (25 usable edges). The propagation hypothesis, following Cohen and Frazzini (2008):
+    investors underreact to economic links, so a basket's move shows up in its neighbors with a lag.
+    Two signals per stock in basket \(b\), using only trailing returns (PIT-safe by construction),
+    with the stock's own basket excluded so this cannot collapse into ordinary momentum:
+  </p>
+  <div class="formula">$$
+    \mathrm{neigh\text{-}up}_{b,t} = \frac{1}{|U_b|}\sum_{a \in U_b} R^{(L)}_{a,t},
+    \quad U_b = \{a : a \to b\};
+    \qquad
+    \mathrm{neigh\text{-}down}_{b,t} = \frac{1}{|D_b|}\sum_{c \in D_b} R^{(L)}_{c,t},
+    \quad D_b = \{c : b \to c\}
+  $$</div>
+  <p>
+    where \(R^{(L)}_{a,t}\) is basket \(a\)'s equal-weight trailing \(L\)-day return
+    (\(L = 21\)). First honest read on ~8.5y of daily data: the supplier direction
+    (neigh-up) is null; the customer direction (neigh-down, demand shocks traveling upstream)
+    shows IC +0.016 at the 21d horizon, beating the own-basket-momentum control but at
+    \(t_{NW}\) of only 1.0: suggestive, not proven. The machinery detects synthetic propagation
+    perfectly, so the next iteration residualizes basket returns against the eight commodity
+    drivers before propagating; raw energy returns share one big crude factor that drowns
+    link-specific information.
+  </p>
 
   <h2 id="scoring"><span class="secno">§6</span>Composite scoring</h2>
   <p>Per config, executed daily by the signals runner:</p>
   <ol>
-    <li><strong>Orient</strong> — lower-is-better components (EV/EBITDA, accruals) are sign-flipped.</li>
-    <li><strong>Winsorize</strong> — clip at the 1st/99th cross-sectional percentiles.</li>
-    <li><strong>Z-score within sector</strong> — sectors from SEC SIC codes; sectors with &lt; 8 names fall back
+    <li><strong>Orient</strong> - lower-is-better components (EV/EBITDA, accruals) are sign-flipped.</li>
+    <li><strong>Winsorize</strong> - clip at the 1st/99th cross-sectional percentiles.</li>
+    <li><strong>Z-score within sector</strong> - sectors from SEC SIC codes; sectors with &lt; 8 names fall back
       to the global z so a 3-name sector can't mint ±1.7σ from noise.</li>
-    <li><strong>Family scores</strong> — mean of component z's per family (value, momentum, pead).</li>
-    <li><strong>Composite</strong> — weight-renormalized mean over the families available for each name;
+    <li><strong>Family scores</strong> - mean of component z's per family (value, momentum, pead).</li>
+    <li><strong>Composite</strong> - weight-renormalized mean over the families available for each name;
       names with fewer than 2 families are not ranked. A name with no recent earnings event simply has no
       PEAD family (no news ≠ zero surprise).</li>
   </ol>
   <p>
+  <div class="formula">$$
+    z^{(c)}_i = \mathrm{z}_{\text{sector}}\!\left(\mathrm{winsor}_{[1,99]}\!\left(s_c\,x^{(c)}_i\right)\right),
+    \qquad
+    \mathrm{composite}_i = \frac{\sum_{f \in F_i} w_f\,\bar z^{(f)}_i}{\sum_{f \in F_i} w_f},
+    \quad |F_i| \geq 2
+  $$</div>
+  <p>
     Enabled set (evidence-driven, §8): <strong>momentum + EV/EBITDA + PEAD</strong>, equal weights.
-    Their pairwise Spearman correlations run |ρ| ≤ 0.23 — genuinely diversifying, not three names for one bet.
+    Their pairwise Spearman correlations run |ρ| ≤ 0.23 - genuinely diversifying, not three names for one bet.
   </p>
 
   <h2 id="validation"><span class="secno">§7</span>Validation &amp; significance</h2>
@@ -255,12 +311,21 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     close <em>t</em> and the forward return entered at close <em>t+1</em> (no formation-day return) over
     horizons of 1/5/21/63 days.
   </p>
-  <div class="formula">IC(t, H) = spearman( signal(t), close[t+H+1]/close[t+1] − 1 )   cross-sectionally, ≥ 20 names</div>
+  <div class="formula">$$
+    \mathrm{IC}(t,H) \;=\; \rho^{\text{Spearman}}_{i}\!\left( x_{i,t},\;\; \frac{P_{i,\,t+H+1}}{P_{i,\,t+1}} - 1 \right)
+    \qquad \text{cross-sectionally, } \geq 20 \text{ names}
+  $$</div>
+  <div class="formula">$$
+    \hat\sigma^{2}_{NW} \;=\; \gamma_0 \;+\; 2\sum_{k=1}^{L}\left(1-\frac{k}{L+1}\right)\gamma_k,
+    \qquad
+    t_{NW} \;=\; \frac{\overline{\mathrm{IC}}}{\sqrt{\hat\sigma^{2}_{NW}/n}},
+    \qquad L = H
+  $$</div>
   <p>
     <strong>Significance is reported two ways</strong>: the naive iid t-stat, and a Newey–West t
     (Bartlett kernel, lag = horizon). Daily ICs at 21/63-day horizons share almost all of their return
     window with their neighbors; the iid t overstates significance by roughly √H. Where the two disagree,
-    <em>only the Newey–West number is treated as evidence</em> — this revision materially changed the
+    <em>only the Newey–West number is treated as evidence</em> - this revision materially changed the
     conclusions in §8.
   </p>
   <p>
@@ -272,26 +337,36 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
   <h2 id="baselines"><span class="secno">§8</span>Current baseline evidence <span style="font-family:var(--mono);font-size:12px;color:var(--text-dim)">(2026-07-19, pre-cost, single-factor)</span></h2>
   <table>
     <tr><th>Signal</th><th>63d IC</th><th>NW t</th><th>Verdict</th></tr>
-    <tr><td>PEAD / SUE</td><td><span class="pos">+0.123</span></td><td>+2.97</td><td class="sans"><strong>Strongest.</strong> Monotone IC growth 1d→63d, hit rate 0.76 at 21d — textbook drift. Low breadth (~30-40 names/day).</td></tr>
+    <tr><td>PEAD / SUE</td><td><span class="pos">+0.123</span></td><td>+2.97</td><td class="sans"><strong>Strongest.</strong> Monotone IC growth 1d→63d, hit rate 0.76 at 21d - textbook drift. Low breadth (~30-40 names/day).</td></tr>
     <tr><td>Value · EV/EBITDA</td><td><span class="pos">+0.040</span></td><td>+2.51</td><td class="sans"><strong>Most robust slow signal.</strong> Monthly grid ⇒ little overlap; NW barely moves it.</td></tr>
     <tr><td>Momentum 12-1 (TR)</td><td>+0.010</td><td>+0.52</td><td class="sans"><strong>Short-horizon only.</strong> 1d NW t = 2.7 is real; the 21/63d "consistency" was an overlapping-window artifact. Kept for diversification.</td></tr>
     <tr><td>FCF yield · quality</td><td>~0</td><td>&lt; 1.8</td><td class="sans">Noise in this small-cap window; disabled pending sector-neutralized re-test.</td></tr>
+    <tr><td>Graph · neigh-down</td><td>+0.016 <span style="color:var(--text-dim)">(21d)</span></td><td>+1.03</td><td class="sans"><strong>Experimental.</strong> Beats the own-basket control; below significance. Residualized version is the next iteration (§5).</td></tr>
+    <tr><td>Graph · neigh-up</td><td>~0</td><td>&lt; 1.4</td><td class="sans">No supplier-direction propagation detected at 21d lookback.</td></tr>
   </table>
+  <p>
+    <strong>First portfolio-level result</strong> (walk-forward quantile long-short harness, weekly
+    rebalance, quintiles, 60 bps per replaced position): momentum 12-1 long-short LOSES 10.9%/yr net
+    (Sharpe −0.45) with a U-shaped quantile profile: recent losers outperformed at the weekly horizon.
+    Short-term reversal dominates weekly rebalancing in small caps, consistent with the IC finding
+    that momentum's honest edge lives at the 1-day horizon only. This is exactly the kind of
+    conclusion the IC table cannot deliver and the backtester exists to force.
+  </p>
   <div class="callout note">
     These are <strong>information coefficients, not P&amp;L</strong>. No transaction costs, no portfolio
-    construction, no walk-forward discipline yet — that is the next phase of the roadmap. Numbers here
+    construction, no walk-forward discipline yet - that is the next phase of the roadmap. Numbers here
     should move DOWN once costs and honest out-of-sample evaluation are applied.
   </div>
 
   <h2 id="limits"><span class="secno">§9</span>Known limitations &amp; biases</h2>
   <ol>
-    <li><strong>Survivorship</strong> — engine backtests use today's index membership (§3 disclosure).</li>
-    <li><strong>Single price source</strong> — yfinance only; unofficial, occasionally revised, no second feed to cross-check against yet.</li>
-    <li><strong>No cost model applied</strong> — S&amp;P 600 spreads are material; net-of-cost validation pending.</li>
-    <li><strong>Sector map is slowly-varying, not strictly PIT</strong> — SIC reclassifications are rare and carry no forward return information, but the shortcut is documented.</li>
-    <li><strong>Atlas pipeline is not PIT at all</strong> — descriptive layer only (§4 callout).</li>
-    <li><strong>Multiple-testing exposure</strong> — several factor variants were examined to produce §8; family-wise error control arrives with the backtest harness.</li>
-    <li><strong>Q4 SUE approximation</strong> — FY − ΣQ1..Q3 ignores intra-year share-count drift; roughly constant cross-sectionally, so it washes out of ranks.</li>
+    <li><strong>Survivorship</strong> - engine backtests use today's index membership (§3 disclosure).</li>
+    <li><strong>Single price source</strong> - yfinance only; unofficial, occasionally revised, no second feed to cross-check against yet.</li>
+    <li><strong>No cost model applied</strong> - S&amp;P 600 spreads are material; net-of-cost validation pending.</li>
+    <li><strong>Sector map is slowly-varying, not strictly PIT</strong> - SIC reclassifications are rare and carry no forward return information, but the shortcut is documented.</li>
+    <li><strong>Atlas pipeline is not PIT at all</strong> - descriptive layer only (§4 callout).</li>
+    <li><strong>Multiple-testing exposure</strong> - several factor variants were examined to produce §8; family-wise error control arrives with the backtest harness.</li>
+    <li><strong>Q4 SUE approximation</strong> - FY − ΣQ1..Q3 ignores intra-year share-count drift; roughly constant cross-sectionally, so it washes out of ranks.</li>
   </ol>
 
   <h2 id="cadence"><span class="secno">§10</span>Update cadence &amp; versioning</h2>
@@ -300,8 +375,15 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     <tr><td>prices + corporate actions</td><td>nightly 21:00</td><td class="sans">yfinance OHLCV, dividends, splits for the ~770-name union universe</td></tr>
     <tr><td>EDGAR fundamentals</td><td>weekly Sun 09:00</td><td class="sans">companyfacts + submissions for all universe CIKs</td></tr>
     <tr><td>IJR snapshot</td><td>nightly 18:30 (manual CSV drop)</td><td class="sans">S&amp;P 600 membership history accumulation</td></tr>
-    <tr><td>dashboard data</td><td>on pipeline rebuild</td><td class="sans"><code>dashboard_data.json</code> — the timestamp shown in every freshness chip</td></tr>
+    <tr><td>Atlas dashboard pipeline</td><td>nightly 21:40, weekdays</td><td class="sans">Full analysis chain, then <code>dashboard_data.json</code> is committed and pushed; the site redeploys itself. The freshness chip should read green every trading morning.</td></tr>
+    <tr><td>composite signals</td><td>with the Atlas job</td><td class="sans">Ranked cross-section snapshot + day-over-day diff in <code>data_store/snapshots/</code></td></tr>
   </table>
+  <p>
+    Why not intraday: yfinance quotes are delayed and unofficial, EDGAR facts arrive on filing
+    schedules, and every signal here is computed from daily closes. Daily-after-close is the honest
+    cadence for this data spine; anything faster requires a licensed real-time feed and a streaming
+    rewrite, and would change the numbers only cosmetically until the signals themselves are intraday.
+  </p>
   <p>
     Engine results are versioned by git SHA + data watermarks stamped into every generated report; the
     full change history, phase status, and the baseline scorecard live in the repository
@@ -315,7 +397,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
 </main>
 
 <script>
-/* Freshness chip: same contract as the dashboard — reads meta.generated_at
+/* Freshness chip: same contract as the dashboard - reads meta.generated_at
    from dashboard_data.json so both pages report the same vintage. */
 fetch("dashboard_data.json")
   .then(r => r.ok ? r.json() : null)

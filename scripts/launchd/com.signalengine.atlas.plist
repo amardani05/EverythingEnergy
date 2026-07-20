@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Nightly Atlas pipeline + auto-publish, weekdays 21:40 local.
+
+  Runs scripts/refresh_atlas.sh: full analysis chain, composite signals
+  snapshot, then commits dashboard_data.json and pushes (Vercel redeploys
+  on push). Scheduled after the 21:00 prices job so the analysis sees
+  today's closes.
+
+  Install (one-time):
+    cp scripts/launchd/com.signalengine.atlas.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.signalengine.atlas.plist
+
+  Logs: tail -f data_store/logs/atlas.{stdout,stderr}.log
+  Uninstall: launchctl unload ~/Library/LaunchAgents/com.signalengine.atlas.plist
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.signalengine.atlas</string>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/amardani/EverythingEnergy</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/amardani/EverythingEnergy/scripts/refresh_atlas.sh</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>40</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>40</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>40</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>40</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>40</integer></dict>
+  </array>
+
+  <key>StandardOutPath</key>
+  <string>/Users/amardani/EverythingEnergy/data_store/logs/atlas.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/amardani/EverythingEnergy/data_store/logs/atlas.stderr.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

@@ -1,5 +1,5 @@
 """
-IMA Energy Dashboard — Data Consolidator
+IMA Energy Dashboard - Data Consolidator
 ==========================================
 
 Reads all analysis outputs and produces a single dashboard_data.json that
@@ -19,7 +19,7 @@ INPUTS (all should be in current directory):
   - price_cache.parquet (for return histories)
 
 OUTPUT:
-  - dashboard_data.json   — single file, ~2-5MB, consumed by index.html
+  - dashboard_data.json   - single file, ~2-5MB, consumed by index.html
 
 JSON STRUCTURE:
 {
@@ -66,6 +66,7 @@ import yaml
 import pandas as pd
 import numpy as np
 import json
+import math
 from pathlib import Path
 from datetime import datetime
 
@@ -130,7 +131,7 @@ def main():
     with open(YAML_PATH) as f:
         tax = yaml.safe_load(f)
     
-    # Driver list — from basket_loadings columns
+    # Driver list - from basket_loadings columns
     print("[consolidate] reading analysis CSVs...")
     
     # Resolve a CSV by trying cwd first then the natural phase output dir.
@@ -186,7 +187,7 @@ def main():
             print(f"[consolidate] ivr_snapshot loaded: {len(ivr_df)} rows")
             break
     
-    # Driver list — extract from beta_ columns
+    # Driver list - extract from beta_ columns
     drivers = []
     if not basket_loadings_df.empty:
         drivers = [c.replace('beta_', '') for c in basket_loadings_df.columns if c.startswith('beta_')]
@@ -302,7 +303,7 @@ def main():
                     if vcol in brow.columns:
                         var_shares[d] = safe_float(brow[vcol].iloc[0])
         
-        # Cumulative returns (basket EW) — sample at weekly freq for chart.
+        # Cumulative returns (basket EW) - sample at weekly freq for chart.
         # Single-constituent baskets (e.g. nuclear_smr_developers / OKLO) used to
         # fall through and produce an empty series, which broke the backtester
         # with "not enough history". For len==1 we use that ticker's series
@@ -325,7 +326,7 @@ def main():
                     for d, v in cum_sampled.items() if safe_float(v) is not None
                 ]
         
-        # Rolling betas — last 130 weekly obs (~2.5y) for visualization
+        # Rolling betas - last 130 weekly obs (~2.5y) for visualization
         # We don't have these stored; could compute on-the-fly but expensive.
         # For UI we'll skip this for now and fetch from rolling_betas charts as images.
         # Future: include here.
@@ -496,8 +497,20 @@ def main():
         'weekly_returns_by_ticker': weekly_by_ticker,
     }
     
+    def _sanitize(obj):
+        """NaN/inf -> None recursively. Python's json.dump happily emits bare
+        NaN, which is NOT valid JSON: browsers throw on parse and the whole
+        dashboard fails to hydrate. Caught live 2026-07-19 ('in_pair': NaN)."""
+        if isinstance(obj, dict):
+            return {k: _sanitize(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [_sanitize(v) for v in obj]
+        if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+            return None
+        return obj
+
     with open(OUTPUT, 'w') as f:
-        json.dump(payload, f, indent=None, default=str)  # indent=None for smallest size
+        json.dump(_sanitize(payload), f, indent=None, default=str)  # indent=None for smallest size
     
     sz = Path(OUTPUT).stat().st_size
     print(f"\n[done] wrote {OUTPUT}: {sz/1024:.1f} KB")
