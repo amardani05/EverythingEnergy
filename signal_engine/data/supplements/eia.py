@@ -1,4 +1,4 @@
-"""EIA energy series — free, env key EIA_API_KEY.
+"""EIA energy series - free, env key EIA_API_KEY.
 
 EIA's v2 API is paginated and supports vintage queries via `frequency` +
 `facets`. We store one row per (series_id, period, knowledge_date).

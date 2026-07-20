@@ -1,4 +1,4 @@
-"""Bitemporal read-API tests — the PIT plumbing must not be violable.
+"""Bitemporal read-API tests - the PIT plumbing must not be violable.
 
 Three things we assert here:
   1. Facts filed AFTER as_of are invisible (the basic PIT cut).
@@ -85,7 +85,7 @@ def test_originals_only_never_returns_amendments(tmp_con: duckdb.DuckDBPyConnect
 
 
 def test_as_of_corporate_actions_hides_future_ex_dates(tmp_con) -> None:
-    """A dividend with ex-date after as_of must be invisible — the ex-date
+    """A dividend with ex-date after as_of must be invisible - the ex-date
     is the knowledge date for corporate actions."""
     from datetime import date
 

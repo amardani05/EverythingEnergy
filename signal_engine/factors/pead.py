@@ -1,4 +1,4 @@
-"""PEAD / SUE — Post-Earnings Announcement Drift signal.
+"""PEAD / SUE - Post-Earnings Announcement Drift signal.
 
 Per the spec (constraints 2, 3 and turn 6 SUE-method decision):
 
@@ -12,7 +12,7 @@ Per the spec (constraints 2, 3 and turn 6 SUE-method decision):
   * KNOWLEDGE_DATE = the `filed` date of the 10-Q that REPORTED EPS_t.
                      This is the announcement date; SUE_t may only be
                      applied to dates >= signal_date.
-  * Restatements (10-Q/A) do NOT rewrite history — we pull originals only
+  * Restatements (10-Q/A) do NOT rewrite history - we pull originals only
     via as_of_facts(..., originals_only=True). Hard contract; the
     SUE-`filed` test enforces it.
 
@@ -68,7 +68,7 @@ def compute_sue_series(
     Output: cik, period_end, fy, fp, filed (= signal_date), eps_diluted,
             eps_yoy_diff, sue.
 
-    The `filed` column equals the announcement date — the signal is known
+    The `filed` column equals the announcement date - the signal is known
     only on/after `filed`, never before. Any downstream join MUST gate on
     that.
     """
@@ -84,7 +84,7 @@ def compute_sue_series(
     # For each fp (Q1/Q2/Q3), walk fiscal years in order, computing
     # YoY diff against the same fp one year prior.
     for fp, series in by_fp.items():
-        # Sort by period_end ascending — should already be, defensive
+        # Sort by period_end ascending - should already be, defensive
         series.sort(key=lambda r: r["period_end"])
         for i, row in enumerate(series):
             if i == 0:

@@ -1,4 +1,4 @@
-"""Snapshot + diff layer — the daily artifact a human actually reads.
+"""Snapshot + diff layer - the daily artifact a human actually reads.
 
 Per config.yaml `output`:
   * every composite run writes `signals_<as_of>.parquet` into snapshot_dir
@@ -111,13 +111,13 @@ def diff_snapshots(
 
 
 def _pctl(v: float | None) -> str:
-    return "—" if v is None else f"{100 * v:.0f}%"
+    return " - " if v is None else f"{100 * v:.0f}%"
 
 
 def render_diff_markdown(diff: DiffReport) -> str:
-    lines: list[str] = [f"# Signal diff — {diff.as_of}", ""]
+    lines: list[str] = [f"# Signal diff - {diff.as_of}", ""]
     if diff.is_first_snapshot:
-        lines += ["*First snapshot — nothing to diff against.*", ""]
+        lines += ["*First snapshot - nothing to diff against.*", ""]
         return "\n".join(lines)
     lines += [f"*vs previous snapshot {diff.prev_as_of}. Percentile 0% = best.*", ""]
 

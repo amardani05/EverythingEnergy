@@ -4,7 +4,7 @@ Schema decisions (see turn 5/7 design notes):
 
   * EDGAR XBRL is naturally long-form (concept-keyed). We store one row per
     (cik, concept, unit, period_end, accession). Restatements (amended forms)
-    arrive on a later `filed` date with a new accession — never overwrite.
+    arrive on a later `filed` date with a new accession - never overwrite.
 
   * Prices (Stooq + yfinance fallback) are wide per (ticker, date, source).
     `source` is in the PK so we keep both feeds for cross-checks.
@@ -25,7 +25,7 @@ Schema decisions (see turn 5/7 design notes):
 The PIT read API (`as_of_facts`, `as_of_series`, etc.) filters
 `knowledge_date <= as_of` and resolves ties with `ROW_NUMBER() ... ORDER BY
 knowledge_date DESC, ingest_ts DESC`. Factor code MUST go through these
-helpers — never SELECT raw from the underlying tables. The leakage test
+helpers - never SELECT raw from the underlying tables. The leakage test
 enforces this contract.
 """
 
@@ -40,7 +40,7 @@ import duckdb
 import polars as pl
 
 # DDL is one string per logical table so we can call CREATE TABLE IF NOT EXISTS
-# idempotently from any process. Keep the column order stable — downstream
+# idempotently from any process. Keep the column order stable - downstream
 # polars schemas mirror this.
 
 DDL: dict[str, str] = {
@@ -124,7 +124,7 @@ DDL: dict[str, str] = {
             shares        DOUBLE,
             market_value  DOUBLE,
             asset_class   VARCHAR,
-            sector        VARCHAR,               -- iShares GICS — kept for cross-check vs our SIC mapping
+            sector        VARCHAR,               -- iShares GICS - kept for cross-check vs our SIC mapping
             ingest_ts     TIMESTAMP NOT NULL DEFAULT now(),
             PRIMARY KEY (snapshot_date, ticker)
         );
@@ -166,7 +166,7 @@ def init_db(db_path: Path) -> None:
 
 @contextmanager
 def connect(db_path: Path, *, read_only: bool = False) -> Iterator[duckdb.DuckDBPyConnection]:
-    """Yield a DuckDB connection. Use a fresh connection per task — DuckDB
+    """Yield a DuckDB connection. Use a fresh connection per task - DuckDB
     handles concurrency via the file lock; long-lived connections are not
     needed here."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -194,7 +194,7 @@ def as_of_facts(
 ) -> pl.DataFrame:
     """Latest-known fact per (cik, concept, period_end) as of `as_of`.
 
-    Set `originals_only=True` for the PEAD/SUE signal — restatements (forms
+    Set `originals_only=True` for the PEAD/SUE signal - restatements (forms
     ending in '/A') must NOT retroactively change a surprise that was
     computed at the original announcement date.
     """
@@ -263,7 +263,7 @@ def as_of_corporate_actions(
     """All corporate-action rows with `date <= as_of`.
 
     A dividend/split is public knowledge on its ex-date, so the trade date
-    is the knowledge date — no separate vintage axis needed. Factor code
+    is the knowledge date - no separate vintage axis needed. Factor code
     reads dividends ONLY through this helper (leakage contract)."""
     where_parts = ["date <= ?"]
     params: list[object] = [as_of]

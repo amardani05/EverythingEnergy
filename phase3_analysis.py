@@ -1,12 +1,12 @@
 """
-IMA Energy Dashboard — Phase 3: Pairs, Residuals, Rolling Betas
+IMA Energy Dashboard - Phase 3: Pairs, Residuals, Rolling Betas
 =================================================================
 
 Three analyses that turn the dashboard from a tracker into a screener:
 
 1. PAIRS FRAMEWORK (cross_basket_pairs)
    Taxonomy-driven long/short pairs based on commodity flow logic.
-   No optimization — the pairs are pre-defined by the energy value chain.
+   No optimization - the pairs are pre-defined by the energy value chain.
    For each pair, computes:
      - 5y rolling correlation (regime stability)
      - Current pair return z-score (mean-reversion signal)
@@ -43,10 +43,10 @@ USAGE
 DESIGN NOTES (overfitting defenses)
 -----------------------------------
 - Pairs are NOT optimized: long-X / short-Y is determined by taxonomy
-  (refiners vs upstream, IPPs vs utilities, etc.) — pre-specified before seeing data.
+  (refiners vs upstream, IPPs vs utilities, etc.) - pre-specified before seeing data.
 - Residual signals report BOTH directions (mean-revert AND momentum) so the
   analyst chooses based on context. Single-direction would be data-mined.
-- Rolling betas use a fixed 60-day window — not selected to maximize anything.
+- Rolling betas use a fixed 60-day window - not selected to maximize anything.
 - Regime change threshold is 2σ on the rolling beta z-score, fixed.
 """
 
@@ -70,7 +70,7 @@ LOOKBACK_YEARS = 5
 ROLLING_WINDOW = 60  # trading days for rolling beta
 
 # ============================================================
-# Pre-specified pairs (NOT data-mined — derived from taxonomy)
+# Pre-specified pairs (NOT data-mined - derived from taxonomy)
 # ============================================================
 # Format: (long_basket, short_basket, thesis)
 TAXONOMY_PAIRS = [
@@ -178,7 +178,7 @@ def compute_pair_stats(baskets_d):
         cur = cum.iloc[-1]
         z_60d = (cur - recent_mean) / recent_std if recent_std > 0 else 0
         
-        # 1y rolling correlation (between long and short basket returns) — pair stability
+        # 1y rolling correlation (between long and short basket returns) - pair stability
         if len(baskets_d) >= 252:
             rolling_corr = baskets_d[long_b].rolling(252).corr(baskets_d[short_b]).dropna()
             corr_now = rolling_corr.iloc[-1] if len(rolling_corr) else np.nan
@@ -224,7 +224,7 @@ def chart_pairs(pairs_df, output_dir):
     ax.axvline(1.5, color='#c0392b', linestyle='--', alpha=0.5)
     ax.axvline(0, color='black', linewidth=0.5)
     ax.set_xlabel('Pair z-score (current cum vs 60d mean)')
-    ax.set_title('Cross-basket pair z-scores — taxonomy-driven pairs only\nNegative z = pair stretched DOWN (long side underperformed); Positive z = pair stretched UP', fontsize=11)
+    ax.set_title('Cross-basket pair z-scores - taxonomy-driven pairs only\nNegative z = pair stretched DOWN (long side underperformed); Positive z = pair stretched UP', fontsize=11)
     ax.legend(loc='lower right'); ax.grid(axis='x', alpha=0.3)
     plt.tight_layout()
     path = output_dir / 'pairs_zscores.png'
@@ -292,9 +292,9 @@ def chart_residual_screen(resid_df, output_dir, top_n=20):
     if len(resid_df) == 0: return None
     df = resid_df.dropna(subset=['z_resid_60d']).copy()
     
-    # Top N positive residuals (outperforming peers — momentum / catch-up rerating)
+    # Top N positive residuals (outperforming peers - momentum / catch-up rerating)
     momentum = df.sort_values('z_resid_60d', ascending=False).head(top_n)
-    # Top N negative residuals (underperforming peers — mean-reversion candidates)
+    # Top N negative residuals (underperforming peers - mean-reversion candidates)
     mean_rev = df.sort_values('z_resid_60d', ascending=True).head(top_n)
     
     fig, axes = plt.subplots(1, 2, figsize=(16, max(7, 0.4*top_n)))
@@ -478,7 +478,7 @@ img {{ max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px
 .cols {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
 .cols h3 {{ margin-top: 0; }}
 </style></head><body>
-<h1>IMA Energy Dashboard — Phase 3: Pairs, Residuals, Regimes</h1>
+<h1>IMA Energy Dashboard - Phase 3: Pairs, Residuals, Regimes</h1>
 <p style="color:#666;">Daily returns, {LOOKBACK_YEARS}y, {ROLLING_WINDOW}d rolling windows where applicable</p>
 
 <div class="note"><b>How to read this:</b> three idea-generation lenses on top of the basket framework.
@@ -487,7 +487,7 @@ img {{ max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px
 <li><b>Residuals:</b> each name's recent return minus its predicted return given the basket's move. Negative residual = name underperformed peers (potential mean-reversion long); positive = outperformed (catalyst-driven, investigate).</li>
 <li><b>Regimes:</b> baskets whose rolling beta to a driver has shifted &gt;2σ from its long-run mean. Flags structural change (e.g. IPP betas to NG dropping post-AI rerating).</li>
 </ul>
-None of these are signals to trade blindly — they're idea filters that surface things worth investigating.</div>
+None of these are signals to trade blindly - they're idea filters that surface things worth investigating.</div>
 
 <h2>1. Cross-basket pair z-scores</h2>
 <img src="pairs_zscores.png" alt="Pairs z-scores">

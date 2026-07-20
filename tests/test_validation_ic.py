@@ -1,4 +1,4 @@
-"""IC harness tests — algebra + leakage canary.
+"""IC harness tests - algebra + leakage canary.
 
 The leakage canary is THE most important test in this file: it injects a
 synthetic feature whose value at t equals the realized forward H-day
@@ -40,7 +40,7 @@ def test_ic_harness_flags_future_leak_at_matching_horizon() -> None:
     """A feature whose value at t equals the realized 5-day return starting
     at t should produce an absurdly-high IC at horizon=5. The harness
     enforces "no formation-day return" (entry at t+1, exit at t+H+1), so
-    the leak and the forward return are 1-day misaligned — they correlate
+    the leak and the forward return are 1-day misaligned - they correlate
     near 0.78, not 1.00, on a 50-ticker noisy panel. That's still ~10x
     higher than any real signal achieves; the canary's job is to make
     sure IC blows up obviously, not to match a specific number.
@@ -110,7 +110,7 @@ def test_nw_t_close_to_iid_t_on_iid_series() -> None:
 def test_nw_t_shrinks_under_overlap_autocorrelation() -> None:
     """A moving-average(H) of white noise mimics an H-day overlapping IC
     series. NW with lag H must report materially LESS significance than the
-    iid t — that's the whole point."""
+    iid t - that's the whole point."""
     import numpy as np
 
     from signal_engine.validation.ic import newey_west_t

@@ -1,4 +1,4 @@
-"""FRED macro series — free, env key FRED_API_KEY.
+"""FRED macro series - free, env key FRED_API_KEY.
 
 FRED revises series (esp. macro aggregates), so we store every vintage
 with `knowledge_date` = release date, keyed (series_id, period, knowledge_date).

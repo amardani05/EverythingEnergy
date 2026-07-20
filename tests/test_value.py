@@ -1,4 +1,4 @@
-"""Value factor tests — FCF yield + EV/EBITDA algebra and PIT contract."""
+"""Value factor tests - FCF yield + EV/EBITDA algebra and PIT contract."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def test_fcf_yield_and_ev_ebitda_match_hand_numbers(tmp_con: duckdb.DuckDBPyConn
 
 
 def test_negative_ebitda_returns_none(tmp_con: duckdb.DuckDBPyConnection) -> None:
-    """Sign-flipped EV/EBITDA breaks ranking — emit None instead."""
+    """Sign-flipped EV/EBITDA breaks ranking - emit None instead."""
     cik = 1000002
     # Push values so EBITDA is negative: big NI loss, tiny everything else
     vals = standard_annual_values(net_income=-500_000_000, interest=10_000_000,
@@ -56,7 +56,7 @@ def test_negative_ebitda_returns_none(tmp_con: duckdb.DuckDBPyConnection) -> Non
     df = compute_value(tmp_con, as_of=date(2025, 6, 1), ticker_to_cik={"LOSS": cik})
     row = df.row(0, named=True)
     assert row["ev_ebitda"] is None
-    # FCF yield is allowed to be negative — see docstring
+    # FCF yield is allowed to be negative - see docstring
     assert row["fcf_yield"] is not None
 
 

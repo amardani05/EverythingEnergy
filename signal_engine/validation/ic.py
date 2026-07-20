@@ -1,4 +1,4 @@
-"""Forward Information Coefficient (IC) — Spearman rank correlation
+"""Forward Information Coefficient (IC) - Spearman rank correlation
 between a signal at date t and realized forward returns from t+1.
 
 Convention (constraint: no formation-day return):
@@ -10,8 +10,7 @@ Convention (constraint: no formation-day return):
 The harness operates on a tidy "long" panel:
   signals_df: ticker, date, value
   prices_df:  ticker, date, close
-Both must already be filtered to the universe + as-of-date you care about
-— this module does no PIT enforcement itself. Use signal_engine.data.store
+Both must already be filtered to the universe + as-of-date you care about - this module does no PIT enforcement itself. Use signal_engine.data.store
 as_of_* helpers to construct the inputs.
 
 Walk-forward driver lives in signal_engine.validation.backtest (later step).
@@ -36,7 +35,7 @@ class IcSummary:
     n_dates: int           # number of date cross-sections that had valid IC
     mean: float
     std: float
-    t_stat: float          # mean / (std / sqrt(n)) — iid assumption
+    t_stat: float          # mean / (std / sqrt(n)) - iid assumption
     hit_rate: float        # fraction of dates with IC > 0
     sample_size_mean: float  # average names per cross-section
     t_stat_nw: float = 0.0  # Newey-West t (lag = horizon); the honest one
@@ -55,7 +54,7 @@ class IcSummary:
 def newey_west_t(series: np.ndarray, n_lags: int) -> float:
     """t-stat of the series mean with a Newey-West (Bartlett-kernel) HAC
     variance. For an H-day-forward IC computed daily, consecutive ICs share
-    H-1 days of return data — the iid t overstates significance by roughly
+    H-1 days of return data - the iid t overstates significance by roughly
     sqrt(H). Standard practice: n_lags = horizon.
 
     var_NW = gamma_0 + 2 * sum_{k=1..L} w_k * gamma_k,  w_k = 1 - k/(L+1)
@@ -131,13 +130,13 @@ def daily_ic(
     out_dates: list = []
     ics: list[float] = []
     ns: list[int] = []
-    # group_by then iterate — small panels per date so the python loop is fine.
+    # group_by then iterate - small panels per date so the python loop is fine.
     for (d,), sub in joined.group_by(["date"], maintain_order=True):
         if sub.height < min_cross_section:
             continue
         v = sub[value_col].to_numpy()
         f = sub[fwd_col].to_numpy()
-        # Drop pairs with NaN/inf — spearmanr otherwise returns NaN silently.
+        # Drop pairs with NaN/inf - spearmanr otherwise returns NaN silently.
         mask = np.isfinite(v) & np.isfinite(f)
         if mask.sum() < min_cross_section:
             continue

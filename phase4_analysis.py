@@ -1,5 +1,5 @@
 """
-IMA Energy Dashboard — Phase 4: Performance Attribution & Implied vs Realized
+IMA Energy Dashboard - Phase 4: Performance Attribution & Implied vs Realized
 =============================================================================
 
 Builds two analyses on top of Phase 2's loadings:
@@ -30,13 +30,13 @@ OUTPUTS:
 DESIGN NOTES (overfitting defenses)
 -----------------------------------
 - Uses BETAS FROM PHASE 2 (already estimated on weekly data, full 5y window)
-- Applies them to a FORWARD-LOOKING window (last N weeks) — strict out-of-sample
+- Applies them to a FORWARD-LOOKING window (last N weeks) - strict out-of-sample
   in the temporal sense (the betas were fit on data that includes this period
   but the *prediction* uses driver returns realized in the period)
 - We're not refitting per window, so no parameter snooping
 - Results are descriptive, not predictive: "this is how much of recent
   performance is consistent with the basket's historical driver sensitivity"
-- Idiosyncratic returns ≠ alpha (in finance sense) — they could be unpriced
+- Idiosyncratic returns ≠ alpha (in finance sense) - they could be unpriced
   factors, news, mispricing, or noise. The screen flags candidates for analysis.
 """
 
@@ -65,7 +65,7 @@ WINDOWS = {
     '1y': 52,
 }
 
-# Driver list — same as Phase 2
+# Driver list - same as Phase 2
 DRIVER_SET = ['CL', 'NG', 'CRACK_321', 'WTI_BRENT', 'SPX', 'TNX', 'URA', 'BDRY']
 ALL_DRIVER_KINDS = {
     'CL': 'price', 'NG': 'price', 'BRENT': 'price', 'RB': 'price', 'HO': 'price',
@@ -300,7 +300,7 @@ def chart_attribution(attr_df, output_dir, window='3m'):
     ax.set_yticklabels(df['node'])
     ax.axvline(0, color='black', linewidth=0.6)
     ax.set_xlabel(f'Cumulative return over last {window}')
-    ax.set_title(f'Performance attribution by basket — {window}\n'
+    ax.set_title(f'Performance attribution by basket - {window}\n'
                  f'GREEN/RED = factor return (sum of β × driver moves);  GOLD = idiosyncratic (residual)',
                  fontsize=11)
     ax.legend(loc='lower right')
@@ -351,8 +351,8 @@ def chart_implied_vs_realized(ivr_data, output_dir, top_n=10):
     ax.set_yticks(y_pos)
     ax.set_yticklabels(df['node'])
     ax.axvline(0, color='black', linewidth=0.6)
-    ax.set_xlabel('Cumulative return — last 4 weeks')
-    ax.set_title('Implied vs realized — last 4 weeks\n'
+    ax.set_xlabel('Cumulative return - last 4 weeks')
+    ax.set_title('Implied vs realized - last 4 weeks\n'
                  'Positive gap (green) = realized > implied (basket outperforming model). Negative = under.',
                  fontsize=11)
     ax.legend(loc='lower right')
@@ -385,8 +385,8 @@ def chart_ivr_timeseries(ivr_data, output_dir, top_n=6):
         ax.plot(df.index, df['gap_4w'] * 100, label=node,
                 color=cmap(i / max(top_n - 1, 1)), linewidth=1.4, alpha=0.85)
     ax.axhline(0, color='black', linewidth=0.6)
-    ax.set_ylabel('Realized minus implied — 4w cumulative (%)')
-    ax.set_title(f'Implied vs realized gap over time — top {top_n} baskets by current |gap|\n'
+    ax.set_ylabel('Realized minus implied - 4w cumulative (%)')
+    ax.set_title(f'Implied vs realized gap over time - top {top_n} baskets by current |gap|\n'
                  'Persistent positive (negative) gap = sustained outperformance (under) of factor model',
                  fontsize=11)
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=9)
@@ -454,7 +454,7 @@ def build_report(attr_df, name_attr_df, ivr_snap, output_dir):
     name_bot_rows = ''.join(name_row(r) for r in name_bot)
     
     html = f"""<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Phase 4 — Attribution & IVR</title>
+<html><head><meta charset="utf-8"><title>Phase 4 - Attribution & IVR</title>
 <style>
 body {{ font-family: -apple-system, system-ui, sans-serif; max-width: 1400px; margin: 30px auto; padding: 20px; color: #222; }}
 h1 {{ border-bottom: 2px solid #2c3e50; padding-bottom: 8px; }}
@@ -470,18 +470,18 @@ img {{ max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px
 .cols {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
 </style></head><body>
 
-<h1>Phase 4 — Performance Attribution &amp; Implied vs Realized</h1>
+<h1>Phase 4 - Performance Attribution &amp; Implied vs Realized</h1>
 <p style="color:#666;">Decomposes recent returns into factor (driver-explained) and idiosyncratic (residual).</p>
 
 <div class="note">
 <b>How to read attribution:</b> for each basket, ACTUAL return = FACTOR return + IDIOSYNCRATIC return.
 Factor return is what the basket's historical betas would predict given the actual driver moves over the window.
-Idiosyncratic is everything else — could be unmodeled factors, news, mispricing, or noise.
+Idiosyncratic is everything else - could be unmodeled factors, news, mispricing, or noise.
 A large positive idio means the basket outperformed what its driver model predicts; large negative means underperformed.
 This is the lens for "what's actually moving here that I should investigate."
 </div>
 
-<h2>1. Basket attribution — 3 month</h2>
+<h2>1. Basket attribution - 3 month</h2>
 <img src="attribution_chart_3m.png" alt="Attribution 3m">
 
 <div class="cols">
@@ -501,14 +501,14 @@ This is the lens for "what's actually moving here that I should investigate."
 </div>
 </div>
 
-<h2>2. Implied vs realized — last 4 weeks</h2>
+<h2>2. Implied vs realized - last 4 weeks</h2>
 <img src="implied_vs_realized_snap.png" alt="IVR snap">
 <table>
 <tr><th>Basket</th><th>Realized 4w</th><th>Implied 4w</th><th>Gap</th></tr>
 {ivr_rows or '<tr><td colspan=4>no data</td></tr>'}
 </table>
 
-<h3>Gap over time — top 6 baskets by current |gap|</h3>
+<h3>Gap over time - top 6 baskets by current |gap|</h3>
 <img src="ivr_timeseries.png" alt="IVR timeseries">
 
 <h2>3. Top idiosyncratic name movers (3m)</h2>

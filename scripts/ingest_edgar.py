@@ -11,12 +11,12 @@ You run this LOCALLY. At 8 req/s the universe pull is ~5 minutes wall-clock
 largest filers). Idempotent: re-runs upsert by accession, no duplicates.
 
 Robustness contract (post-mortem of the 2026-06-23 crash at ~650/766 CIKs):
-  * One bad filer can never kill the run — fetch + cache + parse are all
+  * One bad filer can never kill the run - fetch + cache + parse are all
     inside the per-CIK try.
   * Rows are flushed to DuckDB incrementally (every FLUSH_EVERY CIKs), so a
     crash loses at most one flush window, not the whole run.
   * Raw payloads are cached under data_store/raw/edgar/ as they arrive, and
-    `--from-cache` re-parses them into DuckDB without any HTTP — a re-parse
+    `--from-cache` re-parses them into DuckDB without any HTTP - a re-parse
     after a code fix costs seconds, not a re-pull.
 
 Usage:
@@ -176,7 +176,7 @@ def upsert_companyfacts(client: edgar.EdgarClient, ciks: list[int], db_path: Pat
 
 
 def reparse_from_cache(db_path: Path, raw_dir: Path, concept_chains: dict) -> None:
-    """Rebuild edgar_submissions + edgar_facts from cached raw JSON — no HTTP.
+    """Rebuild edgar_submissions + edgar_facts from cached raw JSON - no HTTP.
 
     snapshot_date for cached submissions = the cache file's mtime date (when
     the knowledge was actually fetched), NOT today: a re-parse must not

@@ -3,7 +3,7 @@
 Regression context: the original parser fetched dividends (`actions=True`)
 then silently dropped them in the final column select, making total-return
 math impossible from the store. These tests pin the parse contract with a
-synthetic yfinance-shaped frame — no network.
+synthetic yfinance-shaped frame - no network.
 """
 
 from __future__ import annotations

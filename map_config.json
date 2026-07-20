@@ -1,5 +1,5 @@
 {
-  "_comment": "IMA Energy Atlas — map view configuration. The illustrator fills in the visual SVG; this file specifies the structural data the map binds to.",
+  "_comment": "IMA Energy Atlas - map view configuration. The illustrator fills in the visual SVG; this file specifies the structural data the map binds to.",
   "_version": "1.0",
 
   "canvas": {
@@ -37,7 +37,7 @@
       "label": "Industrial Inland",
       "center": [1100, 600],
       "bounds": [880, 480, 1340, 740],
-      "_position_note": "Just inland from the port. Pipeline corridors radiating outward. IOC corporate campuses (taller buildings, but minimal — these are just headquarters). Gathering & processing plants nearer the basin.",
+      "_position_note": "Just inland from the port. Pipeline corridors radiating outward. IOC corporate campuses (taller buildings, but minimal - these are just headquarters). Gathering & processing plants nearer the basin.",
       "nodes": [
         "midstream_pipelines",
         "midstream_gpt",
@@ -49,7 +49,7 @@
       "label": "Oilfield / Basin",
       "center": [580, 600],
       "bounds": [180, 470, 880, 800],
-      "_position_note": "The largest district — sprawling sepia-toned oilfield occupying the center and lower-left of the island. Pump jacks, rigs, well pads. This is where most of the visual weight goes.",
+      "_position_note": "The largest district - sprawling sepia-toned oilfield occupying the center and lower-left of the island. Pump jacks, rigs, well pads. This is where most of the visual weight goes.",
       "nodes": [
         "upstream_oil_eandp",
         "upstream_gas_eandp",
@@ -72,7 +72,7 @@
       "label": "Quarry / Mine",
       "center": [180, 760],
       "bounds": [60, 700, 320, 850],
-      "_position_note": "Lower-left corner. Open-pit mine with terraced walls. Conveyor belts. A quieter, darker district — coal and minerals are extractive but lower-vol than oil.",
+      "_position_note": "Lower-left corner. Open-pit mine with terraced walls. Conveyor belts. A quieter, darker district - coal and minerals are extractive but lower-vol than oil.",
       "nodes": [
         "coal"
       ]
@@ -92,7 +92,7 @@
       "label": "Power District",
       "center": [1180, 820],
       "bounds": [950, 740, 1340, 870],
-      "_position_note": "Lower-right of island. A grouping: gas-fired power station (cooling towers), wind turbines on a ridge, transmission lines radiating. Distinct from the industrial port — this is where electricity is GENERATED, not consumed.",
+      "_position_note": "Lower-right of island. A grouping: gas-fired power station (cooling towers), wind turbines on a ridge, transmission lines radiating. Distinct from the industrial port - this is where electricity is GENERATED, not consumed.",
       "nodes": [
         "power_ipps_merchant",
         "power_renewables",
@@ -105,7 +105,7 @@
       "label": "Nuclear Quarter",
       "center": [1280, 660],
       "bounds": [1200, 600, 1340, 740],
-      "_position_note": "Adjacent to the power district but visually separated — its own enclave with cooling towers (the canonical nuclear silhouette). Smaller, fewer elements, more iconic.",
+      "_position_note": "Adjacent to the power district but visually separated - its own enclave with cooling towers (the canonical nuclear silhouette). Smaller, fewer elements, more iconic.",
       "nodes": [
         "uranium_nuclear_fuel",
         "nuclear_smr_developers"
@@ -116,7 +116,7 @@
       "label": "Town",
       "center": [700, 750],
       "bounds": [600, 700, 800, 800],
-      "_position_note": "Small clustered town — a few buildings, a gas station icon, maybe a road running through. The 'consumer' end of the value chain. Smallest district by visual weight.",
+      "_position_note": "Small clustered town - a few buildings, a gas station icon, maybe a road running through. The 'consumer' end of the value chain. Smallest district by visual weight.",
       "nodes": [
         "downstream_retail"
       ]
@@ -198,7 +198,7 @@
 
   "rendering_hints": {
     "node_marker_count_per_district": {
-      "_note": "How many distinct visual elements should represent the sub-industries within each district. Some districts have multiple nodes — the illustrator can either render one element per node OR render thematic clusters (e.g. 'a row of pump jacks' represents the oil_eandp node).",
+      "_note": "How many distinct visual elements should represent the sub-industries within each district. Some districts have multiple nodes - the illustrator can either render one element per node OR render thematic clusters (e.g. 'a row of pump jacks' represents the oil_eandp node).",
       "open_ocean": "3 elements: a drillship (drillers), a smaller subsea vessel (OFS offshore), a tanker (shipping)",
       "port_waterfront": "3 elements: LNG storage tanks with jetty (LNG terminals), a refinery silhouette (refiners), a chemical plant with stacks (petrochem)",
       "industrial_inland": "3 elements: a pipeline pump station (pipelines), a gas processing facility (GPT), a corporate tower or two (IOCs)",

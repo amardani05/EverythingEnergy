@@ -1,4 +1,4 @@
-"""Shared helpers for factor tests — synthetic edgar_facts and prices
+"""Shared helpers for factor tests - synthetic edgar_facts and prices
 injection so we can drive Value/Quality/PEAD in isolation without hitting
 the live ingester."""
 

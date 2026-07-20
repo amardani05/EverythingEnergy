@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""IJR holdings ingester — disk-based (manual daily drop).
+"""IJR holdings ingester - disk-based (manual daily drop).
 
 Per turn 8 decision: iShares' AJAX endpoint is Akamai-walled, so v1 ingests
 from a directory of CSVs you save manually:
@@ -7,7 +7,7 @@ from a directory of CSVs you save manually:
   1. Open https://www.ishares.com/us/products/239774/ishares-core-sp-small-cap-etf
   2. Click "Download holdings (CSV)" near the top right.
   3. Move the downloaded file into data_store/raw/ijr/  (filename doesn't
-     matter — we parse the as-of date from the CSV header).
+     matter - we parse the as-of date from the CSV header).
 
 Run this script (idempotent, PK-protected) to ingest any new snapshots:
 
@@ -37,7 +37,7 @@ def ingest_directory(raw_dir: Path, db_path: Path) -> int:
     keys that were inserted."""
     csvs = sorted(raw_dir.glob("*.csv"))
     if not csvs:
-        log.info("[ijr] no CSVs in %s — nothing to ingest. Drop the iShares "
+        log.info("[ijr] no CSVs in %s - nothing to ingest. Drop the iShares "
                  "holdings file there and re-run.", raw_dir)
         return 0
 

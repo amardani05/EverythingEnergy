@@ -1,4 +1,4 @@
-"""IJR holdings parser tests — locks the iShares CSV format we ingest.
+"""IJR holdings parser tests - locks the iShares CSV format we ingest.
 
 If iShares changes the columns/header again, these tests fail loudly
 instead of silently dropping holdings into a malformed parquet.
@@ -15,7 +15,6 @@ from signal_engine.data.universe import (
     parse_as_of_date,
     parse_holdings_csv,
 )
-
 
 CSV_2026_FORMAT = dedent("""\
     iShares Core S&P Small-Cap ETF
@@ -47,7 +46,7 @@ def test_parse_as_of_date_unquoted_form() -> None:
 def test_parse_holdings_csv_extracts_equity_rows_only() -> None:
     as_of, df = parse_holdings_csv(CSV_2026_FORMAT)
     assert as_of == date(2026, 6, 12)
-    # XTSLA cash sweep must be filtered out — only equity asset class survives.
+    # XTSLA cash sweep must be filtered out - only equity asset class survives.
     assert df["ticker"].to_list() == ["SMTC", "AAON"]
     assert "XTSLA" not in df["ticker"].to_list()
 

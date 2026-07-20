@@ -1,4 +1,4 @@
-"""Quality factor tests — ROIC + accruals + margin stability."""
+"""Quality factor tests - ROIC + accruals + margin stability."""
 
 from __future__ import annotations
 
@@ -44,8 +44,7 @@ def test_margin_stability_requires_min_years(tmp_con: duckdb.DuckDBPyConnection)
 
 
 def test_margin_stability_higher_when_margins_more_consistent(tmp_con: duckdb.DuckDBPyConnection) -> None:
-    """Two companies with same trailing-mean margin but different vol —
-    the steadier one must score higher."""
+    """Two companies with same trailing-mean margin but different vol - the steadier one must score higher."""
     stable_cik, volatile_cik = 2000003, 2000004
     # Stable: opinc/revenue = 0.15 every year for 4 years
     for i, fy in enumerate(range(2021, 2025)):
@@ -54,7 +53,7 @@ def test_margin_stability_higher_when_margins_more_consistent(tmp_con: duckdb.Du
         insert_annual_bundle(tmp_con, cik=stable_cik, fy=fy,
                              period_end=date(fy, 12, 31),
                              filed=date(fy + 1, 2, 15), values=v,
-                             accession_prefix=f"stable-")
+                             accession_prefix="stable-")
     # Volatile: oscillates 0.05 / 0.25 / 0.05 / 0.25
     for i, fy in enumerate(range(2021, 2025)):
         margin = 0.05 if i % 2 == 0 else 0.25
@@ -63,7 +62,7 @@ def test_margin_stability_higher_when_margins_more_consistent(tmp_con: duckdb.Du
         insert_annual_bundle(tmp_con, cik=volatile_cik, fy=fy,
                              period_end=date(fy, 12, 31),
                              filed=date(fy + 1, 2, 15), values=v,
-                             accession_prefix=f"vol-")
+                             accession_prefix="vol-")
 
     df = compute_quality(tmp_con, as_of=date(2025, 6, 1),
                          ticker_to_cik={"STABLE": stable_cik, "VOL": volatile_cik})

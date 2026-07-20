@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Daily signal run — the Phase 1 acceptance command.
+"""Daily signal run - the Phase 1 acceptance command.
 
 One invocation:
   1. builds the ranked, sector-neutral composite cross-section at --as-of
@@ -51,7 +51,7 @@ def main() -> int:
         else:
             as_of = con.execute("SELECT max(date) FROM prices").fetchone()[0]
             if as_of is None:
-                log.error("prices table is empty — run scripts/ingest_prices.py first")
+                log.error("prices table is empty - run scripts/ingest_prices.py first")
                 return 2
 
         df = build_composite(con, as_of, cfg)
@@ -62,7 +62,7 @@ def main() -> int:
     # ---- console report ----
     top = ranked.head(args.top)
     with pl.Config(tbl_rows=args.top, tbl_cols=-1, float_precision=3):
-        print(f"\n=== Top {args.top} — {as_of} (pctl 0% = best; survivorship_clean=False) ===")
+        print(f"\n=== Top {args.top} - {as_of} (pctl 0% = best; survivorship_clean=False) ===")
         print(top.select([c for c in (
             "rank", "ticker", "sector", "composite",
             "score_momentum", "score_value", "score_pead", "score_quality",

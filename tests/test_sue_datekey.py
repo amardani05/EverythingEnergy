@@ -1,4 +1,4 @@
-"""SUE-`filed` PIT contract test — ACTIVATED in step 3.
+"""SUE-`filed` PIT contract test - ACTIVATED in step 3.
 
 The contract from the spec:
 
@@ -75,7 +75,7 @@ def test_sue_never_attached_before_its_filed_date(tmp_con: duckdb.DuckDBPyConnec
 
 
 def test_sue_filed_date_present_on_every_row(tmp_con: duckdb.DuckDBPyConnection) -> None:
-    """The `signal_date` column must never be NULL — even degenerate rows
+    """The `signal_date` column must never be NULL - even degenerate rows
     where SUE numerator/denominator can't be computed should be dropped
     by the factor before emission."""
     cik = 4000002

@@ -1,28 +1,28 @@
-# Cross-sectional signal engine — runtime configuration.
+# Cross-sectional signal engine - runtime configuration.
 # Edit freely; nothing in the code hardcodes these values.
 
 universe:
   # 'ijr_current' = today's IJR membership applied to all dates (biased; flagged in outputs)
   # 'ijr_pit'     = point-in-time IJR membership (only available from today forward)
-  # 'none'        = no membership filter — diagnostic, see how much IJR contributes
+  # 'none'        = no membership filter - diagnostic, see how much IJR contributes
   membership_mode: ijr_current
   # Report a comparison row using these alternate modes on every backtest output.
   report_also: [none]
   # Min trailing days of price coverage required to score a name.
   min_price_history_days: 252
 
-# Liquidity floor removed in v1 per spec — walk-forward is the primary gate.
+# Liquidity floor removed in v1 per spec - walk-forward is the primary gate.
 # Spreads/ADV will be revisited only if a position-sizing layer needs them.
 
 signals:
-  # Selection signals — sector-neutralized, weighted composite (scoring/).
+  # Selection signals - sector-neutralized, weighted composite (scoring/).
   # Enablement + component choices follow docs/baselines.md (2026-07-17):
   # PEAD, EV/EBITDA, and momentum carry real IC; the rest were noise raw.
   selection:
     - name: value
       enabled: true
       weight: 1.0
-      components: [ev_ebitda]   # fcf_yield excluded — ~0 IC in baseline
+      components: [ev_ebitda]   # fcf_yield excluded - ~0 IC in baseline
     - name: quality
       enabled: false            # ROIC/accruals/margin-stability ~0 IC raw;
       weight: 1.0               # revisit after sector-neutralization
@@ -33,7 +33,7 @@ signals:
     - name: pead
       enabled: true
       weight: 1.0
-  # Macro sleeve — separate ranked sleeve, NOT in the composite.
+  # Macro sleeve - separate ranked sleeve, NOT in the composite.
   macro:
     - name: commodity_beta
       enabled: false      # implemented in step 4 from atlas/
@@ -53,9 +53,9 @@ validation:
     horizons_days: [1, 5, 21, 63]
     rebalance_freq: B           # business-daily
     min_train_days: 504         # 2 years of in-sample before first scored day
-  # Holdout demoted to a one-off final check — still emitted in the scorecard.
+  # Holdout demoted to a one-off final check - still emitted in the scorecard.
   holdout_months: 12
-  # Cost model — gross and net both reported.
+  # Cost model - gross and net both reported.
   cost_model:
     spread_bps: 60              # placeholder; revisit when we have a real estimator
     impact_bps_per_pct_adv: 10
@@ -68,7 +68,7 @@ output:
     rank_jump_threshold: 50     # percentile points
     pair_z_alert: 2.0
 
-# EDGAR XBRL — fundamentals
+# EDGAR XBRL - fundamentals
 edgar:
   user_agent_email: amard2@illinois.edu        # required by SEC fair-use policy
   user_agent_name: "EverythingEnergy/SignalEngine"
@@ -134,10 +134,10 @@ edgar:
       tags: [CommonStockSharesOutstanding]
   # Derived line items computed in factors/, not at ingest:
   #   ebitda = net_income + interest_expense + tax_expense + depreciation_amortization
-  #            (street formula — per turn 6 decision)
+  #            (street formula - per turn 6 decision)
   #   fcf    = operating_cash_flow - capex
 
-# Prices — yfinance is primary in v1 (flagged unofficial); Stooq deferred
+# Prices - yfinance is primary in v1 (flagged unofficial); Stooq deferred
 # until a captcha-acquired apikey is wired up.
 prices:
   primary_source: yfinance
@@ -149,14 +149,14 @@ prices:
     enabled: false
     per_ticker_url: "https://stooq.com/q/d/l/?s={ticker}.us&i=d"
 
-# iShares IJR — S&P 600 proxy. Akamai walls the AJAX URL, so v1 ingests CSVs
+# iShares IJR - S&P 600 proxy. Akamai walls the AJAX URL, so v1 ingests CSVs
 # you manually save into data_store/raw/ijr/. scripts/snapshot_ijr.py is a
 # disk-based ingester (idempotent).
 ijr:
   snapshot_dir: data_store/raw/ijr
   download_page: "https://www.ishares.com/us/products/239774/ishares-core-sp-small-cap-etf"
 
-# FINRA — semi-monthly short interest (free)
+# FINRA - semi-monthly short interest (free)
 finra:
   monthly_index_url: "https://cdn.finra.org/equity/regsho/monthly/"
 
@@ -166,7 +166,7 @@ macro:
   eia_base: "https://api.eia.gov/v2"
   # Series mapped per Atlas basket in signal_engine/atlas/clusters.py (reads energy_taxonomy.yaml).
 
-# Atlas — reads existing /energy_taxonomy.yaml; no duplication here.
+# Atlas - reads existing /energy_taxonomy.yaml; no duplication here.
 atlas:
   taxonomy_path: energy_taxonomy.yaml
 

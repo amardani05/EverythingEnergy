@@ -1,4 +1,4 @@
-"""Output — snapshot persistence + day-over-day diff artifacts."""
+"""Output - snapshot persistence + day-over-day diff artifacts."""
 
 from signal_engine.output.snapshots import (
     DiffReport,

@@ -29,7 +29,7 @@ python3 server.py
 open http://localhost:8000/dashboard.html
 ```
 
-> The **↻ refresh** button in the top-bar re-runs the consolidator and reloads. Use it any time you've nudged YAML constituents, re-pulled prices, or re-run an upstream phase — no manual reload needed.
+> The **↻ refresh** button in the top-bar re-runs the consolidator and reloads. Use it any time you've nudged YAML constituents, re-pulled prices, or re-run an upstream phase - no manual reload needed.
 
 > Hard-refresh with **Cmd+Shift+R** after editing source files (atlas.jsx / app.jsx / dashboard.html). The JSON is cache-busted automatically; only the JS/CSS need a manual refresh.
 
@@ -45,16 +45,16 @@ Three view modes (toggle bottom-left):
 
 | Mode | What edges represent |
 |---|---|
-| **Flow** | Commodity flow (taxonomy-driven) — molecule from upstream → downstream |
-| **Correlation** *(default)* | Cross-basket weekly-return correlation. Color is a teal→neutral→gold gradient stretched across the live data's `[min ρ, max ρ]`. Width is bucketed (strong ≥ 0.7 / medium 0.5–0.7 / weak < 0.5). All pairs shown — no thresholding. |
+| **Flow** | Commodity flow (taxonomy-driven) - molecule from upstream → downstream |
+| **Correlation** *(default)* | Cross-basket weekly-return correlation. Color is a teal→neutral→gold gradient stretched across the live data's `[min ρ, max ρ]`. Width is bucketed (strong ≥ 0.7 / medium 0.5–0.7 / weak < 0.5). All pairs shown - no thresholding. |
 | **Signal** | Active pair-trade signals where 60d residual `|z| > 0.5`. Gold = stretched, dashed grey = watch. |
 
 Click any node to open the side drawer. Tabs:
 
-- **Overview** — N constituents, 60d return, intra-basket correlation, R² to factors, IVR block (Realized / Factor-Implied / Gap)
-- **Names** — sorted constituent table with 60d returns
-- **Residuals** — sorted by `|z60d|`; `|z| > 1.5` rows highlighted gold (mean-reversion candidates)
-- **Attribution** — 1m / 3m / YTD / 1y window selector + horizontal factor-contribution bars
+- **Overview** - N constituents, 60d return, intra-basket correlation, R² to factors, IVR block (Realized / Factor-Implied / Gap)
+- **Names** - sorted constituent table with 60d returns
+- **Residuals** - sorted by `|z60d|`; `|z| > 1.5` rows highlighted gold (mean-reversion candidates)
+- **Attribution** - 1m / 3m / YTD / 1y window selector + horizontal factor-contribution bars
 
 The strip below the map shows top active signals (or, if no `|z| > 0.5` pairs, the top 8 strongest correlations as a fallback).
 
@@ -67,7 +67,7 @@ The strip below the map shows top active signals (or, if no `|z| > 0.5` pairs, t
 | `dashboard.html` | HTML shell · all CSS · SVG `<defs>` (filters, patterns, markers) |
 | `app.jsx` | React app · map SVG · edges (D3) · drawer · screener · signals strip |
 | `atlas.jsx` | Data hydrator · loads `dashboard_data.json` → `window.NODES` etc. · holds node `(x,y)` overlay |
-| `districts.jsx` | Illustrated island components (terrain, motifs) — **don't modify** without illustrator's input |
+| `districts.jsx` | Illustrated island components (terrain, motifs) - **don't modify** without illustrator's input |
 | `dashboard_data.json` | Pipeline output (~450 KB) consumed at page load |
 | `map_config.json` | Optional district-label overrides |
 | `energy_taxonomy.yaml` | Source of truth for baskets + constituents (drives every analysis script) |
@@ -92,7 +92,7 @@ The price/driver Parquet caches (`price_cache.parquet`, `driver_cache.parquet`) 
 {
   "meta":   { "generated_at", "taxonomy_version", "n_nodes", "n_constituents", "lookback_years" },
   "drivers": ["CL", "NG", "CRACK_321", "WTI_BRENT", "SPX", "TNX", "URA", "BDRY"],
-  "nodes":  [ /* 23 NodeObj — see ARCHITECTURE.md for full schema */ ],
+  "nodes":  [ /* 23 NodeObj - see ARCHITECTURE.md for full schema */ ],
   "pairs":  [ /* taxonomy-driven long/short pair signals with z, thesis, ret_3m */ ],
   "regime_alerts": [ /* rolling-beta breaks */ ],
   "cross_basket_correlation": { "<id>": { "<id>": <ρ> } }
@@ -116,11 +116,11 @@ See `ARCHITECTURE.md` for design rationale and the deferred-feature list.
 
 ## Deploying to Vercel
 
-The frontend is a static bundle (HTML + JSX-transpiled-in-browser + JSON) — no build step. The repo is wired for Vercel:
+The frontend is a static bundle (HTML + JSX-transpiled-in-browser + JSON) - no build step. The repo is wired for Vercel:
 
 - `vercel.json` serves `.jsx` files with `Content-Type: application/javascript` (required so Babel-standalone can pick them up) and redirects `/` → `/dashboard.html`.
 - `.vercelignore` keeps the Python pipeline, parquet caches, and intermediate `*_results/` CSVs out of the deploy. Only `dashboard.html`, the three `.jsx` files, `dashboard_data.json`, `map_config.json`, and `icons/` ship to prod.
-- The ↻ refresh button is hidden on non-localhost hosts — pipeline reruns are local-only. To update the hosted snapshot, re-run the pipeline locally, then commit the new `dashboard_data.json`.
+- The ↻ refresh button is hidden on non-localhost hosts - pipeline reruns are local-only. To update the hosted snapshot, re-run the pipeline locally, then commit the new `dashboard_data.json`.
 
 Deploy: `vercel` (preview) or `vercel --prod`. No env vars or build command needed.
 
@@ -131,4 +131,4 @@ Deploy: `vercel` (preview) or `vercel --prod`. No env vars or build command need
 | "ATLAS HYDRATION FAILED" red banner | You opened `dashboard.html` via `file://`. Always serve via `python3 -m http.server`. |
 | Stale data after pipeline re-run | Hard refresh; if still wrong, check that `consolidate_data.py` printed `[done] wrote dashboard_data.json`. |
 | Empty signals strip | No pairs at `|z| > 0.5` right now. The strip falls back to top correlations. Re-run `phase3_analysis.py` to recompute. |
-| Node missing from map | `[atlas] nodes in dashboard_data.json not on map (no POSITIONS entry):` warning in console — add the id to `POSITIONS` in `atlas.jsx`. |
+| Node missing from map | `[atlas] nodes in dashboard_data.json not on map (no POSITIONS entry):` warning in console - add the id to `POSITIONS` in `atlas.jsx`. |

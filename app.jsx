@@ -16,7 +16,7 @@ function curvePath(s, t, lift = 0.18) {
 }
 
 /* Wave path · sinusoidal perpendicular perturbation along the s→t line.
-   Used by the flow mode for "gas" — feels like compressible-fluid flow. */
+   Used by the flow mode for "gas" - feels like compressible-fluid flow. */
 function wavePath(s, t, amplitude = 4, frequency = 8) {
   const dx = t.x - s.x, dy = t.y - s.y;
   const len = Math.sqrt(dx * dx + dy * dy);
@@ -128,7 +128,7 @@ function InfoButton() {
             <div className="info-mode">Flow</div>
             <p className="info-summary">Physical commodity flow through the energy value chain.</p>
             <p className="info-detail"><strong>Computed:</strong> Edges are taxonomy-driven, not analysis-derived. Each line is a known commodity hand-off (e.g. E&amp;P → midstream → refiners → retail).</p>
-            <p className="info-detail"><strong>What's shown:</strong> Color + style encodes the commodity class (amber crude, blue gas, orange products, pale dotted LNG, black dashed coal, teal long-dash nuclear, violet zigzag electricity, tan dash-dot services, olive tight-dotted feedstock). Capsules ride at speeds matching real-world logistics tempo — electricity instant, coal/nuclear slow rail/batch.</p>
+            <p className="info-detail"><strong>What's shown:</strong> Color + style encodes the commodity class (amber crude, blue gas, orange products, pale dotted LNG, black dashed coal, teal long-dash nuclear, violet zigzag electricity, tan dash-dot services, olive tight-dotted feedstock). Capsules ride at speeds matching real-world logistics tempo - electricity instant, coal/nuclear slow rail/batch.</p>
             <p className="info-detail"><strong>Frame as:</strong> "Where does the molecule go?" Answers physical-supply-chain questions. Hover any district to isolate flows in/out of it.</p>
           </section>
 
@@ -136,15 +136,15 @@ function InfoButton() {
             <div className="info-mode">Correlation</div>
             <p className="info-summary">Weekly-return co-movement between every pair of baskets.</p>
             <p className="info-detail"><strong>Computed:</strong> Pearson correlation of weekly basket returns over the lookback window (5y), every basket vs every other.</p>
-            <p className="info-detail"><strong>What's shown:</strong> Color is a white→gold gradient stretched across the live data's <code>[min ρ, max ρ]</code> so the gradient always uses its full range. Width is bucketed (<code>|ρ|≥0.7</code> strong, <code>0.5–0.7</code> medium, <code>&lt;0.5</code> weak). The chip in the bottom-left is a Tufte strip — every pair plotted at its <code>|ρ|</code> position. Drag the slider to set a threshold; pairs below it dim out.</p>
+            <p className="info-detail"><strong>What's shown:</strong> Color is a white→gold gradient stretched across the live data's <code>[min ρ, max ρ]</code> so the gradient always uses its full range. Width is bucketed (<code>|ρ|≥0.7</code> strong, <code>0.5–0.7</code> medium, <code>&lt;0.5</code> weak). The chip in the bottom-left is a Tufte strip - every pair plotted at its <code>|ρ|</code> position. Drag the slider to set a threshold; pairs below it dim out.</p>
             <p className="info-detail"><strong>Frame as:</strong> "What moves together right now?" High ρ → baskets share a common factor exposure (oil, rates, growth, dollar). Low ρ → diversification candidate or factor-divergence story.</p>
           </section>
 
           <section>
             <div className="info-mode">Signal</div>
             <p className="info-summary">Active pair-trade signals + per-basket signal density.</p>
-            <p className="info-detail"><strong>Computed:</strong> Six signal types per basket — <em>Pair</em> (60d residual z on a taxonomy-defined L/S spread), <em>Residual</em> (count of constituents stretched ±1.5z), <em>IVR</em> (4w realized vs factor-implied gap), <em>Regime</em> (rolling-β breaks vs long-run mean), <em>Dispersion</em> (idio share of total return magnitude), <em>Momentum</em> (60d return + percentile vs other baskets).</p>
-            <p className="info-detail"><strong>What's shown:</strong> Edges = active pair signals (gold solid for <code>|z|&gt;1.5</code>, dashed grey for pre-trigger watch). Each node carries an <code>n/6</code> badge — how many signal types are firing on that basket. ≥3 firing earns a gold halo.</p>
+            <p className="info-detail"><strong>Computed:</strong> Six signal types per basket - <em>Pair</em> (60d residual z on a taxonomy-defined L/S spread), <em>Residual</em> (count of constituents stretched ±1.5z), <em>IVR</em> (4w realized vs factor-implied gap), <em>Regime</em> (rolling-β breaks vs long-run mean), <em>Dispersion</em> (idio share of total return magnitude), <em>Momentum</em> (60d return + percentile vs other baskets).</p>
+            <p className="info-detail"><strong>What's shown:</strong> Edges = active pair signals (gold solid for <code>|z|&gt;1.5</code>, dashed grey for pre-trigger watch). Each node carries an <code>n/6</code> badge - how many signal types are firing on that basket. ≥3 firing earns a gold halo.</p>
             <p className="info-detail"><strong>Frame as:</strong> "Where is something stretched enough to act on?" Tactical timing, not structural thesis. Click any basket for the full six-card stack.</p>
           </section>
         </div>
@@ -264,7 +264,7 @@ function Zones() {
 }
 
 /* ---------------- District hit-areas (invisible) ----------------
-   No rendered labels — the illustrator's island already provides location.
+   No rendered labels - the illustrator's island already provides location.
    Each invisible <rect> still captures hover so flow mode can highlight
    edges entering or leaving a district. */
 function DistrictLabels({ onDistrictHover }) {
@@ -333,7 +333,7 @@ function Edges({ mode, hover, selected, hoverDistrict, corrThreshold = 0 }) {
       })).filter(e => e.s && e.t);
 
       const opacityFor = (d) => {
-        // District hover takes priority — dim everything not touching the district
+        // District hover takes priority - dim everything not touching the district
         if (hoverDistrict) {
           const sd = d.s.district, td = d.t.district;
           if (sd !== hoverDistrict && td !== hoverDistrict) return 0.15;
@@ -356,7 +356,7 @@ function Edges({ mode, hover, selected, hoverDistrict, corrThreshold = 0 }) {
         .append("g")
         .attr("class", d => "flow-edge flow-" + d.cls);
 
-      // Main edge — wave / zigzag / curve depending on class. No endpoint
+      // Main edge - wave / zigzag / curve depending on class. No endpoint
       // arrowheads on the flow layer; direction reads from the moving capsule.
       sel.append("path")
         .attr("class", "edge-base")
@@ -368,7 +368,7 @@ function Edges({ mode, hover, selected, hoverDistrict, corrThreshold = 0 }) {
         .attr("fill", "none")
         .attr("stroke-linecap", "round");
 
-      // Double-line variants ("products") — second parallel curve offset by 3px
+      // Double-line variants ("products") - second parallel curve offset by 3px
       sel.filter(d => (FLOW_STYLE[d.cls] || {}).double === true)
         .append("path")
         .attr("class", "edge-base-double")
@@ -379,7 +379,7 @@ function Edges({ mode, hover, selected, hoverDistrict, corrThreshold = 0 }) {
         .attr("fill", "none")
         .attr("stroke-linecap", "round");
 
-      // Animated traveling dot — class-coded color, class-coded CSS duration.
+      // Animated traveling dot - class-coded color, class-coded CSS duration.
       // Width tuned a little above the line so the capsule reads as a bright
       // bead riding on the line rather than a dot lost in it.
       sel.append("path")
@@ -434,7 +434,7 @@ function Edges({ mode, hover, selected, hoverDistrict, corrThreshold = 0 }) {
       const span = (cMax - cMin) || 1;
       const tOf = c => (Math.abs(c) - cMin) / span;
 
-      // Threshold filter — declutter pairs below |ρ| ≥ corrThreshold.
+      // Threshold filter - declutter pairs below |ρ| ≥ corrThreshold.
       // Edges touching the focused node are kept regardless so hover still
       // reveals the full local web.
       const all = allUnfiltered.filter(e =>
@@ -473,7 +473,7 @@ function Edges({ mode, hover, selected, hoverDistrict, corrThreshold = 0 }) {
         .append("g")
         .attr("class", d => "corr-edge bucket-" + d.bucket);
 
-      // HALO — strong only
+      // HALO - strong only
       sel.filter(d => d.bucket === "strong").append("path")
         .attr("class", "edge-halo")
         .attr("d", d => curvePath(d.s, d.t, 0.18))
@@ -495,7 +495,7 @@ function Edges({ mode, hover, selected, hoverDistrict, corrThreshold = 0 }) {
         .attr("fill", "none")
         .attr("stroke-linecap", "round");
 
-      // Endpoint markers — strong only
+      // Endpoint markers - strong only
       const endpoints = sel.filter(d => d.bucket === "strong");
       endpoints.append("circle")
         .attr("cx", d => d.s.x).attr("cy", d => d.s.y)
@@ -514,7 +514,7 @@ function Edges({ mode, hover, selected, hoverDistrict, corrThreshold = 0 }) {
         .attr("r", 3.5).attr("fill", d => colorOf(d.c))
         .attr("opacity", d => focus && !(d.a === focus || d.b === focus) ? 0 : 1);
 
-      // Animated traveling dot — strong bucket only, gradient color. Bigger
+      // Animated traveling dot - strong bucket only, gradient color. Bigger
       // stroke so the bead is unmistakable against the line.
       sel.filter(d => d.bucket === "strong").append("path")
         .attr("class", "edge-dot")
@@ -757,7 +757,7 @@ function computeSignals(node) {
 
   const signals = [];
 
-  // 1. PAIR — strongest pair this basket participates in
+  // 1. PAIR - strongest pair this basket participates in
   const pairCands = allPairs
     .filter(p => p.long === node.id || p.short === node.id)
     .slice()
@@ -782,7 +782,7 @@ function computeSignals(node) {
     signals.push({ type: "pair", firing: false, score: 0, direction: "neutral" });
   }
 
-  // 2. RESIDUAL — count of constituents with |z60d| > 1.5
+  // 2. RESIDUAL - count of constituents with |z60d| > 1.5
   const consts = node.constituents || [];
   const stretched = consts.filter(c => c.residual_z60d != null && Math.abs(c.residual_z60d) > 1.5);
   const stretchedPos = stretched.filter(c => c.residual_z60d > 0).length;
@@ -800,7 +800,7 @@ function computeSignals(node) {
     stretchedPos, stretchedNeg,
   });
 
-  // 3. IVR — gap_4w; positive gap = realized exceeded factor (potential mean-reversion bear)
+  // 3. IVR - gap_4w; positive gap = realized exceeded factor (potential mean-reversion bear)
   const gap = node.ivr && node.ivr.gap_4w;
   if (gap != null) {
     const ivrFiring = Math.abs(gap) > 0.02;
@@ -817,7 +817,7 @@ function computeSignals(node) {
     signals.push({ type: "ivr", firing: false, score: 0, direction: "neutral" });
   }
 
-  // 4. REGIME — strongest β break for this basket (others kept for the card body)
+  // 4. REGIME - strongest β break for this basket (others kept for the card body)
   const myRegime = regimeAlerts
     .filter(r => r.basket === node.id)
     .slice()
@@ -841,7 +841,7 @@ function computeSignals(node) {
     signals.push({ type: "regime", firing: false, score: 0, direction: "neutral" });
   }
 
-  // 5. DISPERSION — idio share of total magnitude (3m window)
+  // 5. DISPERSION - idio share of total magnitude (3m window)
   const a3 = node.attribution && node.attribution["3m"];
   if (a3) {
     const absIdio = Math.abs(a3.idio || 0);
@@ -861,7 +861,7 @@ function computeSignals(node) {
     signals.push({ type: "dispersion", firing: false, score: 0, direction: "neutral" });
   }
 
-  // 6. MOMENTUM — 60d return + percentile vs other baskets
+  // 6. MOMENTUM - 60d return + percentile vs other baskets
   const r60 = node.r60;
   if (r60 != null) {
     const all60s = allNodes.map(n => n.r60).filter(v => v != null);
@@ -890,7 +890,7 @@ function SignalStack({ node, onSelectBasket }) {
   const signals = useMemo(() => computeSignals(node), [node]);
   const firingCount = signals.filter(s => s.firing).length;
 
-  // Watch list — pairs touching this basket with 0.8 < |z| < 1.5
+  // Watch list - pairs touching this basket with 0.8 < |z| < 1.5
   const watch = (window.ALL_PAIRS || [])
     .filter(p => (p.long === node.id || p.short === node.id))
     .filter(p => p.z != null && Math.abs(p.z) > 0.8 && Math.abs(p.z) < 1.5)
@@ -1013,7 +1013,7 @@ function SignalStack({ node, onSelectBasket }) {
         ))}
       </div>
 
-      {/* Watch — pre-trigger pairs */}
+      {/* Watch - pre-trigger pairs */}
       {watch.length > 0 && (
         <div className="sig-watch">
           <div className="section-head">Watch · approaching trigger</div>
@@ -1038,8 +1038,7 @@ function SignalStack({ node, onSelectBasket }) {
 
 /* ---------------- Side pane: drawer + screener ---------------- */
 /* Data-freshness chip · reads the record atlas.jsx computed at hydration.
-   Rendered wherever numbers whose meaning decays with time are shown —
-   drawers, signal strips, density header. `inline` = compact variant. */
+   Rendered wherever numbers whose meaning decays with time are shown - drawers, signal strips, density header. `inline` = compact variant. */
 function AsOfChip({ inline }) {
   const a = window.DATA_ASOF;
   if (!a) return null;
@@ -1074,7 +1073,7 @@ function Drawer({ node, onClose, onSelectStock, onSelectBasket }) {
       <div className="desc-blk">{DESCRIPTIONS[node.id] || ""}</div>
       <div style={{ margin: "6px 0 2px" }}><AsOfChip inline /></div>
       
-      {/* Tab bar — Lookup retired; the global search in the top bar replaces it. */}
+      {/* Tab bar - Lookup retired; the global search in the top bar replaces it. */}
       <div className="drawer-tabs">
         <button className={"drawer-tab" + (tab==="overview" ? " active" : "")} onClick={()=>setTab("overview")}>Overview</button>
         <button className={"drawer-tab" + (tab==="constituents" ? " active" : "")} onClick={()=>setTab("constituents")}>Names · {consts.length}</button>
@@ -1091,7 +1090,7 @@ function Drawer({ node, onClose, onSelectStock, onSelectBasket }) {
             <div className="stat"><div className="lab">R²</div><div className="val">{node.r2 != null ? node.r2.toFixed(2) : "·"}</div></div>
           </div>
 
-          {/* Signal stack — replaces the old IVR-only block */}
+          {/* Signal stack - replaces the old IVR-only block */}
           <SignalStack node={node} onSelectBasket={onSelectBasket} />
 
           <div className="section-head">Flows into</div>
@@ -1331,7 +1330,7 @@ function SignalsStrip({ onSelect, onSeedLab, onSelectStock }) {
       {/* Basket ↔ Basket · z-scored pair signals */}
       <div className="signals-row-label">Basket ↔ Basket</div>
       <div className="signals-grid">
-        {basketBasket.length === 0 && <div className="dash-empty">No basket pair signals — run phase3.</div>}
+        {basketBasket.length === 0 && <div className="dash-empty">No basket pair signals - run phase3.</div>}
         {basketBasket.map((p, i) => {
           const stretched = Math.abs(p.z || 0) >= 1.5;
           const longId = p.long || p.a, shortId = p.short || p.b;
@@ -1471,7 +1470,7 @@ function Dashboard({ onSelectBasket, onSelectStock, onSeedLab }) {
   const fmtZ = (v) => v == null ? "·" : (v >= 0 ? "+" : "") + v.toFixed(2);
   const fmtBeta = (v) => v == null ? "·" : v.toFixed(2);
 
-  /* 1. Active Signals — split into two rows.
+  /* 1. Active Signals - split into two rows.
         Top 4 basket↔basket pair signals (z-scored, between groups).
         Top 4 stock↔stock correlations (raw 5y weekly ρ). */
   const basketSignals = (window.ALL_PAIRS || [])
@@ -1509,7 +1508,7 @@ function Dashboard({ onSelectBasket, onSelectStock, onSeedLab }) {
     .sort((a, b) => Math.abs(b.ivr.gap_4w) - Math.abs(a.ivr.gap_4w))
     .slice(0, 5);
 
-  /* 5. Dispersion Rising — current idio_share at 3m window.
+  /* 5. Dispersion Rising - current idio_share at 3m window.
         Raw idio_share blows up when |actual| ~ 0; for a sane sort we use
         |idio| / (|factor| + |idio|) as the dispersion fraction (0..1). */
   const dispersion = (window.NODES || [])
@@ -1525,7 +1524,7 @@ function Dashboard({ onSelectBasket, onSelectStock, onSeedLab }) {
     .sort((a, b) => b.share - a.share)
     .slice(0, 5);
 
-  // Diagnostic counts in console — explicit confirmation per task gate.
+  // Diagnostic counts in console - explicit confirmation per task gate.
   React.useEffect(() => {
     console.log("[dashboard] signals:", signals.length,
                 "· regime:", regime.length,
@@ -1546,7 +1545,7 @@ function Dashboard({ onSelectBasket, onSelectStock, onSeedLab }) {
         {/* Basket ↔ Basket · z-scored pair signals */}
         <div className="dash-signal-row-label">Basket ↔ Basket</div>
         <div className="dash-signals">
-          {basketSignals.length === 0 && <div className="dash-empty">No basket pair signals — re-run phase3.</div>}
+          {basketSignals.length === 0 && <div className="dash-empty">No basket pair signals - re-run phase3.</div>}
           {basketSignals.map((p, i) => {
             const longN = NODE_BY_ID[p.long], shortN = NODE_BY_ID[p.short];
             const stretched = Math.abs(p.z || 0) >= 1.5;
@@ -1726,7 +1725,7 @@ function MapColumn({ onOpenAtlas }) {
   const ink    = "rgba(240,232,208,0.42)";
   const inkDim = "rgba(240,232,208,0.22)";
 
-  // Layer 01 · Ocean — bathymetric depth contours
+  // Layer 01 · Ocean - bathymetric depth contours
   const oceanMotif = (
     <g stroke={ink} fill="none">
       <g strokeWidth="0.6">
@@ -1743,7 +1742,7 @@ function MapColumn({ onOpenAtlas }) {
     </g>
   );
 
-  // Layer 02 · Port & Terminal — engineering plan view
+  // Layer 02 · Port & Terminal - engineering plan view
   const portMotif = (
     <g fill="none">
       <g stroke={ink} strokeWidth="0.7">
@@ -1767,7 +1766,7 @@ function MapColumn({ onOpenAtlas }) {
     </g>
   );
 
-  // Layer 03 · Onshore Subsurface — well log / stratigraphic column
+  // Layer 03 · Onshore Subsurface - well log / stratigraphic column
   const subsurfaceMotif = (
     <g fill="none">
       <g stroke={ink} strokeWidth="0.55">
@@ -1785,7 +1784,7 @@ function MapColumn({ onOpenAtlas }) {
     </g>
   );
 
-  // Layer 04 · Onshore Surface — closed elevation contours
+  // Layer 04 · Onshore Surface - closed elevation contours
   const surfaceMotif = (
     <g fill="none">
       <g stroke={ink} strokeWidth="0.6">
@@ -1799,7 +1798,7 @@ function MapColumn({ onOpenAtlas }) {
     </g>
   );
 
-  // Layer 05 · End User — one-line schematic
+  // Layer 05 · End User - one-line schematic
   const endUserMotif = (
     <g fill="none">
       <line x1="20" y1="44" x2="260" y2="44" stroke={ink} strokeWidth="1.4"/>
@@ -1823,11 +1822,11 @@ function MapColumn({ onOpenAtlas }) {
     <div className="map-column" onClick={onOpenAtlas} title="Open the full Atlas">
       <svg className="map-column-svg" width={W} height={TOTAL_H} viewBox={`0 0 ${W} ${TOTAL_H}`} preserveAspectRatio="xMidYMin meet">
         <defs>
-          {/* Universal dot grid — ties every layer together visually */}
+          {/* Universal dot grid - ties every layer together visually */}
           <pattern id="mapBgGrid" width="14" height="14" patternUnits="userSpaceOnUse">
             <circle cx="0.5" cy="0.5" r="0.5" fill="rgba(240,232,208,0.10)"/>
           </pattern>
-          {/* Diagonal hatch — quiet texture in the corners */}
+          {/* Diagonal hatch - quiet texture in the corners */}
           <pattern id="mapBgHatch" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
             <line x1="0" y1="0" x2="0" y2="22" stroke="rgba(240,232,208,0.05)" strokeWidth="0.5"/>
           </pattern>
@@ -1863,7 +1862,7 @@ function MapColumn({ onOpenAtlas }) {
           <path d={`M ${W - 4} ${TOTAL_H - 16} L ${W - 4} ${TOTAL_H - 4} L ${W - 16} ${TOTAL_H - 4}`}/>
         </g>
 
-        {/* Continuous "trace" snaking through every motif — the connective thread */}
+        {/* Continuous "trace" snaking through every motif - the connective thread */}
         <path
           d={`M 140 30
               C 200 ${BAND_H * 0.6}, 80 ${BAND_H * 1.2}, 140 ${BAND_H * 1.6}
@@ -1898,7 +1897,7 @@ function computeStockSignals(c, node) {
   if (!c || !node) return [];
   const sigs = [];
 
-  // 1. Residual — stock's own z60d
+  // 1. Residual - stock's own z60d
   const z = c.residual_z60d;
   if (z != null) {
     const firing = Math.abs(z) > 1.5;
@@ -1913,7 +1912,7 @@ function computeStockSignals(c, node) {
     sigs.push({ type: "residual", firing: false, score: 0, direction: "neutral" });
   }
 
-  // 2. Attribution — stock's idio share of total magnitude (3m)
+  // 2. Attribution - stock's idio share of total magnitude (3m)
   const a3 = c.attribution && c.attribution["3m"];
   if (a3) {
     const absIdio = Math.abs(a3.idio || 0);
@@ -1934,7 +1933,7 @@ function computeStockSignals(c, node) {
                 missing: true });
   }
 
-  // 3. Peer divergence — stock 60d vs basket median 60d
+  // 3. Peer divergence - stock 60d vs basket median 60d
   const peers = (node.constituents || [])
     .filter(p => p.ticker !== c.ticker && p.return_60d != null)
     .map(p => p.return_60d)
@@ -1956,7 +1955,7 @@ function computeStockSignals(c, node) {
     sigs.push({ type: "peer", firing: false, score: 0, direction: "neutral" });
   }
 
-  // 4. Earnings — placeholder; consolidator doesn't emit earnings dates today
+  // 4. Earnings - placeholder; consolidator doesn't emit earnings dates today
   sigs.push({ type: "earnings", firing: false, score: 0, direction: "neutral",
               missing: true });
 
@@ -2010,7 +2009,7 @@ function StockSignalStack({ ticker, c, node }) {
               ) : <div className="sig-summary">Mostly factor-driven (3m). Idio share &lt;60%.</div>
             )}
             {s.type === "attribution" && s.missing && (
-              <div className="sig-summary">Name-level attribution not in current JSON — re-run consolidate.</div>
+              <div className="sig-summary">Name-level attribution not in current JSON - re-run consolidate.</div>
             )}
             {s.type === "peer" && (
               s.firing ? (
@@ -2082,7 +2081,7 @@ function StockDrawer({ ticker, onClose, onSelectBasket }) {
         ‹ Back to {node ? node.name : c.node_id}
       </button>
 
-      {/* Stock signal stack — slim version of the basket signal universe */}
+      {/* Stock signal stack - slim version of the basket signal universe */}
       <div className="section-head" style={{marginTop:22}}>Signals</div>
       <StockSignalStack ticker={ticker} c={c} node={node} />
 
@@ -2107,7 +2106,7 @@ function StockDrawer({ ticker, onClose, onSelectBasket }) {
       <div className="section-head" style={{marginTop:22}}>Factor exposures · stock vs basket</div>
       {Object.keys(loadings).length === 0 ? (
         <div className="panel-explain">
-          name-level loadings not in current JSON — re-run consolidate
+          name-level loadings not in current JSON - re-run consolidate
         </div>
       ) : (
         <div className="contrib-list">
@@ -2149,7 +2148,7 @@ function StockDrawer({ ticker, onClose, onSelectBasket }) {
       <div className="section-head" style={{marginTop:22}}>Attribution · factor vs idio</div>
       {(c.attribution && Object.keys(c.attribution).length > 0)
         ? <AttributionPanel attribution={c.attribution} fmtPct={fmtPct} />
-        : <div className="panel-explain">name-level attribution not in current JSON — re-run consolidate</div>}
+        : <div className="panel-explain">name-level attribution not in current JSON - re-run consolidate</div>}
 
       {/* Peers */}
       <div className="section-head" style={{marginTop:22}}>Peers · same basket, closest 60d return</div>
@@ -2372,7 +2371,7 @@ function cumLogLevel(rets) {
    trendFollowPositions now produce continuous positions in [-leverage,
    +leverage] plus an actions log capturing every position change.
 
-   Signal mapping is via targetPosition() — a piecewise-linear ramp from
+   Signal mapping is via targetPosition() - a piecewise-linear ramp from
    `entryThreshold` (0% of leverage) to `saturation` (100% of leverage). For
    z-score strategies saturation is in z-units; for trend it's a return %.
 
@@ -2440,7 +2439,7 @@ function _generatePositions(signal, prices, params, type, opts) {
 
     let target = targetPosition(signal[t], params, type);
 
-    // Trend filter — suppress counter-trend leg when long-horizon momentum
+    // Trend filter - suppress counter-trend leg when long-horizon momentum
     // points the other way and is bigger than the threshold.
     if (longMom != null && longMom[t] != null) {
       const m = longMom[t];
@@ -2449,7 +2448,7 @@ function _generatePositions(signal, prices, params, type, opts) {
       if (target > 0 && m < -thr) target = 0;
     }
 
-    // Persistence check (factor_residual fade only) — skip when residual has
+    // Persistence check (factor_residual fade only) - skip when residual has
     // been stretched > 70% of the lookback bars on the same side.
     if (type === "factor_residual" && params.fadeOrRide === "fade" && opts && opts.persistenceCheck) {
       const lookback = opts.persistenceLookback || 4;
@@ -2837,7 +2836,7 @@ function runBacktest({ subject, strategy, params }) {
 
   const pnl = applyPositionsToReturns(positions, rets);
   // Trade reconstruction uses the legacy extractTrades over (continuous)
-  // positions for now — actionsToTrades / scale-event UI lands in the next
+  // positions for now - actionsToTrades / scale-event UI lands in the next
   // round. The action log is already captured for that future use.
   const trades = extractTrades(positions, rets, dates, tradeCtx);
   const equity = equityCurveFromPnl(pnl);
@@ -2886,7 +2885,7 @@ function PairLegPicker({ label, leg, onChange, nodesList, optionLabel }) {
       {leg.type === "basket" ? (
         <select className="bt-select" value={leg.value || ""}
           onChange={e => onChange({ type: "basket", value: e.target.value })}>
-          <option value="">— pick a basket —</option>
+          <option value=""> - pick a basket - </option>
           {nodesList.map(n => <option key={n.id} value={n.id}>{optionLabel(n)}</option>)}
         </select>
       ) : (
@@ -2966,7 +2965,7 @@ function Backtest({ seed }) {
   const [strategyType, setStrategyType] = useState(seed?.strategyType || "mean-revert");
   const [testMode, setTestMode]         = useState("walk-forward");
 
-  // Strategy params (sliders) — one combined object the UI mutates
+  // Strategy params (sliders) - one combined object the UI mutates
   const [params, setParams] = useState({
     entry: 1.5, exit: 0.5, stopPct: 0.08, maxHoldDays: 30,        // mean-revert
     lookbackDays: 60, trendEntry: 0.10, trailingStopPct: 0.05, trendMaxHoldDays: 60,
@@ -3384,7 +3383,7 @@ function BtEquityChart({ result, focused, setHighlight, setHover: setHoverTrade 
       .attr("d", "M " + eq.map((v, i) => `${x(i)} ${y(v)}`).join(" L "))
       .attr("stroke", SKY).attr("stroke-width", 1.8).attr("fill", "none");
 
-    // === Vertical lines per action — colored by BUY (green) vs SELL (red) ===
+    // === Vertical lines per action - colored by BUY (green) vs SELL (red) ===
     // Long trade   : entry = BUY  (green), exit = SELL (red)
     // Short trade  : entry = SELL (red),   exit = BUY  (green)
     // Two lines per trade so the user can read the direction of each action,
@@ -3638,7 +3637,7 @@ function TopBarSearch({ onPick }) {
 
 /* ---------------- Refresh-pipeline button ----------------
    The loading screen lives in dashboard.html as #boot-loading. We don't
-   render a React copy — we just toggle the existing element via a useEffect
+   render a React copy - we just toggle the existing element via a useEffect
    keyed on `loading` state in App, so the same DOM is the single source of
    truth for both boot hydration and in-app refreshes. */
 function RefreshButton({ onRefresh, busy }) {
@@ -3700,7 +3699,7 @@ function App() {
 
   // Loading flow · used for the pipeline-refresh action. We toggle the
   // existing #boot-loading element in dashboard.html (rendered before React
-  // mounts) instead of duplicating the markup in React — single source of
+  // mounts) instead of duplicating the markup in React - single source of
   // truth for both boot hydration and in-app refreshes.
   const [loading, setLoading] = useState(null);
   React.useEffect(() => {
@@ -3771,7 +3770,7 @@ function App() {
          the map column visible.
        - Basket drawer in ATLAS view always renders in the side-pane.
          If the screener column was collapsed when the user clicked a
-         basket, the auto-uncollapse effect above pops it open — same
+         basket, the auto-uncollapse effect above pops it open - same
          transition as clicking the side-toggle, pushing the map aside. */
   const rightSlideContent = selectedStock
     ? <StockDrawer
@@ -3848,7 +3847,7 @@ function App() {
       )}
 
       {/* Loading overlay is the static #boot-loading element in dashboard.html
-          toggled by the loading-state useEffect above — no React render here. */}
+          toggled by the loading-state useEffect above - no React render here. */}
     </>
   );
 }

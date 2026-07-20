@@ -2,9 +2,9 @@
 """Bulk yfinance price ingest for the v1 universes.
 
 By default ingests:
-  * the energy taxonomy (signal_engine/atlas/clusters.py)         — ~205 names
-  * the latest IJR snapshot in DuckDB                              — ~603 names
-  * deduped union                                                  — ~750 names
+  * the energy taxonomy (signal_engine/atlas/clusters.py)         - ~205 names
+  * the latest IJR snapshot in DuckDB                              - ~603 names
+  * deduped union                                                  - ~750 names
 
 You run this LOCALLY in your VSCode terminal, not from Claude. The pull
 takes ~10-15 min at the default 0.1s throttle.

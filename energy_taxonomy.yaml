@@ -1,5 +1,5 @@
-# Energy Sector Taxonomy — IMA Dashboard
-# Version 0.4 — Reconciled against basket correlation results + full utilities universe
+# Energy Sector Taxonomy - IMA Dashboard
+# Version 0.4 - Reconciled against basket correlation results + full utilities universe
 # ====================================================================================
 #
 # CHANGELOG vs v0.3
@@ -11,25 +11,24 @@
 #   - compression_services FOLDED into midstream_gpt. AROC, USAC, KGS all show top
 #     correlation with midstream_gpt; the carve-out didn't earn its keep.
 #   - DTM moved from midstream_pipelines to midstream_gpt (delta +0.12, strong signal).
-#   - FLOC moved from minerals_royalty to ofs_onshore (originally flagged 'verify' —
-#     it's a production optimization OFS name, not a royalty company).
+#   - FLOC moved from minerals_royalty to ofs_onshore (originally flagged 'verify' - #     it's a production optimization OFS name, not a royalty company).
 #   - minerals_royalty KEPT as separate node despite weak basket cohesion. Justification:
 #     business model and valuation framework are genuinely different (yield + growth vs
 #     EV/EBITDA). For graph navigation it's a meaningful distinction even if returns
 #     cluster with E&Ps. Sub-tagged differently to acknowledge return behavior.
-#   - SOC (Sable Offshore) reclassified to upstream_offshore_drillers — California
+#   - SOC (Sable Offshore) reclassified to upstream_offshore_drillers - California
 #     offshore restart, not a typical onshore E&P. (-0.31 min_pair in oil E&P explains
 #     the negative correlation.)
 #
 # Utilities universe added from CapIQ pull (64 names → narrowed to ~25 energy-relevant):
-#   - Water utilities (AWK, WTRG, AWR, CWT, HTO) EXCLUDED — not energy-relevant
-#   - Brookfield names (BIP, BIPC, BEPC) EXCLUDED — diversified infrastructure
+#   - Water utilities (AWK, WTRG, AWR, CWT, HTO) EXCLUDED - not energy-relevant
+#   - Brookfield names (BIP, BIPC, BEPC) EXCLUDED - diversified infrastructure
 #   - power_ipps_merchant: VST, NRG, TLN, CEG (+ added SRE Sempra for LNG exposure)
 #   - power_utilities_regulated_gas: SO, DUK, D, AEP, SRE, ETR, XEL, EXC, PEG, WEC,
 #     PCG, ATO, AEE, DTE, CNP, FE, EIX, ES, CMS, NI, EVRG, PNW, AES, OGE
 #   - power_utilities_regulated_ldc: NJR, SR, OGS, SWX, NFG, UGI (gas local distribution)
 #   - power_renewables: NEE, CWEN, ORA, XIFR
-#   - nuclear_smr_developers: OKLO (new sub-node — small modular reactor developer,
+#   - nuclear_smr_developers: OKLO (new sub-node - small modular reactor developer,
 #     not a fuel cycle name like UEC/LEU)
 #
 # Map layer/tier metadata added per node:
@@ -53,18 +52,18 @@
 meta:
   version: 0.4
   last_updated: 2026-05-06
-  source_screen: "CapIQ — Industry: Energy + Utilities (Primary), Primary Listing: US, MCap > $500M"
+  source_screen: "CapIQ - Industry: Energy + Utilities (Primary), Primary Listing: US, MCap > $500M"
   flow_convention: commodity
   universe_count: ~190
   map_layers: [ocean, port, onshore_subsurface, onshore_surface, end_user]
 
 # ============================================================
-# IOC ANCHORS — graph hubs
+# IOC ANCHORS - graph hubs
 # ============================================================
 
 iocs_integrated:
   display_name: "Integrated Oil & Gas (IOCs)"
-  description: "Vertically integrated majors. Anchor nodes — flows in and out across the whole graph."
+  description: "Vertically integrated majors. Anchor nodes - flows in and out across the whole graph."
   layer: port
   representative_ticker: XOM
   gics: "10102050"
@@ -77,14 +76,14 @@ iocs_integrated:
     - {ticker: CVX, name: "Chevron", index: 500, mc: large, niche: "diversified IOC", confidence: high}
   notes: |
     - Treat as graph hub. v0.3 confirmed 0.85 intra-cohesion and 0.83 cross-correlation
-      with upstream_oil_eandp — these names anchor the entire upstream factor.
+      with upstream_oil_eandp - these names anchor the entire upstream factor.
 
 # ============================================================
-# UPSTREAM SUBSURFACE — onshore_subsurface layer
+# UPSTREAM SUBSURFACE - onshore_subsurface layer
 # ============================================================
 
 upstream_oil_eandp:
-  display_name: "E&P — Oil-Weighted (Onshore)"
+  display_name: "E&P - Oil-Weighted (Onshore)"
   description: "US onshore E&Ps with >55% liquids mix. Permian, Bakken, Eagle Ford, DJ Basin, plus diversified."
   layer: onshore_subsurface
   representative_ticker: COP
@@ -122,12 +121,12 @@ upstream_oil_eandp:
     - {ticker: WTI, name: "W&T Offshore", index: 600, mc: small, basin: "Gulf of Mexico", confidence: high}
     - {ticker: SD, name: "SandRidge Energy", index: 600, mc: small, basin: "Mid-Con", confidence: high}
   notes: |
-    - REMOVED in v0.4: SOC (moved to upstream_offshore_drillers — California offshore restart).
+    - REMOVED in v0.4: SOC (moved to upstream_offshore_drillers - California offshore restart).
     - CTRA, OVV, APA still flagged 'medium' for liquids/gas split.
     - v0.3 cohesion: 0.57 mean, min -0.31. SOC removal should raise min_corr substantially.
 
 upstream_gas_eandp:
-  display_name: "E&P — Gas-Weighted"
+  display_name: "E&P - Gas-Weighted"
   description: "E&Ps with >60% gas mix. Appalachia (Marcellus/Utica) and Haynesville core."
   layer: onshore_subsurface
   representative_ticker: EQT
@@ -147,14 +146,14 @@ upstream_gas_eandp:
     - {ticker: DEC, name: "Diversified Energy", index: ext, mc: small, basin: "Appalachia mature wells", confidence: high}
     - {ticker: TXO, name: "TXO Partners", index: ext, mc: small, basin: "San Juan/Williston gas", confidence: high}
   notes: |
-    - v0.3 cohesion 0.50 — acceptable but the gas E&Ps systematically pull toward
+    - v0.3 cohesion 0.50 - acceptable but the gas E&Ps systematically pull toward
       midstream_gpt or upstream_oil_eandp depending on regime. Real factor structure.
-    - DEC (PDP harvester) is functionally distinct — different driver set entirely.
+    - DEC (PDP harvester) is functionally distinct - different driver set entirely.
       Consider micro-bucket if cohesion remains weak in v0.4.
 
 minerals_royalty:
   display_name: "Minerals & Royalty"
-  description: "Land/mineral rights owners. No operating exposure — pure commodity price + production growth."
+  description: "Land/mineral rights owners. No operating exposure - pure commodity price + production growth."
   layer: onshore_subsurface
   representative_ticker: TPL
   gics: "10102020 (mostly)"
@@ -162,7 +161,7 @@ minerals_royalty:
   key_drivers: [CL1, NG1, ACTIVE_RIG_COUNT_ON_ACREAGE, NEW_PERMITS]
   feeds_into: []
   served_by_revenue_from: [upstream_oil_eandp, upstream_gas_eandp, iocs_integrated]
-  factor_note: "v0.3 basket cohesion 0.37 — names cluster with upstream_oil_eandp at the return level. Kept as separate node for graph topology / valuation framework reasons; for portfolio construction, this node should be considered a sub-bucket of the oil E&P factor."
+  factor_note: "v0.3 basket cohesion 0.37 - names cluster with upstream_oil_eandp at the return level. Kept as separate node for graph topology / valuation framework reasons; for portfolio construction, this node should be considered a sub-bucket of the oil E&P factor."
   constituents:
     - {ticker: TPL, name: "Texas Pacific Land", index: 500, mc: large, niche: "Permian land + royalty + water", confidence: high}
     - {ticker: VNOM, name: "Viper Energy", index: 400, mc: mid, niche: "Permian minerals (FANG affiliate)", confidence: high}
@@ -173,13 +172,13 @@ minerals_royalty:
     - {ticker: DMLP, name: "Dorchester Minerals", index: 600, mc: small, niche: "diversified minerals", tax_form: "K-1", confidence: high}
     - {ticker: MNR, name: "Mach Natural Resources", index: ext, mc: mid, niche: "Mid-Con minerals + E&P (hybrid)", confidence: medium}
   notes: |
-    - REMOVED in v0.4: FLOC (moved to ofs_onshore — production optimization, not royalty).
-    - REMOVED in v0.4: KRP (Kimbell — moved fully into upstream_oil_eandp; was conflicted in v0.3).
+    - REMOVED in v0.4: FLOC (moved to ofs_onshore - production optimization, not royalty).
+    - REMOVED in v0.4: KRP (Kimbell - moved fully into upstream_oil_eandp; was conflicted in v0.3).
     - Royalty trusts (SBR, PBT) are wasting assets with idiosyncratic distribution timing.
-      Watch their min_pair in v0.4 cohesion — they'll likely still drag the basket score.
+      Watch their min_pair in v0.4 cohesion - they'll likely still drag the basket score.
 
 # ============================================================
-# OCEAN LAYER — offshore drillers, OFS-offshore, tanker shipping
+# OCEAN LAYER - offshore drillers, OFS-offshore, tanker shipping
 # ============================================================
 
 upstream_offshore_drillers:
@@ -199,10 +198,10 @@ upstream_offshore_drillers:
     - {ticker: SDRL, name: "Seadrill", index: ext, mc: mid, rig_type: "floater", confidence: high}
     - {ticker: SOC, name: "Sable Offshore", index: ext, mc: mid, rig_type: "California offshore (Santa Ynez)", confidence: medium}
   notes: |
-    - SOC moved here in v0.4 from upstream_oil_eandp — single-asset offshore restart.
+    - SOC moved here in v0.4 from upstream_oil_eandp - single-asset offshore restart.
 
 ofs_offshore:
-  display_name: "OFS — Offshore Services & Subsea"
+  display_name: "OFS - Offshore Services & Subsea"
   description: "Subsea construction, ROV, supply vessels, marine services, helicopters."
   layer: ocean
   representative_ticker: TDW
@@ -223,7 +222,7 @@ tanker_shipping:
   description: "Crude/product/LPG/LNG carriers. Driven by Worldscale rates, fleet utilization, ton-mile demand."
   layer: ocean
   representative_ticker: FRO
-  gics: "20305020 (Industrials — Marine Transport) — functional energy"
+  gics: "20305020 (Industrials - Marine Transport) - functional energy"
   commodity_exposure: [BDTI, BCTI, WORLDSCALE_RATES, VLCC_RATES, LNG_SHIPPING_RATES]
   key_drivers: [BDTI, BCTI, OPEC_QUOTAS, RED_SEA_HORMUZ_NEWS, FLEET_UTILIZATION, NEWBUILD_ORDERBOOK, LNG_SHIPPING_RATES]
   feeds_into: [external_global_demand]
@@ -249,11 +248,11 @@ tanker_shipping:
     - {ticker: TK, name: "Teekay Corporation", index: ext, mc: small, niche: "diversified shipping", confidence: high}
     - {ticker: SFL, name: "SFL Corporation", index: ext, mc: small, niche: "diversified ship leasing", confidence: high}
   notes: |
-    - GLNG and FLNG moved here in v0.4 — they're shipping operators, not terminal operators.
+    - GLNG and FLNG moved here in v0.4 - they're shipping operators, not terminal operators.
     - v0.3 cohesion 0.61. Adding the LNG carriers may dilute slightly but functionally correct.
 
 # ============================================================
-# PORT LAYER — terminals, refineries, midstream, petchem
+# PORT LAYER - terminals, refineries, midstream, petchem
 # ============================================================
 
 lng_terminals:
@@ -279,7 +278,7 @@ lng_terminals:
     - Most tied to your CRK thesis (Haynesville → Gulf Coast LNG corridor).
 
 midstream_gpt:
-  display_name: "Midstream — Gathering, Processing & Compression"
+  display_name: "Midstream - Gathering, Processing & Compression"
   description: "Wellhead gas/liquids gathering, processing, NGL fractionation, gas compression. Volume-driven."
   layer: port
   representative_ticker: WMB
@@ -303,16 +302,16 @@ midstream_gpt:
     - {ticker: KGS, name: "Kodiak Gas Services", index: 400, mc: mid, niche: "compression services", confidence: high}
     - {ticker: USAC, name: "USA Compression Partners", index: 600, mc: mid, niche: "compression services", tax_form: "K-1", confidence: high}
     # Royalty hybrid
-    - {ticker: KRP, name: "Kimbell Royalty Partners", index: ext, mc: small, niche: "minerals (royalty) — overlap", tax_form: "K-1", confidence: medium}
+    - {ticker: KRP, name: "Kimbell Royalty Partners", index: ext, mc: small, niche: "minerals (royalty) - overlap", tax_form: "K-1", confidence: medium}
   notes: |
     - DTM moved here from midstream_pipelines (v0.3 misclass: delta +0.12).
     - Compression services (AROC, KGS, USAC) folded in from former compression_services
-      node — they pulled toward midstream_gpt with delta +0.04 to +0.07.
+      node - they pulled toward midstream_gpt with delta +0.04 to +0.07.
     - This is now the largest midstream node and may need a sub-tag for "compression"
       vs "G&P" if internal cohesion drops in v0.4.
 
 midstream_pipelines:
-  display_name: "Midstream — Long-Haul Pipelines & Logistics"
+  display_name: "Midstream - Long-Haul Pipelines & Logistics"
   description: "Interstate pipes, takeaway capacity, terminals. Fee-based, less commodity sensitive."
   layer: port
   representative_ticker: EPD
@@ -329,14 +328,14 @@ midstream_pipelines:
     - {ticker: PAGP, name: "Plains GP Holdings", index: 400, mc: mid, niche: "PAA GP wrapper", tax_form: "1099", confidence: high}
     - {ticker: WES, name: "Western Midstream", index: 400, mc: large, niche: "Permian/DJ", tax_form: "K-1", confidence: high}
     - {ticker: SUN, name: "Sunoco LP", index: 400, mc: mid, niche: "fuel distribution", tax_form: "K-1", confidence: high}
-    - {ticker: SUNC, name: "SunocoCorp LLC", index: ext, mc: mid, niche: "Sunoco corp wrapper — verify", tax_form: "1099", confidence: verify}
+    - {ticker: SUNC, name: "SunocoCorp LLC", index: ext, mc: mid, niche: "Sunoco corp wrapper - verify", tax_form: "1099", confidence: verify}
     - {ticker: DKL, name: "Delek Logistics", index: 600, mc: small, niche: "Permian crude", tax_form: "K-1", confidence: high}
     - {ticker: GEL, name: "Genesis Energy", index: 600, mc: small, niche: "soda ash+crude", tax_form: "K-1", confidence: high}
     - {ticker: NGL, name: "NGL Energy Partners", index: 600, mc: small, niche: "NGL/water midstream", tax_form: "K-1", confidence: high}
     - {ticker: GLP, name: "Global Partners", index: 600, mc: small, niche: "refined products terminals", tax_form: "K-1", confidence: high}
   notes: |
     - DTM moved out to midstream_gpt in v0.4.
-    - SUNC still needs verification — corp wrapper post-Sunoco split.
+    - SUNC still needs verification - corp wrapper post-Sunoco split.
 
 downstream_refiners:
   display_name: "Refiners"
@@ -366,7 +365,7 @@ petrochem:
   description: "Ethane/propane → ethylene/polyethylene. NGL feedstock advantage matters."
   layer: port
   representative_ticker: LYB
-  gics: "15101050 (Materials) — functional energy"
+  gics: "15101050 (Materials) - functional energy"
   commodity_exposure: [NGL_PRICES, ETHYLENE_MARGIN, POLY_PRICES]
   key_drivers: [ETHYLENE_PRICES, NGL_FRAC_SPREAD, CHINA_DEMAND]
   feeds_into: [external_industrial_demand]
@@ -378,11 +377,11 @@ petrochem:
     - {ticker: OLN, name: "Olin", index: 500, mc: mid, niche: "chlor-alkali", confidence: high}
 
 # ============================================================
-# ONSHORE SURFACE — OFS, equipment, biofuels, coal
+# ONSHORE SURFACE - OFS, equipment, biofuels, coal
 # ============================================================
 
 ofs_onshore:
-  display_name: "OFS — Onshore (Pressure Pumping, Completions, Drilling Services)"
+  display_name: "OFS - Onshore (Pressure Pumping, Completions, Drilling Services)"
   description: "Frac fleets, wireline, coiled tubing, sand, water. Onshore service intensity proxy."
   layer: onshore_surface
   representative_ticker: SLB
@@ -415,11 +414,11 @@ ofs_onshore:
     - {ticker: FLOC, name: "Flowco Holdings", index: ext, mc: small, niche: "production optimization", confidence: high}
 
 ofs_equipment:
-  display_name: "OFS — Equipment & Drilling Hardware"
+  display_name: "OFS - Equipment & Drilling Hardware"
   description: "Drill bits, BOPs, wellheads, capital equipment. Long-cycle vs OFS short-cycle."
   layer: onshore_surface
   representative_ticker: FTI
-  gics: "20106020 (Industrials) — functional energy"
+  gics: "20106020 (Industrials) - functional energy"
   commodity_exposure: [CL1, NG1, OFFSHORE_FID_COUNT]
   key_drivers: [GLOBAL_RIG_COUNT, OFFSHORE_FID_COUNT, EandP_CAPEX_INTL]
   feeds_into: []
@@ -457,12 +456,12 @@ coal:
   feeds_into: [power_ipps_merchant, power_utilities_regulated_gas, external_steelmakers]
   served_by_revenue_from: []
   constituents:
-    - {ticker: CNR, name: "Core Natural Resources", index: 400, mc: mid, niche: "coal — CONSOL/Arch merger", confidence: high}
+    - {ticker: CNR, name: "Core Natural Resources", index: 400, mc: mid, niche: "coal - CONSOL/Arch merger", confidence: high}
     - {ticker: ARLP, name: "Alliance Resource Partners", index: 600, mc: mid, niche: "thermal coal MLP", tax_form: "K-1", confidence: high}
     - {ticker: BTU, name: "Peabody Energy", index: 600, mc: mid, niche: "thermal+met coal", confidence: high}
 
 # ============================================================
-# END-USER LAYER — power, fuel cycle, retail
+# END-USER LAYER - power, fuel cycle, retail
 # ============================================================
 
 power_ipps_merchant:
@@ -482,10 +481,10 @@ power_ipps_merchant:
     - {ticker: CEG, name: "Constellation Energy", index: 500, mc: large, fuel: "nuclear", confidence: high}
   notes: |
     - All four heavily re-rated on AI thesis. Beta is structurally different post-2024.
-    - Nuclear-weighted (CEG, partial VST/TLN) — different fuel cycle exposure than gas-fired.
+    - Nuclear-weighted (CEG, partial VST/TLN) - different fuel cycle exposure than gas-fired.
 
 power_utilities_regulated_gas:
-  display_name: "Regulated Utilities — Electric (Gas/Nuclear/Mixed)"
+  display_name: "Regulated Utilities - Electric (Gas/Nuclear/Mixed)"
   description: "Regulated electrics with significant gas-fired or nuclear generation. Pass-through fuel cost."
   layer: end_user
   representative_ticker: NEE
@@ -541,7 +540,7 @@ power_utilities_regulated_gas:
       vertically integrated names. Consider sub-bucket if cohesion is weak.
 
 power_utilities_regulated_ldc:
-  display_name: "Regulated Utilities — Gas LDCs (Pure-Play)"
+  display_name: "Regulated Utilities - Gas LDCs (Pure-Play)"
   description: "Pure-play natural gas local distribution companies. NG1-indirect via fuel cost pass-through."
   layer: end_user
   representative_ticker: ATO
@@ -562,7 +561,7 @@ power_utilities_regulated_ldc:
   notes: |
     - Carved out from regulated-electric in v0.4 because LDCs have a distinct driver mix:
       heating degree days, gas commodity pass-through, smaller capex profiles.
-    - NFG is hybrid — owns Appalachia gas E&P + pipeline + LDC. Worth a sub-tag.
+    - NFG is hybrid - owns Appalachia gas E&P + pipeline + LDC. Worth a sub-tag.
 
 power_renewables:
   display_name: "Renewables / Clean IPPs (Yieldcos)"
@@ -577,10 +576,10 @@ power_renewables:
   constituents:
     - {ticker: CWEN, name: "Clearway Energy", index: 400, mc: mid, niche: "renewable yieldco", confidence: high}
     - {ticker: ORA, name: "Ormat Technologies", index: 400, mc: mid, niche: "geothermal", confidence: high}
-    - {ticker: XIFR, name: "XPLR Infrastructure (ex-NEP)", index: 600, mc: small, niche: "renewable yieldco — distressed", confidence: verify}
+    - {ticker: XIFR, name: "XPLR Infrastructure (ex-NEP)", index: 600, mc: small, niche: "renewable yieldco - distressed", confidence: verify}
   notes: |
-    - NEE moved to power_utilities_regulated_gas — it's vertically integrated, not pure yieldco.
-    - AES moved to power_utilities_regulated_gas — global IPP with regulated mix.
+    - NEE moved to power_utilities_regulated_gas - it's vertically integrated, not pure yieldco.
+    - AES moved to power_utilities_regulated_gas - global IPP with regulated mix.
     - Pure yieldco set is now small. Could fold into utilities if it stays this thin.
 
 uranium_nuclear_fuel:
@@ -612,7 +611,7 @@ nuclear_smr_developers:
   constituents:
     - {ticker: OKLO, name: "Oklo Inc", index: ext, mc: large, niche: "fast neutron SMR developer (Sam Altman-backed)", confidence: medium}
   notes: |
-    - New node in v0.4. Pre-revenue thesis play — behaves like high-beta growth, not utility.
+    - New node in v0.4. Pre-revenue thesis play - behaves like high-beta growth, not utility.
     - May add NNE (Nano Nuclear), SMR (NuScale) if/when they hit screen criteria.
     - Functionally an end-user node since it serves data center demand, but driver set is
       regulatory + capital markets, not commodity. Worth a "pre-revenue" sub-tag.
@@ -622,7 +621,7 @@ downstream_retail:
   description: "Gas stations + convenience. Volume + merchandise margin business."
   layer: end_user
   representative_ticker: CASY
-  gics: "25504030 (Cons Disc) — functional energy"
+  gics: "25504030 (Cons Disc) - functional energy"
   commodity_exposure: [GASOLINE_RETAIL_MARGIN, MERCH_MARGIN]
   key_drivers: [GASOLINE_DEMAND, MILES_DRIVEN, MERCH_COMPS]
   feeds_into: [external_consumer]
@@ -642,7 +641,7 @@ external_iocs:
 
 external_global_lng_demand:
   display_name: "[External] Global LNG Demand (JKM/TTF)"
-  description: "European + Asian gas markets — terminal demand for US LNG."
+  description: "European + Asian gas markets - terminal demand for US LNG."
   layer: ocean
 
 external_data_center_demand:
@@ -657,7 +656,7 @@ external_consumer:
 
 external_steelmakers:
   display_name: "[External] Steelmakers (Met Coal Demand)"
-  description: "Global steel mills — met coal end demand. Cyclical with China/India construction."
+  description: "Global steel mills - met coal end demand. Cyclical with China/India construction."
   layer: end_user
 
 external_industrial_demand:

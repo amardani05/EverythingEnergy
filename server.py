@@ -2,7 +2,7 @@
 """
 Everything Energy · dev server.
 
-Replaces `python3 -m http.server 8000` — same static-file behavior plus:
+Replaces `python3 -m http.server 8000` - same static-file behavior plus:
 
   POST /api/refresh   → re-runs consolidate_data.py (rebuilds dashboard_data.json),
                         returns {status, returncode, stdout, stderr} so the
@@ -29,7 +29,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def end_headers(self):
-        # No browser caching during dev — the frontend already cache-busts JSON
+        # No browser caching during dev - the frontend already cache-busts JSON
         # but JS/CSS can still go stale on hard refresh otherwise.
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
         self.send_header("Pragma", "no-cache")

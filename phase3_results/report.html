@@ -15,7 +15,7 @@ img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .cols h3 { margin-top: 0; }
 </style></head><body>
-<h1>IMA Energy Dashboard — Phase 3: Pairs, Residuals, Regimes</h1>
+<h1>IMA Energy Dashboard - Phase 3: Pairs, Residuals, Regimes</h1>
 <p style="color:#666;">Daily returns, 5y, 60d rolling windows where applicable</p>
 
 <div class="note"><b>How to read this:</b> three idea-generation lenses on top of the basket framework.
@@ -24,7 +24,7 @@ img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 
 <li><b>Residuals:</b> each name's recent return minus its predicted return given the basket's move. Negative residual = name underperformed peers (potential mean-reversion long); positive = outperformed (catalyst-driven, investigate).</li>
 <li><b>Regimes:</b> baskets whose rolling beta to a driver has shifted &gt;2σ from its long-run mean. Flags structural change (e.g. IPP betas to NG dropping post-AI rerating).</li>
 </ul>
-None of these are signals to trade blindly — they're idea filters that surface things worth investigating.</div>
+None of these are signals to trade blindly - they're idea filters that surface things worth investigating.</div>
 
 <h2>1. Cross-basket pair z-scores</h2>
 <img src="pairs_zscores.png" alt="Pairs z-scores">

@@ -1,18 +1,18 @@
 # Baseline IC scorecard
 
-*Generated 2026-07-19 on `143536d`. Spearman rank IC; forward return t+1 -> t+H+1 (no formation-day return). Universe: latest IJR snapshot (602 names, `ijr_current` — survivorship-biased by construction).*
+*Generated 2026-07-19 on `143536d`. Spearman rank IC; forward return t+1 -> t+H+1 (no formation-day return). Universe: latest IJR snapshot (602 names, `ijr_current` - survivorship-biased by construction).*
 
 *Data watermarks: prices through 2026-07-17, edgar_facts = 1,325,958 rows.*
 
-**Read `t (NW)`, not `t (iid)`:** overlapping 21/63d horizons make daily ICs autocorrelated; the Newey-West column (lag = horizon) is the honest significance. Momentum is total-return (dividends folded in); SUE includes derived Q4 events (FY - sum(Q1..3), filed at the 10-K). Remaining caveats: no costs, no neutralization — raw single-factor IC only; `ijr_current` survivorship bias.
+**Read `t (NW)`, not `t (iid)`:** overlapping 21/63d horizons make daily ICs autocorrelated; the Newey-West column (lag = horizon) is the honest significance. Momentum is total-return (dividends folded in); SUE includes derived Q4 events (FY - sum(Q1..3), filed at the 10-K). Remaining caveats: no costs, no neutralization - raw single-factor IC only; `ijr_current` survivorship bias.
 
 ## Takeaways (revised 2026-07-19 with NW t-stats, TR momentum, Q4 SUE)
 
 The honest-significance pass changes the ranking from the 2026-07-17 baseline:
 
-1. **PEAD/SUE — still the strongest signal, now honestly significant.** The iid t of ~9 was inflated as suspected, but NW keeps it at 2.5–3.0 across 5–63d with the same textbook monotone IC (+0.02 → +0.12) and 0.76 hit rate at 21d. Q4-derived events are now included. Low breadth remains (29–42 names/day).
-2. **Value/EV-EBITDA — the most robust slow signal.** +0.0395 IC at 63d with NW t 2.5 (barely different from iid because the grid is monthly — little overlap). Hit rate 0.67. FCF yield stays dead; the config's `components: [ev_ebitda]` choice stands.
-3. **Momentum 12-1 — downgraded: a short-horizon signal only.** Total-return momentum keeps 1d significance (NW t 2.7) but the 21/63d "consistency" in the previous baseline was an overlapping-window artifact: NW t collapses to 0.4–0.5. Keep it in the composite for its diversification (corr with pead +0.23, value −0.12) and short-horizon edge, but don't lean on it for slow rebalances.
+1. **PEAD/SUE - still the strongest signal, now honestly significant.** The iid t of ~9 was inflated as suspected, but NW keeps it at 2.5–3.0 across 5–63d with the same textbook monotone IC (+0.02 → +0.12) and 0.76 hit rate at 21d. Q4-derived events are now included. Low breadth remains (29–42 names/day).
+2. **Value/EV-EBITDA - the most robust slow signal.** +0.0395 IC at 63d with NW t 2.5 (barely different from iid because the grid is monthly - little overlap). Hit rate 0.67. FCF yield stays dead; the config's `components: [ev_ebitda]` choice stands.
+3. **Momentum 12-1 - downgraded: a short-horizon signal only.** Total-return momentum keeps 1d significance (NW t 2.7) but the 21/63d "consistency" in the previous baseline was an overlapping-window artifact: NW t collapses to 0.4–0.5. Keep it in the composite for its diversification (corr with pead +0.23, value −0.12) and short-horizon edge, but don't lean on it for slow rebalances.
 
 **Still noise** (NW confirms): FCF yield, ROIC, accruals, margin stability. Revisit after sector-neutralized IC (the composite now z-scores within sector; re-running this scorecard on neutralized components is the natural Phase 2 diagnostic).
 

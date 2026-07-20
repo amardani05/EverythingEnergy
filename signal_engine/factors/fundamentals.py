@@ -1,4 +1,4 @@
-"""Fundamentals helper — assembles per-(ticker, as_of) snapshots from
+"""Fundamentals helper - assembles per-(ticker, as_of) snapshots from
 EDGAR XBRL facts. All Value/Quality factors read through this so the PIT
 contract is implemented in one place.
 
@@ -16,7 +16,7 @@ v1 simplifications (documented; revisit in v1.5):
     per the bitemporal store contract. The PEAD path uses originals_only
     so a 10-Q/A doesn't retroactively change a historical surprise.
 
-Every helper here takes (con, as_of, cik) — never a "current" implicit time.
+Every helper here takes (con, as_of, cik) - never a "current" implicit time.
 """
 
 from __future__ import annotations
@@ -111,7 +111,7 @@ def latest_annual_snapshot(
       1. Pull all facts for this CIK with filed <= as_of (latest-knowledge
          already applied by the read API).
       2. For each concept, take the row whose `period_end` is the most
-         recent annual (period length 350-380d) — that's the latest 10-K's
+         recent annual (period length 350-380d) - that's the latest 10-K's
          annual value.
       3. Bundle into AnnualSnapshot; missing concepts -> None.
     """
@@ -230,13 +230,13 @@ def quarterly_eps_series(
         eps_Q4 = eps_FY - (eps_Q1 + eps_Q2 + eps_Q3)
     with `filed` = the 10-K's filed date (the Q4 surprise becomes knowable
     only when the annual report lands) and `derived = True`. The derivation
-    requires all three standalone quarters for that fy — partial years are
+    requires all three standalone quarters for that fy - partial years are
     skipped rather than guessed. This ignores intra-year share-count drift;
     for SUE (a YoY-difference signal) that bias is largely constant across
     companies and washes out cross-sectionally. Pass `derive_q4=False` for
     the zero-approximation Q1-Q3-only series.
 
-    `originals_only=True` (default) excludes amended filings — restatements
+    `originals_only=True` (default) excludes amended filings - restatements
     don't rewrite history. The PEAD/SUE path relies on this.
     """
     facts = as_of_facts(
@@ -279,7 +279,7 @@ def quarterly_eps_series(
         .rename({"value": "eps_fy"})
         .drop_nulls(["eps_fy", "fy"])
     )
-    # Sum of standalone quarters per fy — require all three, none null.
+    # Sum of standalone quarters per fy - require all three, none null.
     qsum = (
         quarterly.drop_nulls(["eps_diluted", "fy"])
         .group_by("fy")

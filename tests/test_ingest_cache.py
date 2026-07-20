@@ -143,8 +143,7 @@ def test_flush_submissions_partial_batch_survives_bad_row(tmp_db: Path, tmp_path
     raw_dir = tmp_path / "edgar"
     raw_dir.mkdir()
     _write_cache(raw_dir / "submissions_0000000123.json", _submissions_payload(123, "Alpha"))
-    # `tickers` as a plain string will make submissions_row raise (not a list) —
-    # simulates the next unknown payload mutation EDGAR throws at us.
+    # `tickers` as a plain string will make submissions_row raise (not a list) - # simulates the next unknown payload mutation EDGAR throws at us.
     bad = _submissions_payload(456, "Beta")
     bad["tickers"] = 42
     _write_cache(raw_dir / "submissions_0000000456.json", bad)

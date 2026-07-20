@@ -1,4 +1,4 @@
-"""Momentum factor — 12-1 month price return, skipping the most recent month.
+"""Momentum factor - 12-1 month price return, skipping the most recent month.
 
 Standard small-cap momentum convention:
 
@@ -10,8 +10,8 @@ intermediate-term trend.
 
 Total-return: when a `dividends` frame is supplied (ticker, date, value =
 cash per share on ex-date), momentum is computed on a per-ticker
-total-return index — daily gross return (close_t + div_t) / close_{t-1},
-cumulated — so the ex-date price drop no longer reads as negative
+total-return index - daily gross return (close_t + div_t) / close_{t-1},
+cumulated - so the ex-date price drop no longer reads as negative
 momentum. Without dividends the TR index collapses to the close ratio and
 the result is identical to raw price momentum. Closes and yfinance
 dividend values are both split-adjusted, so the two series compose.
@@ -77,7 +77,7 @@ def compute_momentum(
         div = (
             dividends.select(["ticker", "date", "value"])
             .rename({"value": "_div"})
-            # One row per (ticker, ex-date) — sum in case of multiple entries.
+            # One row per (ticker, ex-date) - sum in case of multiple entries.
             .group_by(["ticker", "date"]).agg(pl.col("_div").sum())
         )
         panel = (
@@ -133,7 +133,7 @@ def momentum_as_of(
 
     # lookback_days counts TRADING rows; the panel window is CALENDAR days.
     # ~252 trading days span ~365 calendar days (5/7 week + holidays), so
-    # scale by 7/5 before adding the buffer — a plain lookback+buffer window
+    # scale by 7/5 before adding the buffer - a plain lookback+buffer window
     # leaves the 252-row shift permanently unfilled on real data.
     calendar_span = int(cfg.lookback_days * 7 / 5) + history_buffer_days
     earliest_needed = as_of - timedelta(days=calendar_span)

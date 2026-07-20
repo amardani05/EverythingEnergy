@@ -1,4 +1,4 @@
-"""Scoring — raw factor values -> sector-neutral z -> weighted composite."""
+"""Scoring - raw factor values -> sector-neutral z -> weighted composite."""
 
 from signal_engine.scoring.composite import (
     FAMILY_COMPONENTS,

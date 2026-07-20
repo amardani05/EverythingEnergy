@@ -1,4 +1,4 @@
-"""Momentum factor tests — the 12-1 algebra + no peek into the future.
+"""Momentum factor tests - the 12-1 algebra + no peek into the future.
 
 Layered:
   1. Algebra:  hand-computed momentum matches the formula on a tiny panel.
@@ -117,7 +117,7 @@ def test_total_return_counts_dividend_inside_window() -> None:
 
 def test_total_return_ignores_dividend_in_skip_window() -> None:
     """A dividend AFTER t-S (inside the skipped month) must not move 12-1
-    momentum — the window ends at t-S."""
+    momentum - the window ends at t-S."""
     L, S = 20, 5
     start = date(2024, 1, 1)
     panel = _flat_panel("A", start, days=30)

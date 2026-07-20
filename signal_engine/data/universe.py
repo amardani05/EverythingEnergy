@@ -1,8 +1,8 @@
-"""Universe construction — iShares IJR ETF holdings as the S&P 600 proxy.
+"""Universe construction - iShares IJR ETF holdings as the S&P 600 proxy.
 
 iShares posts the full holdings file daily as a CSV. We snapshot it on
 ingest with the snapshot_date being the file's reporting date (parsed from
-the CSV header, NOT the download wall-clock — the file may publish on T+1).
+the CSV header, NOT the download wall-clock - the file may publish on T+1).
 
 Three membership modes downstream (config: universe.membership_mode):
 
@@ -16,7 +16,7 @@ Three membership modes downstream (config: universe.membership_mode):
                    measured effect comes from the universe definition.
 
 Every backtest emits results for `ijr_current` AND `none` so the membership
-contribution is always visible — per turn 7 decision.
+contribution is always visible - per turn 7 decision.
 """
 
 from __future__ import annotations
@@ -98,7 +98,7 @@ def parse_holdings_csv(text: str) -> tuple[date | None, pl.DataFrame]:
     """Parse the iShares holdings CSV into (as_of, df)."""
     # Akamai/CloudFront bot mitigation on the iShares CDN sometimes returns
     # the product PAGE (HTML) with a fake `text/csv` content-type. Detect that
-    # and fail loudly — the calling code should fall back to a manual download.
+    # and fail loudly - the calling code should fall back to a manual download.
     stripped = text.lstrip()
     if stripped.startswith("<") or "<!DOCTYPE" in stripped[:200].upper():
         raise ValueError(

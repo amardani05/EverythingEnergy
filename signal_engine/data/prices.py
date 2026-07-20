@@ -1,4 +1,4 @@
-"""Prices ingestion — yfinance primary in v1, Stooq deferred for cross-check.
+"""Prices ingestion - yfinance primary in v1, Stooq deferred for cross-check.
 
 Per turn 8 decision: Stooq's free bulk endpoint now returns Unauthorized and
 the per-ticker URL requires a captcha-acquired apikey, so v1 ships on
@@ -7,8 +7,8 @@ that reads from `prices` carries the source label so we can audit what
 fraction of any signal is built on yfinance bytes.
 
 When a real second source lands (Stooq apikey, Tiingo, Polygon, etc.) the
-existing schema already supports it — `source` is in the prices PK and the
-`as_of_prices` view prefers stooq over yfinance — no migration needed.
+existing schema already supports it - `source` is in the prices PK and the
+`as_of_prices` view prefers stooq over yfinance - no migration needed.
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ def parse_yf_history(yf_df: pd.DataFrame | None, ticker: str) -> tuple[pl.DataFr
     """Convert one yfinance `history()` frame (auto_adjust=False, actions=True)
     into `(prices, corporate_actions)` polars frames.
 
-    Pure function — tests drive it with a synthetic pandas frame, no network.
+    Pure function - tests drive it with a synthetic pandas frame, no network.
     Dividend rows are days where `Dividends != 0` (cash per share on ex-date);
     split rows are days where `Stock Splits != 0` (new/old ratio, e.g. 2.0).
     """
@@ -186,7 +186,7 @@ STOOQ_API_KEY_PAGE = "https://stooq.com/q/d/?s=aaon.us&get_apikey"  # captcha
 class StooqDownloader:
     """Deferred. As of v1, Stooq bulk requires a paid account and per-ticker
     requires a captcha-acquired apikey (see STOOQ_API_KEY_PAGE). Keep this
-    class in tree so the cross-check path is easy to enable later — just
+    class in tree so the cross-check path is easy to enable later - just
     pass `apikey` (from `STOOQ_API_KEY` env var) and call `per_ticker()`.
     """
     bulk_url: str = STOOQ_BULK_URL

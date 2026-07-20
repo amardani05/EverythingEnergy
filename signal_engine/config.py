@@ -19,13 +19,13 @@ class Config:
     path: Path = field(default=DEFAULT_CONFIG_PATH)
 
     @classmethod
-    def load(cls, path: Path | str | None = None) -> "Config":
+    def load(cls, path: Path | str | None = None) -> Config:
         p = Path(path) if path else DEFAULT_CONFIG_PATH
         with p.open("r") as f:
             data = yaml.safe_load(f)
         return cls(raw=data, path=p)
 
-    # Convenience accessors — keep these thin; downstream modules can read raw[...] too.
+    # Convenience accessors - keep these thin; downstream modules can read raw[...] too.
     @property
     def duckdb_path(self) -> Path:
         return REPO_ROOT / self.raw["storage"]["duckdb_path"]

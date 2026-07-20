@@ -1,4 +1,4 @@
-"""Composite scoring — the layer between raw factor values and a tradable rank.
+"""Composite scoring - the layer between raw factor values and a tradable rank.
 
 Pipeline per config.yaml `scoring` + `signals.selection`:
 
@@ -19,11 +19,11 @@ PIT: every factor input arrives through the as_of_* read API (the factors
 themselves enforce this); the sector map is a slowly-varying attribute
 (SIC reclassification is rare and carries no forward return information),
 so it uses the nearest available submissions snapshot rather than a strict
-knowledge-date gate — documented deviation, revisit if SIC-based signals
+knowledge-date gate - documented deviation, revisit if SIC-based signals
 are ever added.
 
 Missing-PEAD semantics: a name with no earnings event inside the hold
-window has no `sue` component — the pead family simply drops out of that
+window has no `sue` component - the pead family simply drops out of that
 name's composite (weights renormalize). No news is treated as no drift
 signal, not as a zero surprise.
 """
@@ -66,10 +66,10 @@ FAMILY_COMPONENTS: dict[str, list[str]] = {
 }
 
 # A name must have at least this many families present to receive a
-# composite — one lone family would rank on a different effective scale.
+# composite - one lone family would rank on a different effective scale.
 MIN_FAMILIES = 2
 
-# Sectors with fewer names than this use the global z instead — a 3-name
+# Sectors with fewer names than this use the global z instead - a 3-name
 # sector z is noise dressed up as neutralization.
 MIN_SECTOR_N = 8
 
@@ -135,7 +135,7 @@ def universe_ticker_to_cik(con: duckdb.DuckDBPyConnection, as_of: date,
 def sector_map(con: duckdb.DuckDBPyConnection, as_of: date) -> pl.DataFrame:
     """cik -> sector via SIC. Nearest submissions snapshot at-or-before
     `as_of`, else the earliest available (SIC is a slowly-varying attribute
-    — see module docstring). Returns columns: cik, sector."""
+    - see module docstring). Returns columns: cik, sector."""
     sics = con.execute("""
         SELECT cik, sic FROM (
             SELECT cik, sic, snapshot_date,
@@ -331,8 +331,7 @@ def build_composite(
 
 def family_correlation(df: pl.DataFrame) -> pl.DataFrame:
     """Spearman correlation matrix between family scores (ranked names only).
-    High pairwise correlation means two families are buying the same names —
-    diversification is illusory."""
+    High pairwise correlation means two families are buying the same names - diversification is illusory."""
     import numpy as np
     from scipy.stats import spearmanr
 

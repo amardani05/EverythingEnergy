@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Phase 4 — Attribution & IVR</title>
+<html><head><meta charset="utf-8"><title>Phase 4 - Attribution & IVR</title>
 <style>
 body { font-family: -apple-system, system-ui, sans-serif; max-width: 1400px; margin: 30px auto; padding: 20px; color: #222; }
 h1 { border-bottom: 2px solid #2c3e50; padding-bottom: 8px; }
@@ -15,18 +15,18 @@ img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 </style></head><body>
 
-<h1>Phase 4 — Performance Attribution &amp; Implied vs Realized</h1>
+<h1>Phase 4 - Performance Attribution &amp; Implied vs Realized</h1>
 <p style="color:#666;">Decomposes recent returns into factor (driver-explained) and idiosyncratic (residual).</p>
 
 <div class="note">
 <b>How to read attribution:</b> for each basket, ACTUAL return = FACTOR return + IDIOSYNCRATIC return.
 Factor return is what the basket's historical betas would predict given the actual driver moves over the window.
-Idiosyncratic is everything else — could be unmodeled factors, news, mispricing, or noise.
+Idiosyncratic is everything else - could be unmodeled factors, news, mispricing, or noise.
 A large positive idio means the basket outperformed what its driver model predicts; large negative means underperformed.
 This is the lens for "what's actually moving here that I should investigate."
 </div>
 
-<h2>1. Basket attribution — 3 month</h2>
+<h2>1. Basket attribution - 3 month</h2>
 <img src="attribution_chart_3m.png" alt="Attribution 3m">
 
 <div class="cols">
@@ -46,14 +46,14 @@ This is the lens for "what's actually moving here that I should investigate."
 </div>
 </div>
 
-<h2>2. Implied vs realized — last 4 weeks</h2>
+<h2>2. Implied vs realized - last 4 weeks</h2>
 <img src="implied_vs_realized_snap.png" alt="IVR snap">
 <table>
 <tr><th>Basket</th><th>Realized 4w</th><th>Implied 4w</th><th>Gap</th></tr>
 <tr><td><b>coal</b></td><td class='num'>-6.2%</td><td class='num'>+8.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-15.0%</td></tr><tr><td><b>petrochem</b></td><td class='num'>-4.8%</td><td class='num'>+8.9%</td><td class='num' style='color:#c4544a; font-weight:bold'>-13.6%</td></tr><tr><td><b>upstream_gas_eandp</b></td><td class='num'>-4.8%</td><td class='num'>+7.9%</td><td class='num' style='color:#c4544a; font-weight:bold'>-12.6%</td></tr><tr><td><b>ofs_offshore</b></td><td class='num'>-2.4%</td><td class='num'>+9.9%</td><td class='num' style='color:#c4544a; font-weight:bold'>-12.3%</td></tr><tr><td><b>ofs_equipment</b></td><td class='num'>-3.9%</td><td class='num'>+8.3%</td><td class='num' style='color:#c4544a; font-weight:bold'>-12.3%</td></tr><tr><td><b>downstream_retail</b></td><td class='num'>+15.4%</td><td class='num'>+3.2%</td><td class='num' style='color:#5db075; font-weight:bold'>+12.1%</td></tr><tr><td><b>power_utilities_regulated_ldc</b></td><td class='num'>-6.2%</td><td class='num'>+4.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-11.0%</td></tr><tr><td><b>upstream_offshore_drillers</b></td><td class='num'>-1.1%</td><td class='num'>+9.1%</td><td class='num' style='color:#c4544a; font-weight:bold'>-10.2%</td></tr><tr><td><b>lng_terminals</b></td><td class='num'>-1.7%</td><td class='num'>+6.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-8.5%</td></tr><tr><td><b>power_utilities_regulated_gas</b></td><td class='num'>-3.6%</td><td class='num'>+4.6%</td><td class='num' style='color:#c4544a; font-weight:bold'>-8.2%</td></tr><tr><td><b>upstream_oil_eandp</b></td><td class='num'>+0.5%</td><td class='num'>+7.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-7.4%</td></tr><tr><td><b>iocs_integrated</b></td><td class='num'>-2.2%</td><td class='num'>+5.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-7.2%</td></tr><tr><td><b>minerals_royalty</b></td><td class='num'>+1.1%</td><td class='num'>+6.5%</td><td class='num' style='color:#c4544a; font-weight:bold'>-5.5%</td></tr><tr><td><b>power_renewables</b></td><td class='num'>+0.7%</td><td class='num'>+6.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-5.3%</td></tr><tr><td><b>power_ipps_merchant</b></td><td class='num'>+7.6%</td><td class='num'>+12.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-4.4%</td></tr><tr><td><b>uranium_nuclear_fuel</b></td><td class='num'>+18.2%</td><td class='num'>+13.9%</td><td class='num' style='color:#5db075; font-weight:bold'>+4.3%</td></tr><tr><td><b>midstream_gpt</b></td><td class='num'>+2.6%</td><td class='num'>+6.8%</td><td class='num' style='color:#c4544a; font-weight:bold'>-4.2%</td></tr><tr><td><b>tanker_shipping</b></td><td class='num'>+9.7%</td><td class='num'>+6.6%</td><td class='num' style='color:#5db075; font-weight:bold'>+3.1%</td></tr><tr><td><b>downstream_biofuels</b></td><td class='num'>+9.5%</td><td class='num'>+6.8%</td><td class='num' style='color:#5db075; font-weight:bold'>+2.8%</td></tr><tr><td><b>midstream_pipelines</b></td><td class='num'>+3.3%</td><td class='num'>+5.0%</td><td class='num' style='color:#c4544a; font-weight:bold'>-1.7%</td></tr><tr><td><b>ofs_onshore</b></td><td class='num'>+11.2%</td><td class='num'>+10.5%</td><td class='num' style='color:#5db075; font-weight:bold'>+0.7%</td></tr><tr><td><b>downstream_refiners</b></td><td class='num'>+6.3%</td><td class='num'>+6.2%</td><td class='num' style='color:#5db075; font-weight:bold'>+0.1%</td></tr>
 </table>
 
-<h3>Gap over time — top 6 baskets by current |gap|</h3>
+<h3>Gap over time - top 6 baskets by current |gap|</h3>
 <img src="ivr_timeseries.png" alt="IVR timeseries">
 
 <h2>3. Top idiosyncratic name movers (3m)</h2>

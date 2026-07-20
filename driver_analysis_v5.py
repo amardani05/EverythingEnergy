@@ -1,5 +1,5 @@
 """
-IMA Energy Dashboard — Phase 2 Driver Analysis (v5)
+IMA Energy Dashboard - Phase 2 Driver Analysis (v5)
 ====================================================
 
 Fixes from v1:
@@ -14,7 +14,7 @@ Fixes from v1:
    tickers are >5% of universe.
 4. SPECIALTY DRIVERS: added more granular drivers where freely available:
    - HH_FORWARD via NG=F (already there)
-   - JKM_HH_PROXY: would need FactSet — flagged
+   - JKM_HH_PROXY: would need FactSet - flagged
    - URANIUM proxy via URA ETF
    - REFINERY via XOP (E&P ETF for residualization)
    - COAL via KOL ETF (thermal coal proxy)
@@ -49,7 +49,7 @@ try:
     PDR_AVAILABLE = True
 except ImportError:
     PDR_AVAILABLE = False
-    print("[warn] pandas-datareader not installed — install for FRED access")
+    print("[warn] pandas-datareader not installed - install for FRED access")
 
 warnings.filterwarnings('ignore')
 
@@ -61,7 +61,7 @@ OUTPUT_DIR = Path('drivers_results')
 LOOKBACK_YEARS = 5
 REGRESSION_FREQ = 'W-FRI'
 
-# Driver universe — symbol → (source, fred_or_yf_ticker, kind)
+# Driver universe - symbol → (source, fred_or_yf_ticker, kind)
 # kind: 'price' (use log returns) | 'spread' (use diffs) | 'rate' (use diffs)
 DRIVERS = {
     'CL':       ('fred', 'DCOILWTICO', 'price'),
@@ -75,12 +75,12 @@ DRIVERS = {
     'XLU':      ('yf',   'XLU', 'price'),
     'TNX':      ('yf',   '^TNX', 'rate'),
     'DXY':      ('yf',   'DX-Y.NYB', 'price'),
-    # Specialty proxies (v2 additions) — ETFs and macro proxies
-    'URA':      ('yf',   'URA', 'price'),       # uranium miners ETF — proxy for U3O8
-    # 'KOL' delisted Dec 2020 — no clean US thermal coal ETF replacement.
+    # Specialty proxies (v2 additions) - ETFs and macro proxies
+    'URA':      ('yf',   'URA', 'price'),       # uranium miners ETF - proxy for U3O8
+    # 'KOL' delisted Dec 2020 - no clean US thermal coal ETF replacement.
     # Coal basket attribution requires FactSet API2/Newcastle data.
     'BDRY':     ('yf',   'BDRY', 'price'),      # dry bulk shipping ETF
-    'XOP':      ('yf',   'XOP', 'price'),       # E&P ETF — useful for residualizing
+    'XOP':      ('yf',   'XOP', 'price'),       # E&P ETF - useful for residualizing
 }
 
 DERIVED_DRIVERS = ['CRACK_321', 'WTI_BRENT', 'NG_PROXY_LNG_SPREAD']
@@ -94,7 +94,7 @@ def compute_derived(prices_df):
         df['CRACK_321'] = 2*df['RB'] + df['HO'] - 3*df['CL']
     if all(c in df.columns for c in ['CL', 'BRENT']):
         df['WTI_BRENT'] = df['CL'] - df['BRENT']
-    # No JKM proxy from free data — placeholder for FactSet integration
+    # No JKM proxy from free data - placeholder for FactSet integration
     # If user has JKM via another path, drop it into df['JKM'] and the framework picks it up.
     return df
 
@@ -147,7 +147,7 @@ def fetch_prices(tickers, years=LOOKBACK_YEARS, force=False):
         missing = set(tickers) - set(cached.columns)
         miss_pct = len(missing) / max(len(tickers), 1)
         if miss_pct < 0.05:
-            print(f"[cache] price cache hit ({len(missing)} missing, {miss_pct:.1%}) — using cache")
+            print(f"[cache] price cache hit ({len(missing)} missing, {miss_pct:.1%}) - using cache")
             return cached.reindex(columns=[t for t in tickers if t in cached.columns])
         print(f"[cache] missing {len(missing)} tickers ({miss_pct:.1%}); refetching all")
 
@@ -176,9 +176,9 @@ def fetch_drivers(years=LOOKBACK_YEARS, force=False):
         all_keys = list(DRIVERS.keys())
         missing = [k for k in all_keys if k not in cached.columns]
         if not missing:
-            print(f"[cache] driver cache hit — {cached.shape[1]} series, {cached.shape[0]} obs")
+            print(f"[cache] driver cache hit - {cached.shape[1]} series, {cached.shape[0]} obs")
             return cached
-        print(f"[cache] driver cache missing {missing} — refetching")
+        print(f"[cache] driver cache missing {missing} - refetching")
     
     end = pd.Timestamp.today()
     start = end - pd.DateOffset(years=years)
@@ -436,7 +436,7 @@ def chart_basket_r2(basket_reg, output_dir):
     ax.axvline(0.3, color='#e67e22', linestyle='--', alpha=0.5, label='Moderate (≥0.3)')
     ax.set_xlabel('Adjusted R²')
     ax.set_title(f'How much of each basket\'s variance is explained by drivers?\n(weekly returns, {LOOKBACK_YEARS}y)', fontsize=11)
-    # FIX: defensive xlim — handle case where max is NaN/Inf
+    # FIX: defensive xlim - handle case where max is NaN/Inf
     xmax = df['r2_adj'].max()
     if pd.isna(xmax) or not np.isfinite(xmax):
         xmax = 0.7
@@ -559,7 +559,7 @@ def build_report(basket_reg, name_reg, reps_df, diag_df, available_drivers, outp
     rep_rows = []
     for _, r in reps_df.sort_values('node').iterrows():
         c = f"{r['corr']:.3f}" if pd.notna(r['corr']) else 'n/a'
-        rep_rows.append(f"<tr><td>{escape(r['node'])}</td><td><b>{escape(str(r['representative']) or '—')}</b></td><td class='num'>{c}</td><td>{escape(str(r['note']))}</td></tr>")
+        rep_rows.append(f"<tr><td>{escape(r['node'])}</td><td><b>{escape(str(r['representative']) or ' - ')}</b></td><td class='num'>{c}</td><td>{escape(str(r['note']))}</td></tr>")
     
     # Basket regression table
     bask_rows = []
@@ -571,14 +571,14 @@ def build_report(basket_reg, name_reg, reps_df, diag_df, available_drivers, outp
         for d in available_drivers:
             b = r.get(f'beta_{d}', np.nan); t = r.get(f't_{d}', np.nan)
             if pd.isna(b):
-                beta_cells.append("<td class='num'>—</td>")
+                beta_cells.append("<td class='num'> - </td>")
             else:
                 bold = ' style="font-weight:bold"' if pd.notna(t) and abs(t) > 1.96 else ''
                 beta_cells.append(f"<td class='num'{bold}>{b:+.3f}</td>")
-        r2s = f"{r2:.2f}" if pd.notna(r2) else '—'
+        r2s = f"{r2:.2f}" if pd.notna(r2) else ' - '
         bask_rows.append(
             f"<tr class='{cls}'><td><b>{escape(r['node'])}</b></td>"
-            f"<td class='num'>{r2s}</td><td>{r['dominant'] or '—'}</td>"
+            f"<td class='num'>{r2s}</td><td>{r['dominant'] or ' - '}</td>"
             + ''.join(beta_cells) + "</tr>"
         )
     
@@ -591,7 +591,7 @@ def build_report(basket_reg, name_reg, reps_df, diag_df, available_drivers, outp
             for d in available_drivers:
                 b = r.get(f'beta_{d}', np.nan); t = r.get(f't_{d}', np.nan)
                 if pd.isna(b):
-                    beta_cells.append("<td class='num'>—</td>")
+                    beta_cells.append("<td class='num'> - </td>")
                 else:
                     bold = ' style="font-weight:bold"' if pd.notna(t) and abs(t) > 1.96 else ''
                     beta_cells.append(f"<td class='num'{bold}>{b:+.3f}</td>")
@@ -624,7 +624,7 @@ img {{ max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px
 .alert {{ background: #fee; padding: 10px; border-left: 4px solid #e74c3c; margin: 12px 0; font-size: 13px; }}
 code {{ background: #f4f4f4; padding: 1px 5px; border-radius: 3px; font-size: 11px; }}
 </style></head><body>
-<h1>IMA Energy Dashboard — Phase 2 Driver Decomposition (v2)</h1>
+<h1>IMA Energy Dashboard - Phase 2 Driver Decomposition (v2)</h1>
 <p style="color:#666;">Weekly returns · {LOOKBACK_YEARS}y · ~{n_obs} obs · OLS w/ Newey-West HAC SE</p>
 <p style="color:#666;">Available drivers: {drivers_html}</p>
 

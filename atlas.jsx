@@ -19,7 +19,7 @@
      Positions for each node ON the illustrated island (SVG coords).
      The island map and district shapes are designed by the illustrator;
      this dict places each sub-industry within its district.
-     Edit here when you want to move a node visually — analysis
+     Edit here when you want to move a node visually - analysis
      re-runs do NOT touch this.
      -------------------------------------------------------------------- */
   const POSITIONS = {
@@ -153,7 +153,7 @@
 
       NODES.push({
         id: n.id,
-        name: (n.display_name || n.id).replace(/—/g, "·").replace(/–/g, "·"),
+        name: (n.display_name || n.id).replace(/ - /g, "·").replace(/–/g, "·"),
         layer: n.layer,
         ticker: repTk || "",
         n: n.n_constituents || (n.constituents?.length ?? 0),
@@ -183,20 +183,20 @@
 
     const DESCRIPTIONS = {};
     for (const n of data.nodes || []) {
-      const desc = (n.description || "").trim().replace(/—/g, "·").replace(/–/g, "·");
+      const desc = (n.description || "").trim().replace(/ - /g, "·").replace(/–/g, "·");
       DESCRIPTIONS[n.id] = desc || "·";
     }
     // Also strip em dashes from constituent names
     for (const n of NODES) {
       n.constituents = (n.constituents || []).map(c => ({
         ...c,
-        name: (c.name || "").replace(/—/g, "·").replace(/–/g, "·"),
-        sub_tag: (c.sub_tag || "").replace(/—/g, "·").replace(/–/g, "·"),
+        name: (c.name || "").replace(/ - /g, "·").replace(/–/g, "·"),
+        sub_tag: (c.sub_tag || "").replace(/ - /g, "·").replace(/–/g, "·"),
       }));
     }
 
-    /* SIGNAL_PAIRS — filtered to |z|>0.5 for the atlas signal mode.
-       ALL_PAIRS — raw set for the dashboard's Active Signals section. */
+    /* SIGNAL_PAIRS - filtered to |z|>0.5 for the atlas signal mode.
+       ALL_PAIRS - raw set for the dashboard's Active Signals section. */
     const _toPair = p => ({
       a: p.long, b: p.short,
       long: p.long, short: p.short,           // dashboard wording
@@ -213,7 +213,7 @@
 
     /* NODE_CORR_PAIRS from cross_basket_correlation matrix.
        Filter to live ids, dedupe symmetric, drop self-corr.
-       NO magnitude threshold — UI handles encoding of weak pairs. */
+       NO magnitude threshold - UI handles encoding of weak pairs. */
     const NODE_CORR_PAIRS = [];
     const seen = new Set();
     const corrMatrix = data.cross_basket_correlation || {};
@@ -297,7 +297,7 @@
     }
     ALL_TICKERS.sort((a, b) => a.ticker.localeCompare(b.ticker));
 
-    /* CONSTITUENT_BY_TICKER — quick lookup for the stock drawer.
+    /* CONSTITUENT_BY_TICKER - quick lookup for the stock drawer.
        Stores a reference back to its parent node id for "back to basket". */
     const CONSTITUENT_BY_TICKER = {};
     for (const n of NODES) {
@@ -485,7 +485,7 @@
     window.ATLAS_RAW = data;
 
     /* Data-freshness: one computed record every surface reuses. Time-
-       relevance is signal-relevance — a residual z or pair signal computed
+       relevance is signal-relevance - a residual z or pair signal computed
        on stale prices is a different (worse) object than a fresh one, so
        the age is shown wherever numbers are shown. */
     (function stampFreshness() {
@@ -507,7 +507,7 @@
         chip.innerHTML = '<span class="asof-dot"></span>' + label;
         chip.title = iso
           ? `dashboard_data.json generated ${iso}. Rebuild via the analysis pipeline (see Methodology).`
-          : "dashboard_data.json carries no meta.generated_at — rebuild via consolidate_data.py";
+          : "dashboard_data.json carries no meta.generated_at - rebuild via consolidate_data.py";
       }
     })();
 

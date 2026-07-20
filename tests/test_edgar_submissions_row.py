@@ -1,4 +1,4 @@
-"""submissions_row regression tests — locks the None-handling that broke
+"""submissions_row regression tests - locks the None-handling that broke
 the live ingest around 2026-06-23 (some filers ship null entries inside
 their `tickers` / `exchanges` arrays)."""
 

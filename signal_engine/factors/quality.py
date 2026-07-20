@@ -1,4 +1,4 @@
-"""Quality factor — composite of ROIC, accruals (lower better), trailing
+"""Quality factor - composite of ROIC, accruals (lower better), trailing
 margin stability.
 
 Three raw values per ticker. Higher = better quality across all three

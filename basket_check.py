@@ -1,5 +1,5 @@
 """
-IMA Energy Dashboard — Phase 1: Basket Correlation Sanity Check (v2)
+IMA Energy Dashboard - Phase 1: Basket Correlation Sanity Check (v2)
 ======================================================================
 
 Tests whether the taxonomy clusters correctly. Outputs go to ./basket_results/
@@ -72,7 +72,7 @@ def fetch_prices(tickers, years=LOOKBACK_YEARS, force_refresh=False):
         cached = pd.read_parquet(CACHE_PATH)
         missing = set(tickers) - set(cached.columns)
         if not missing:
-            print(f"[cache] hit — {len(tickers)} tickers")
+            print(f"[cache] hit - {len(tickers)} tickers")
             return cached[tickers]
         print(f"[cache] missing {len(missing)} tickers, refetching all")
 
@@ -222,7 +222,7 @@ def chart_intra_basket(intra_df, output_dir):
     ax.axvline(TIER_GOOD, color='#27ae60', linestyle='--', alpha=0.5, label=f'Good (≥{TIER_GOOD})')
     ax.axvline(TIER_OK, color='#e67e22', linestyle='--', alpha=0.5, label=f'OK (≥{TIER_OK})')
     ax.set_xlabel('Mean pairwise correlation (off-diagonal)')
-    ax.set_title('Intra-basket cohesion — taxonomy v0.3\nhigher = tighter bucket', fontsize=13)
+    ax.set_title('Intra-basket cohesion - taxonomy v0.3\nhigher = tighter bucket', fontsize=13)
     ax.set_xlim(0, max(df['mean_pair_corr'].max() * 1.15, 1.0))
     ax.legend(loc='lower right')
     ax.grid(axis='x', alpha=0.3)
@@ -271,7 +271,7 @@ def chart_misclassification(misclass_df, output_dir, top_n=20):
     ax.set_yticks(y_pos)
     ax.set_yticklabels(labels, fontsize=9)
     ax.set_xlabel('Correlation')
-    ax.set_title(f'Top {top_n} misclassifications — names whose top correlation is not their home basket\n(LOO baskets, large delta = stronger evidence to move)', fontsize=12)
+    ax.set_title(f'Top {top_n} misclassifications - names whose top correlation is not their home basket\n(LOO baskets, large delta = stronger evidence to move)', fontsize=12)
     ax.legend(loc='lower right')
     ax.grid(axis='x', alpha=0.3)
     plt.tight_layout()
@@ -400,7 +400,7 @@ img {{ max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px
 .note {{ background: #fffbe6; padding: 10px; border-left: 4px solid #f1c40f; margin: 12px 0; }}
 </style></head><body>
 
-<h1>IMA Energy Dashboard — Basket Check Report</h1>
+<h1>IMA Energy Dashboard - Basket Check Report</h1>
 <p style="color:#666;">Taxonomy v0.3 · {LOOKBACK_YEARS}y daily returns · {n_obs} observations · LOO baskets</p>
 {missing_block}
 
@@ -422,7 +422,7 @@ img {{ max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px
 </table>
 
 <h2>Cross-basket correlation</h2>
-<p class="legend">Look for blocks of high correlation — these are nodes that move together (e.g. OFS-onshore/offshore/equipment cluster, or upstream and integrated).</p>
+<p class="legend">Look for blocks of high correlation - these are nodes that move together (e.g. OFS-onshore/offshore/equipment cluster, or upstream and integrated).</p>
 <img src="cross_basket_heatmap.png" alt="Cross-basket heatmap">
 
 <h2>Cumulative basket returns ({LOOKBACK_YEARS}y)</h2>
@@ -500,7 +500,7 @@ def main():
     print(intra.to_string(index=False))
     
     print("\n" + "="*78)
-    print(f"MISCLASSIFICATIONS — top 20 by delta (LOO basket)")
+    print(f"MISCLASSIFICATIONS - top 20 by delta (LOO basket)")
     print("="*78)
     cols = ['ticker', 'name', 'assigned_node', 'top1_node', 'home_corr', 'top1_corr', 'delta']
     print(misclass.head(20)[cols].to_string(index=False))

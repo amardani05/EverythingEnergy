@@ -1,43 +1,43 @@
 ticker,name,assigned_node,home_corr,top1_node,top1_corr,top2_node,top2_corr,is_home_top,delta
-FLOC,Flowco Holdings,minerals_royalty,0.44157885359905485,ofs_onshore,0.569375194990582,ofs_equipment,0.5577990589288981,False,0.12779634139152712
-DTM,DT Midstream,midstream_pipelines,0.6353236316648274,midstream_gpt,0.7553576252727918,midstream_pipelines,0.6353236316648274,False,0.1200339936079644
-FLNG,FLEX LNG,lng_export,0.3953628709566729,tanker_shipping,0.5129293012804153,minerals_royalty,0.39616660979706025,False,0.11756643032374237
-CAPL,CrossAmerica Partners,downstream_refiners,0.35077804267414087,midstream_pipelines,0.46392482454647466,midstream_gpt,0.4105734492402088,False,0.11314678187233379
-CQP,Cheniere Energy Partners,lng_export,0.502687905063327,midstream_pipelines,0.6117330416752828,midstream_gpt,0.6009755131030174,False,0.1090451366119558
-KRP,Kimbell Royalty Partners,midstream_gpt,0.6023531190125225,upstream_oil_eandp,0.7037006392647106,minerals_royalty,0.6812138914249142,False,0.10134752025218807
-VNOM,Viper Energy,minerals_royalty,0.6977610857175223,upstream_oil_eandp,0.7773915735225606,midstream_gpt,0.6994916521476242,False,0.07963048780503834
-USAC,USA Compression Partners,compression_services,0.5451805522252938,midstream_pipelines,0.6155777356551879,midstream_gpt,0.5936841147993017,False,0.0703971834298941
-LNG,Cheniere Energy,lng_export,0.6022733287052878,midstream_gpt,0.6718375835066731,lng_export,0.6022733287052878,False,0.06956425480138528
-TPL,Texas Pacific Land,minerals_royalty,0.5756197862931062,upstream_oil_eandp,0.6321462258109725,midstream_gpt,0.5892924445111741,False,0.05652643951786629
-AROC,Archrock,compression_services,0.6832131152530928,midstream_gpt,0.7240880116282857,ofs_onshore,0.7149487540875479,False,0.040874896375192926
-VTOL,Bristow Group,ofs_offshore,0.6275177246899263,ofs_onshore,0.6641247860279702,ofs_equipment,0.6364941411697759,False,0.03660706133804392
-WHD,Cactus Inc,ofs_equipment,0.7715443180590467,ofs_onshore,0.8023774124086769,ofs_equipment,0.7715443180590467,False,0.03083309434963022
-SLB,Schlumberger,ofs_onshore,0.7981875690636142,ofs_equipment,0.8255348618432395,ofs_onshore,0.7981875690636142,False,0.027347292779625332
-EE,Excelerate Energy,lng_export,0.5027586712368229,midstream_gpt,0.5259753464573773,lng_export,0.5027586712368229,False,0.023216675220554372
-OIS,Oil States International,ofs_equipment,0.7507538805899134,ofs_onshore,0.7720943997695419,ofs_offshore,0.7575539019759454,False,0.021340519179628425
-BKR,Baker Hughes,ofs_onshore,0.7395109529981088,ofs_equipment,0.7608022605136795,ofs_onshore,0.7395109529981088,False,0.021291307515570734
-MNR,Mach Natural Resources,minerals_royalty,0.4758082408456375,upstream_oil_eandp,0.4961021854096817,minerals_royalty,0.4758082408456375,False,0.02029394456404421
-CLNE,Clean Energy Fuels,ofs_onshore,0.4524747160760525,upstream_oil_eandp,0.47129856182452073,ofs_onshore,0.4524747160760525,False,0.018823845748468238
-DMLP,Dorchester Minerals,minerals_royalty,0.5769325931098132,upstream_oil_eandp,0.5955891807005029,minerals_royalty,0.5769325931098132,False,0.018656587590689777
-OII,Oceaneering International,ofs_offshore,0.7888697071753585,ofs_onshore,0.8030672032752904,ofs_equipment,0.8000143199717392,False,0.014197496099931817
-INVX,Innovex International,ofs_offshore,0.7279487394812093,ofs_equipment,0.7406412135531227,ofs_onshore,0.7377633511923615,False,0.012692474071913429
-HLX,Helix Energy Solutions,ofs_offshore,0.7488883505994799,ofs_onshore,0.760894357594531,ofs_equipment,0.7593415402198965,False,0.012006006995051055
-FET,Forum Energy Technologies,ofs_equipment,0.618873141568372,ofs_onshore,0.6302158597958806,ofs_equipment,0.618873141568372,False,0.011342718227508541
-CLMT,Calumet,downstream_refiners,0.3649180805197491,minerals_royalty,0.37548892661620875,upstream_oil_eandp,0.36874654058797074,False,0.01057084609645964
-XPRO,Expro Group,ofs_onshore,0.7065137798768185,ofs_offshore,0.7170105398833456,ofs_onshore,0.7065137798768185,False,0.010496760006527106
-NESR,National Energy Services Reunited,ofs_onshore,0.504537725956707,ofs_equipment,0.5133297598851866,ofs_onshore,0.504537725956707,False,0.008792033928479603
-NGS,Natural Gas Services Group,ofs_onshore,0.48769557078667464,compression_services,0.4939987397688063,ofs_onshore,0.48769557078667464,False,0.006303168982131679
-WFRD,Weatherford International,ofs_equipment,0.6697068837347997,ofs_onshore,0.6748991560068393,ofs_offshore,0.6743181004902066,False,0.005192272272039555
-ET,Energy Transfer,midstream_pipelines,0.7661406110569221,midstream_gpt,0.770533466395849,midstream_pipelines,0.7661406110569221,False,0.00439285533892686
-BSM,Black Stone Minerals,minerals_royalty,0.6663935710654815,upstream_oil_eandp,0.668949499514601,minerals_royalty,0.6663935710654815,False,0.00255592844911956
-PBT,Permian Basin Royalty Trust,minerals_royalty,0.5119391032143233,upstream_oil_eandp,0.5144779675836572,minerals_royalty,0.5119391032143233,False,0.0025388643693338153
-WKC,World Kinect,downstream_refiners,0.530959141600596,ofs_onshore,0.5320254099718332,downstream_refiners,0.530959141600596,False,0.0010662683712372445
-NRP,Natural Resource Partners,minerals_royalty,0.3707404684867871,compression_services,0.3717926341461035,upstream_oil_eandp,0.3717467817147047,False,0.001052165659316373
-EQT,EQT Corp,upstream_gas_eandp,,midstream_gpt,0.6331453166871978,upstream_oil_eandp,0.5725638037408687,False,
-EXE,Expand Energy,upstream_gas_eandp,,midstream_gpt,0.6327546152901882,upstream_oil_eandp,0.6054958709194042,False,
-AR,Antero Resources,upstream_gas_eandp,,midstream_gpt,0.6805893198000729,upstream_oil_eandp,0.6798843479540831,False,
-RRC,Range Resources,upstream_gas_eandp,,upstream_oil_eandp,0.6799563530892729,midstream_gpt,0.670754606724451,False,
-CRK,Comstock Resources,upstream_gas_eandp,,upstream_oil_eandp,0.6060548924636878,midstream_gpt,0.5966083940423178,False,
-CNX,CNX Resources,upstream_gas_eandp,,upstream_oil_eandp,0.5956335898476951,midstream_gpt,0.5871889329064002,False,
-GPOR,Gulfport Energy,upstream_gas_eandp,,upstream_oil_eandp,0.6154994570440595,midstream_gpt,0.6118050110852525,False,
-TXO,TXO Partners,upstream_gas_eandp,,upstream_oil_eandp,0.40846039770796266,iocs_integrated,0.4051936061027991,False,
+CQP,Cheniere Energy Partners,lng_terminals,0.4590904363348744,midstream_pipelines,0.6019026023103075,midstream_gpt,0.6006765544018065,False,0.14281216597543306
+AES,AES Corp,power_utilities_regulated_gas,0.4698051874600547,power_renewables,0.5932182824014134,power_utilities_regulated_gas,0.4698051874600547,False,0.12341309494135871
+LNG,Cheniere Energy,lng_terminals,0.539542108527177,midstream_gpt,0.6569967842236182,upstream_oil_eandp,0.5846420189553484,False,0.11745467569644119
+CAPL,CrossAmerica Partners,downstream_refiners,0.35077773295680187,midstream_pipelines,0.4617663625591765,midstream_gpt,0.42414571587648237,False,0.11098862960237466
+KRP,Kimbell Royalty Partners,midstream_gpt,0.6058800743914542,upstream_oil_eandp,0.7032829833230763,minerals_royalty,0.6780486400225353,False,0.09740290893162207
+EE,Excelerate Energy,lng_terminals,0.4432815721686177,midstream_gpt,0.5362361625180319,minerals_royalty,0.4778648870590989,False,0.09295459034941417
+VNOM,Viper Energy,minerals_royalty,0.6942390810100975,upstream_oil_eandp,0.7797753445074641,ofs_onshore,0.6983640696599689,False,0.08553626349736665
+RIG,Transocean,upstream_offshore_drillers,0.6725717950328468,ofs_onshore,0.7525710247641314,ofs_equipment,0.7525644981499323,False,0.0799992297312846
+ATO,Atmos Energy,power_utilities_regulated_ldc,0.765764534044375,power_utilities_regulated_gas,0.8311031430916492,power_utilities_regulated_ldc,0.765764534044375,False,0.06533860904727429
+TPL,Texas Pacific Land,minerals_royalty,0.5728799090853811,upstream_oil_eandp,0.6324944360313779,midstream_gpt,0.5944446513223621,False,0.05961452694599678
+VTOL,Bristow Group,ofs_offshore,0.6275177246899263,ofs_onshore,0.6644608734877548,ofs_equipment,0.6364941779075074,False,0.03694314879782856
+OTTR,Otter Tail,power_utilities_regulated_gas,0.5006014428968064,power_utilities_regulated_ldc,0.5358153533250384,power_utilities_regulated_gas,0.5006014428968064,False,0.035213910428231965
+MNR,Mach Natural Resources,minerals_royalty,0.4608281271406408,upstream_oil_eandp,0.4943887097945517,minerals_royalty,0.4608281271406408,False,0.033560582653910875
+WHD,Cactus Inc,ofs_equipment,0.7715442662482738,ofs_onshore,0.8030632912634823,ofs_equipment,0.7715442662482738,False,0.031519025015208535
+SLB,Schlumberger,ofs_onshore,0.7998656187055417,ofs_equipment,0.8255348987111519,ofs_onshore,0.7998656187055417,False,0.025669280005610196
+OIS,Oil States International,ofs_equipment,0.7507538944998363,ofs_onshore,0.7729123040489029,ofs_offshore,0.7575539019759454,False,0.02215840954906656
+CLNE,Clean Energy Fuels,ofs_onshore,0.45076188020171787,upstream_oil_eandp,0.47247541031663565,ofs_onshore,0.45076188020171787,False,0.02171353011491778
+BKR,Baker Hughes,ofs_onshore,0.7407002384969095,ofs_equipment,0.7608021901845052,ofs_onshore,0.7407002384969095,False,0.020101951687595765
+SOC,Sable Offshore,upstream_offshore_drillers,0.18483139297892737,upstream_oil_eandp,0.20348644587634468,petrochem,0.19510364982404282,False,0.018655052897417312
+MDU,MDU Resources,power_utilities_regulated_gas,0.6138943436600495,power_utilities_regulated_ldc,0.6315477242234412,power_utilities_regulated_gas,0.6138943436600495,False,0.01765338056339172
+DMLP,Dorchester Minerals,minerals_royalty,0.5815418070179362,upstream_oil_eandp,0.598000699952528,minerals_royalty,0.5815418070179362,False,0.016458892934591796
+OII,Oceaneering International,ofs_offshore,0.7888697071753585,ofs_onshore,0.8041973925975843,ofs_equipment,0.8000142776164756,False,0.015327685422225734
+ET,Energy Transfer,midstream_pipelines,0.7554689034540621,midstream_gpt,0.7703545543067116,midstream_pipelines,0.7554689034540621,False,0.014885650852649479
+GLNG,Golar LNG,tanker_shipping,0.5487821868866999,upstream_oil_eandp,0.5625286344002814,ofs_onshore,0.5568959597203055,False,0.013746447513581561
+INVX,Innovex International,ofs_offshore,0.7279487394812093,ofs_equipment,0.7406412004055998,ofs_onshore,0.738559521024267,False,0.01269246092439047
+HLX,Helix Energy Solutions,ofs_offshore,0.7488883505994799,ofs_onshore,0.7611982571379868,ofs_equipment,0.7593416011318451,False,0.012309906538506943
+FET,Forum Energy Technologies,ofs_equipment,0.618873162534094,ofs_onshore,0.6297582971677577,ofs_equipment,0.618873162534094,False,0.010885134633663696
+XPRO,Expro Group,ofs_onshore,0.7071911246262075,ofs_offshore,0.7170105398833456,ofs_onshore,0.7071911246262075,False,0.009819415257138142
+NRP,Natural Resource Partners,minerals_royalty,0.37070557332857235,midstream_gpt,0.3805011290160278,upstream_oil_eandp,0.37292350211994196,False,0.009795555687455437
+NESR,National Energy Services Reunited,ofs_onshore,0.5050259567709515,ofs_equipment,0.5133297286263726,ofs_onshore,0.5050259567709515,False,0.008303771855421083
+WFRD,Weatherford International,ofs_equipment,0.6697069123613133,ofs_onshore,0.6757752486689875,ofs_offshore,0.6743180678714066,False,0.006068336307674227
+BSM,Black Stone Minerals,minerals_royalty,0.6668970465627293,upstream_oil_eandp,0.67215353940678,minerals_royalty,0.6668970465627293,False,0.00525649284405072
+CLMT,Calumet,downstream_refiners,0.36491812580558597,upstream_oil_eandp,0.3693524192090233,minerals_royalty,0.36770142866155886,False,0.004434293403437317
+WKC,World Kinect,downstream_refiners,0.5309591994025196,ofs_onshore,0.532211513995474,downstream_refiners,0.5309591994025196,False,0.0012523145929543844
+EQT,EQT Corp,upstream_gas_eandp,,midstream_gpt,0.6347661175028735,upstream_oil_eandp,0.575708666541217,False,
+EXE,Expand Energy,upstream_gas_eandp,,midstream_gpt,0.6341956630886727,upstream_oil_eandp,0.6097067053704804,False,
+AR,Antero Resources,upstream_gas_eandp,,upstream_oil_eandp,0.681936954623612,midstream_gpt,0.6761819416499196,False,
+RRC,Range Resources,upstream_gas_eandp,,upstream_oil_eandp,0.6834781045549901,midstream_gpt,0.6670420536196345,False,
+CRK,Comstock Resources,upstream_gas_eandp,,upstream_oil_eandp,0.6077589386461841,midstream_gpt,0.5930584853981108,False,
+CNX,CNX Resources,upstream_gas_eandp,,upstream_oil_eandp,0.6018678677449575,midstream_gpt,0.5860600786666502,False,
+GPOR,Gulfport Energy,upstream_gas_eandp,,upstream_oil_eandp,0.6177799037865714,midstream_gpt,0.6155320212868765,False,
+TXO,TXO Partners,upstream_gas_eandp,,upstream_oil_eandp,0.40972923918728266,iocs_integrated,0.4051938080452348,False,

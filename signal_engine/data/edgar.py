@@ -1,10 +1,10 @@
-"""SEC EDGAR XBRL client — fundamentals spine.
+"""SEC EDGAR XBRL client - fundamentals spine.
 
 Endpoints used (all under https://data.sec.gov/):
   * submissions/CIK{10pad}.json
         Per-company filing index + SIC, name, tickers, exchanges, fye.
   * api/xbrl/companyfacts/CIK{10pad}.json
-        All XBRL facts a company has ever filed. The workhorse — one call
+        All XBRL facts a company has ever filed. The workhorse - one call
         returns every concept's full history with `accn` and `filed`.
   * api/xbrl/companyconcept/CIK{10pad}/{taxonomy}/{concept}.json
         Single concept for one company. Used as a fallback if companyfacts
@@ -18,7 +18,7 @@ and a later `filed` date; we store them as new rows, never overwriting.
 
 Rate limit: SEC fair-use is ~10 req/s with a real User-Agent. Config caps us
 at 8 to leave headroom. A simple monotonic-clock throttle is enforced
-per-process — if you parallelize, each worker must call `EdgarClient.throttle()`
+per-process - if you parallelize, each worker must call `EdgarClient.throttle()`
 or share a Limiter.
 """
 
@@ -162,7 +162,7 @@ class EdgarClient:
         Some filers carry `null` entries inside their `tickers` / `exchanges`
         arrays (multi-class shares where one class isn't ticker-listed, OTC
         dual-listings where one venue is null, etc.). Filter those out
-        before joining — leaving them in raises TypeError on str.join.
+        before joining - leaving them in raises TypeError on str.join.
         """
         tickers_raw = payload.get("tickers") or []
         exchanges_raw = payload.get("exchanges") or []
@@ -183,7 +183,7 @@ class EdgarClient:
 # ---------- helpers callers will reach for ----------
 
 def cache_raw(path: Path, payload: dict[str, Any]) -> None:
-    """Persist a raw API response as JSON next to the parsed rows — useful
+    """Persist a raw API response as JSON next to the parsed rows - useful
     for debugging and for re-parsing without re-pulling."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload))
@@ -191,7 +191,7 @@ def cache_raw(path: Path, payload: dict[str, Any]) -> None:
 
 def iter_cached_payloads(raw_dir: Path, prefix: str) -> Iterable[tuple[int, Path, dict[str, Any]]]:
     """Yield (cik, path, payload) for every '{prefix}_{cik:010d}.json' under
-    `raw_dir` — the re-parse-without-re-pull counterpart to `cache_raw`.
+    `raw_dir` - the re-parse-without-re-pull counterpart to `cache_raw`.
 
     Files whose name doesn't parse to a CIK or whose JSON is corrupt are
     logged and skipped, never fatal: one bad cache file must not kill a

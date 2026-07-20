@@ -1,20 +1,19 @@
-"""Value factor — FCF yield + EV/EBITDA.
+"""Value factor - FCF yield + EV/EBITDA.
 
 Both ratios are reciprocals-of-multiples; higher = cheaper. We surface them
 as standalone raw values; the composite layer winsorizes and z-scores
 within sector.
 
-Per turn 6: EBITDA uses the street formula (NI + Int + Tax + D&A) — see
+Per turn 6: EBITDA uses the street formula (NI + Int + Tax + D&A) - see
 fundamentals.AnnualSnapshot.ebitda.
 
 Market cap (and hence EV / FCF yield) requires a price at as_of. We use
 the most-recent-as-of close from prices, multiplied by the snapshot's
-shares_outstanding. Both are PIT — price is t-known-at-t, shares is the
+shares_outstanding. Both are PIT - price is t-known-at-t, shares is the
 most recent reported balance.
 
 Negative-EBITDA companies get EV/EBITDA = None (sign-flipped multiples
-break the cross-sectional ranking). FCF yield is allowed to be negative
-— some IJR names burn cash and the signal SHOULD penalize them.
+break the cross-sectional ranking). FCF yield is allowed to be negative - some IJR names burn cash and the signal SHOULD penalize them.
 """
 
 from __future__ import annotations
@@ -61,7 +60,7 @@ def _enterprise_value(market_cap: float | None,
                       cash: float | None) -> float | None:
     if market_cap is None:
         return None
-    # Treat missing debt/cash as zero — many IJR names truly have no LT debt
+    # Treat missing debt/cash as zero - many IJR names truly have no LT debt
     # (see step 1 introspection on AAON). Document this so factor users know
     # EV = mcap whenever both are zero.
     debt = long_term_debt or 0.0

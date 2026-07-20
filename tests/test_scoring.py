@@ -1,9 +1,8 @@
-"""Scoring layer tests — sign conventions, composite algebra, family floor,
+"""Scoring layer tests - sign conventions, composite algebra, family floor,
 and the PIT canary THROUGH the composite (a fact filed after as_of must not
 move any score).
 
-Fixture world: six names in one sector (below MIN_SECTOR_N, so global z —
-deterministic expectations), ~440 weekday prices each, annual fundamentals
+Fixture world: six names in one sector (below MIN_SECTOR_N, so global z - deterministic expectations), ~440 weekday prices each, annual fundamentals
 for five, and a long Q1 EPS history + fresh earnings shock for one.
 """
 
@@ -111,7 +110,7 @@ def seeded(tmp_con: duckdb.DuckDBPyConnection) -> duckdb.DuckDBPyConnection:
 
     # PEADP: 8 years of Q1 EPS with variance, then a POSITIVE shock filed
     # inside the 92-day hold window before AS_OF. CHEAP gets the same
-    # history with a NEGATIVE surprise — a one-name SUE cross-section would
+    # history with a NEGATIVE surprise - a one-name SUE cross-section would
     # z-score to a flat 0.0, so ordering needs at least two events.
     eps_by_fy = {2018: 1.00, 2019: 1.05, 2020: 1.10, 2021: 1.15,
                  2022: 1.10, 2023: 1.20, 2024: 1.25, 2025: 1.30}

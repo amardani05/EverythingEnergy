@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Baseline forward-IC scorecard on real data — roadmap Phase 0.4.
+"""Baseline forward-IC scorecard on real data - roadmap Phase 0.4.
 
 Runs every implemented factor against the live DuckDB store and emits the
 IC scorecard (Spearman, horizons 1/5/21/63) per factor, plus a markdown
@@ -7,10 +7,10 @@ report at docs/baselines.md. This is the "does anything predict anything"
 checkpoint that Phase 1/2 work calibrates against.
 
 Panels:
-  * momentum  — daily, full price history (compute_momentum on the panel)
-  * value     — month-end grid (fcf_yield; ev_ebitda sign-flipped)
-  * quality   — month-end grid (roic; accruals sign-flipped; margin_stability)
-  * pead      — SUE events broadcast forward over a 63-trading-day hold
+  * momentum  - daily, full price history (compute_momentum on the panel)
+  * value     - month-end grid (fcf_yield; ev_ebitda sign-flipped)
+  * quality   - month-end grid (roic; accruals sign-flipped; margin_stability)
+  * pead      - SUE events broadcast forward over a 63-trading-day hold
 
 Phase 1 upgrades folded in: Newey-West t (lag = horizon) reported next to
 the iid t, momentum is total-return, SUE includes derived Q4 events.
@@ -53,7 +53,7 @@ HOLD_WINDOW_DAYS = 63  # PEAD broadcast horizon (trading days)
 def universe_ticker_to_cik(con: duckdb.DuckDBPyConnection) -> dict[str, int]:
     """Latest IJR snapshot tickers resolved through the latest ticker_cik_map.
 
-    This is `membership_mode: ijr_current` — today's members applied to all
+    This is `membership_mode: ijr_current` - today's members applied to all
     history. Survivorship-biased by construction; flagged in the report.
     """
     ijr = con.execute("""
@@ -234,7 +234,7 @@ def main() -> int:
             "",
             f"*Generated {today} on `{git_sha}`. Spearman rank IC; forward return "
             "t+1 -> t+H+1 (no formation-day return). Universe: latest IJR snapshot "
-            f"({len(t2c)} names, `ijr_current` — survivorship-biased by construction).*",
+            f"({len(t2c)} names, `ijr_current` - survivorship-biased by construction).*",
             "",
             f"*Data watermarks: prices through {trading_dates[-1]}, "
             f"edgar_facts = {n_facts:,} rows.*",
@@ -243,7 +243,7 @@ def main() -> int:
             "daily ICs autocorrelated; the Newey-West column (lag = horizon) is "
             "the honest significance. Momentum is total-return (dividends folded "
             "in); SUE includes derived Q4 events (FY - sum(Q1..3), filed at the 10-K). "
-            "Remaining caveats: no costs, no neutralization — raw single-factor "
+            "Remaining caveats: no costs, no neutralization - raw single-factor "
             "IC only; `ijr_current` survivorship bias.",
             "",
         ]

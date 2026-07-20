@@ -22,8 +22,8 @@
   --border-hi:  #344056;
   --line:       #4f5563;
   --text:       #dde1e8;
-  --text-mute:  #98a0b0;   /* brightened — numeric labels were sub-AA contrast */
-  --text-dim:   #737b8c;   /* brightened — was #4f5563, unreadable for numbers */
+  --text-mute:  #98a0b0;   /* brightened - numeric labels were sub-AA contrast */
+  --text-dim:   #737b8c;   /* brightened - was #4f5563, unreadable for numbers */
   --accent:     #d4af37;
 
   /* Editorial map palette · muted, low-sat oklch */
@@ -43,8 +43,7 @@
 
   --serif:      "EB Garamond", Georgia, serif;
   --sans:       "Inter", system-ui, sans-serif;
-  /* IBM Plex Mono: taller x-height + more open counters than JetBrains —
-     numerals stay legible at the dense 10-12px sizes this UI runs on. */
+  /* IBM Plex Mono: taller x-height + more open counters than JetBrains - numerals stay legible at the dense 10-12px sizes this UI runs on. */
   --mono:       "IBM Plex Mono", "JetBrains Mono", "SF Mono", Consolas, monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -109,7 +108,7 @@ a.view-nav-btn { text-decoration: none; display: inline-block; }
   position: relative;
   overflow: hidden;
   /* Negative space (when SVG is centered with whitespace) reads as ocean,
-     not as a black bezel — keeps the map metaphor when the screener
+     not as a black bezel - keeps the map metaphor when the screener
      collapses and the column gets wider than the viewBox aspect. */
   background: var(--water-deep);
   flex: 0 0 auto;
@@ -171,7 +170,7 @@ a.view-nav-btn { text-decoration: none; display: inline-block; }
 .map-title .scale .bar::before { left: 0; }
 .map-title .scale .bar::after { right: 0; }
 
-/* SVG canvas — fills the (now fixed-height) map-pane; preserveAspectRatio
+/* SVG canvas - fills the (now fixed-height) map-pane; preserveAspectRatio
    on the element decides how the viewBox sits inside. */
 svg.atlas { display: block; width: 100%; height: 100%; }
 @keyframes pulseStroke { 0%,100% { opacity: 0.85; } 50% { opacity: 1; } }
@@ -1007,7 +1006,7 @@ svg.atlas { display: block; width: 100%; height: 100%; }
 }
 
 /* =============================================================
-   v4 — Landing-page layout: Dashboard (1fr) · MapColumn (280px)
+   v4 - Landing-page layout: Dashboard (1fr) · MapColumn (280px)
    Drawer slides in from left over the dashboard.
    ============================================================= */
 
@@ -1585,7 +1584,7 @@ svg.atlas { display: block; width: 100%; height: 100%; }
 .view-back {
   position: fixed;
   top: 22px;
-  right: 445px;  /* left of REFRESH (310px) — the right edge belongs to the freshness chip */
+  right: 445px;  /* left of REFRESH (310px) - the right edge belongs to the freshness chip */
   z-index: 100;
   background: rgba(10,13,18,0.92);
   border: 1px solid var(--border-hi);
@@ -1729,7 +1728,7 @@ svg.atlas { display: block; width: 100%; height: 100%; }
   padding: 8px 0; font-style: italic;
 }
 
-/* Signals — wider cards, more breathing room */
+/* Signals - wider cards, more breathing room */
 .dash-signals {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -2007,8 +2006,8 @@ svg.atlas { display: block; width: 100%; height: 100%; }
   <div class="brand">Everything <span class="gold">Energy</span></div>
   <!-- Filled by atlas.jsx at hydration from dashboard_data.json meta.generated_at.
        Age-colored: fresh (<2d) / warn (<7d) / stale. Time-relevance is signal-
-       relevance — a stale read must announce itself. The Methodology link lives
-       in the React ViewNav (app.jsx) — the nav is position:fixed over this bar. -->
+       relevance - a stale read must announce itself. The Methodology link lives
+       in the React ViewNav (app.jsx) - the nav is position:fixed over this bar. -->
   <div class="asof-chip" id="data-asof" title="Loading data timestamp…">data: loading…</div>
 </div>
 

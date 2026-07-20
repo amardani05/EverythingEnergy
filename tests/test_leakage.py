@@ -1,4 +1,4 @@
-"""Leakage canary — wired up now, exercised once the IC harness lands.
+"""Leakage canary - wired up now, exercised once the IC harness lands.
 
 The contract: if anywhere in the pipeline a fact with `knowledge_date > t`
 leaks into the t-indexed feature set, the forward-IC against a future-return
@@ -16,9 +16,9 @@ existence of this file is a contract.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Iterable
 
 import polars as pl
 

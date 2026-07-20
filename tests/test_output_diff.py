@@ -1,4 +1,4 @@
-"""Output layer — snapshot round-trip + diff semantics."""
+"""Output layer - snapshot round-trip + diff semantics."""
 
 from __future__ import annotations
 

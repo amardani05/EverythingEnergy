@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-shot introspection — verifies live schemas before bulk ingest.
+"""One-shot introspection - verifies live schemas before bulk ingest.
 
 v2 (post turn-8 pivot): yfinance primary, IJR manual-drop, Stooq future.
 
@@ -67,7 +67,7 @@ def main() -> int:
     rows = edgar.EdgarClient.extract_facts(facts, cik, chains)
     print(f"\nextract_facts produced {len(rows)} rows for AAON")
 
-    # 4. yfinance — primary v1 path
+    # 4. yfinance - primary v1 path
     hr("yfinance(AAON) recent history")
     yf, yf_actions = prices.yfinance_history("AAON", start="2025-01-01")
     print(f"rows: {yf.height}; columns: {yf.columns}")

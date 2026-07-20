@@ -1,4 +1,4 @@
-"""PEAD/SUE tests — algebra + originals-only contract."""
+"""PEAD/SUE tests - algebra + originals-only contract."""
 
 from __future__ import annotations
 
@@ -175,7 +175,7 @@ def test_compute_sue_mixes_all_none_and_valued_tickers(tmp_con: duckdb.DuckDBPyC
 
 def test_originals_only_excludes_amendments(tmp_con: duckdb.DuckDBPyConnection) -> None:
     """If a 10-Q/A is filed later with a different EPS, the original
-    EPS is what SUE uses — restatements never rewrite history."""
+    EPS is what SUE uses - restatements never rewrite history."""
     cik = 3000004
     # Plant a long enough Q1 history so SUE can fire
     years = {y: 1.00 + 0.05 * (y - 2018) for y in range(2018, 2024)}
@@ -200,7 +200,7 @@ def test_originals_only_excludes_amendments(tmp_con: duckdb.DuckDBPyConnection) 
 
 def test_compute_sue_attaches_signal_date_eq_filed(tmp_con: duckdb.DuckDBPyConnection) -> None:
     """The signal_date on every SUE row must equal the original 10-Q's
-    filed date — NEVER period_end, NEVER ingest_ts. This is the spec
+    filed date - NEVER period_end, NEVER ingest_ts. This is the spec
     contract for 'no look-ahead in the earnings signal'."""
     cik = 3000005
     years = {y: 1.00 + 0.05 * (y - 2018) for y in range(2018, 2025)}
