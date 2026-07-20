@@ -1,5 +1,5 @@
 """Atlas cluster + ticker loader. Reads the existing /energy_taxonomy.yaml
-in the repo root — the same file the Energy Atlas dashboard uses — so the
+in the repo root - the same file the Energy Atlas dashboard uses - so the
 signal engine doesn't fork a second source of truth.
 
 In step 4 this same module gains commodity-beta residualization. In step 2
@@ -27,10 +27,18 @@ def load_taxonomy(path: Path | None = None) -> dict[str, Any]:
         return yaml.safe_load(f)
 
 
+def _looks_like_basket(d: dict[str, Any]) -> bool:
+    """A dict is a basket definition if it carries any basket-shaped field.
+    The real taxonomy keys baskets by their mapping key (no inner 'id')."""
+    return any(k in d for k in ("constituents", "feeds_into", "display_name"))
+
+
 def _walk_constituents(node: Any, basket_id: str | None, out: dict[str, str]) -> None:
-    """Recursive walk that records ticker -> basket_id. The taxonomy nests
-    baskets a few levels deep; the most recent enclosing basket id (the
-    closest dict with 'id' or 'basket_id') is what wins."""
+    """Recursive walk that records ticker -> basket_id. Basket identity comes
+    from (in priority order) an explicit 'id'/'basket_id' field, else the
+    mapping key the basket definition hangs under, else the nearest enclosing
+    basket. The mapping-key case is the live taxonomy's actual shape; the
+    inner-id case keeps list-form taxonomies working."""
     if isinstance(node, dict):
         new_basket = node.get("id") or node.get("basket_id") or basket_id
         constituents = node.get("constituents")
@@ -40,8 +48,12 @@ def _walk_constituents(node: Any, basket_id: str | None, out: dict[str, str]) ->
                     out[c["ticker"].upper()] = new_basket or "uncategorized"
                 elif isinstance(c, str):
                     out[c.upper()] = new_basket or "uncategorized"
-        for v in node.values():
-            if isinstance(v, (dict, list)):
+        for key, v in node.items():
+            if isinstance(v, dict):
+                child = (v.get("id") or v.get("basket_id")
+                         or (key if _looks_like_basket(v) else new_basket))
+                _walk_constituents(v, child, out)
+            elif isinstance(v, list):
                 _walk_constituents(v, new_basket, out)
     elif isinstance(node, list):
         for item in node:
