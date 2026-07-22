@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signals - Everything Energy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0d12'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='18' font-weight='600' fill='%23d4af37'%3EE%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0d12; --bg: #11151c; --bg-card: #161b25;
+  --border: #232a3a; --border-hi: #344056;
+  --text: #dde1e8; --text-mute: #98a0b0; --text-dim: #737b8c;
+  --accent: #d4af37; --pos: #3fb96f; --neg: #d05252;
+  --serif: "EB Garamond", Georgia, serif;
+  --sans: "Inter", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", "SF Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg-deep); color: var(--text);
+  font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums lining-nums;
+}
+.top-bar {
+  display: flex; align-items: center; gap: 28px;
+  padding: 18px 32px; border-bottom: 1px solid var(--border); height: 72px;
+  position: sticky; top: 0; background: rgba(10,13,18,0.92); backdrop-filter: blur(6px); z-index: 10;
+}
+.brand { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 22px; }
+.brand .gold { color: var(--accent); }
+.back-link {
+  font-family: var(--sans); font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-mute); text-decoration: none;
+  border-bottom: 1px solid transparent; padding-bottom: 2px;
+}
+.back-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.asof-chip {
+  margin-left: auto; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+  color: var(--text-mute); padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: 3px; background: rgba(15,20,28,0.6); white-space: nowrap;
+}
+.asof-chip .asof-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; background: var(--text-dim); }
+.asof-chip.asof-fresh .asof-dot { background: var(--pos); }
+.asof-chip.asof-warn  .asof-dot { background: var(--accent); }
+.asof-chip.asof-stale .asof-dot { background: var(--neg); }
+.asof-chip.asof-stale { color: var(--neg); border-color: rgba(208,82,82,0.45); }
+
+main { max-width: 1080px; margin: 0 auto; padding: 44px 32px 120px; }
+h1 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 36px; margin-bottom: 8px; }
+.subtitle { color: var(--text-mute); font-size: 14.5px; max-width: 760px; margin-bottom: 8px; }
+.subtitle a { color: var(--accent); text-decoration: none; }
+h2 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 23px; margin: 44px 0 12px; padding-top: 16px; border-top: 1px solid var(--border); }
+.meta-strip { display: flex; flex-wrap: wrap; gap: 12px; margin: 22px 0 6px; }
+.meta-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
+  padding: 10px 16px; min-width: 130px;
+}
+.meta-card .lab { font-family: var(--sans); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+.meta-card .val { font-family: var(--mono); font-size: 17px; margin-top: 2px; }
+.warn-badge {
+  display: inline-block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
+  color: var(--neg); border: 1px solid rgba(208,82,82,0.45); border-radius: 3px;
+  padding: 3px 9px; margin-top: 10px;
+}
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; margin: 14px 0; }
+th {
+  font-family: var(--sans); font-weight: 600; font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-mute); text-align: right;
+  padding: 7px 12px 7px 0; border-bottom: 1px solid var(--border-hi); white-space: nowrap;
+}
+th:nth-child(-n+3) { text-align: left; }
+td { font-family: var(--mono); padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+td:nth-child(-n+3) { text-align: left; }
+td.sans { font-family: var(--sans); }
+.pos { color: var(--pos); } .neg { color: var(--neg); } .dim { color: var(--text-dim); }
+.tick { color: var(--accent); font-weight: 500; }
+.cov-row { display: flex; align-items: center; gap: 14px; margin: 8px 0; font-family: var(--mono); font-size: 12.5px; }
+.cov-name { width: 110px; color: var(--text-mute); }
+.cov-track { flex: 1; height: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.cov-fill { height: 100%; background: var(--accent); opacity: 0.75; }
+.cov-n { width: 90px; text-align: right; color: var(--text-mute); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
+.note {
+  border: 1px solid var(--border); border-left: 2px solid var(--accent);
+  background: rgba(212,175,55,0.05); padding: 12px 16px; margin: 14px 0;
+  border-radius: 3px; font-size: 13.5px; max-width: 78ch; color: var(--text);
+}
+.bt-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 18px 22px; margin: 14px 0; }
+.bt-card h3 { font-family: var(--sans); font-weight: 600; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-bottom: 2px; }
+.bt-card .cfg { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-bottom: 12px; }
+.bt-stats { display: flex; flex-wrap: wrap; gap: 20px; font-family: var(--mono); font-size: 13px; }
+.bt-stats div .lab { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); font-family: var(--sans); }
+.q-bars { display: flex; gap: 8px; align-items: flex-end; height: 84px; margin-top: 16px; }
+.q-bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+.q-bar .bar { width: 100%; border-radius: 2px 2px 0 0; }
+.empty { color: var(--text-dim); font-family: var(--mono); font-size: 12.5px; padding: 12px 0; }
+.foot { margin-top: 60px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 12px; font-family: var(--mono); }
+@media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="brand">Everything <span class="gold">Energy</span></div>
+  <a class="back-link" href="dashboard.html">&lsaquo; Dashboard</a>
+  <a class="back-link" href="methodology.html">Methodology</a>
+  <div class="asof-chip" id="data-asof">signals: loading&hellip;</div>
+</div>
+
+<main>
+  <h1>Signal Engine</h1>
+  <p class="subtitle">
+    The daily output of the cross-sectional factor model: every S&amp;P 600 name ranked by a
+    sector-neutral composite of momentum, EV/EBITDA value, and post-earnings drift. This is a
+    <em>separate system</em> from the Atlas map (which describes the energy complex); the two share
+    only the taxonomy. Recipes and caveats: <a href="methodology.html">methodology</a>,
+    especially &sect;5&ndash;&sect;9.
+  </p>
+  <div id="meta" class="meta-strip"></div>
+  <div class="warn-badge">survivorship_clean = false &middot; today's index members applied to history</div>
+
+  <h2>Top of the book</h2>
+  <p class="subtitle">Composite rank 1 = best. Family scores are sector-neutral z-scores; a null
+    family (shown as &middot;) means no information, not a zero score.</p>
+  <div id="top-table"></div>
+
+  <div class="grid-2">
+    <div>
+      <h2>Coverage</h2>
+      <div id="coverage"></div>
+      <p class="subtitle" style="margin-top:10px">PEAD only exists for names inside their ~63-day
+        post-earnings window; that scarcity is the signal, not a defect.</p>
+    </div>
+    <div>
+      <h2>Family correlation</h2>
+      <div id="corr"></div>
+      <p class="subtitle" style="margin-top:10px">Spearman, ranked names. Near-zero off-diagonals
+        mean the families are buying different things: real diversification.</p>
+    </div>
+  </div>
+
+  <h2>Movers vs previous run</h2>
+  <div id="diff"></div>
+
+  <h2>Walk-forward backtests</h2>
+  <p class="subtitle">Long top quintile, short bottom, net of 60 bps per replaced position.
+    Single untuned configuration per signal; read these as honest first estimates, not promises.</p>
+  <div id="backtests"><div class="empty">backtests.json not published yet.</div></div>
+
+  <div class="foot">
+    Ranked cross-sections regenerate nightly with the Atlas pipeline (weekdays 21:40) and publish
+    automatically. Research tooling, not investment advice.
+  </div>
+</main>
+
+<script>
+function chipify(el, iso, label) {
+  if (!iso) { el.textContent = label + ": unknown vintage"; el.classList.add("asof-stale"); return; }
+  const gen = new Date(iso);
+  const age = Math.floor((Date.now() - gen.getTime()) / 86400000);
+  const pretty = gen.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  el.classList.add(age < 2 ? "asof-fresh" : age < 7 ? "asof-warn" : "asof-stale");
+  el.innerHTML = '<span class="asof-dot"></span>' + label + ": " + pretty +
+    " · " + (age <= 0 ? "today" : age === 1 ? "1d old" : age + "d old");
+}
+const fmt = (v, d = 2) => v == null ? '<span class="dim">·</span>'
+  : '<span class="' + (v > 0 ? "pos" : v < 0 ? "neg" : "") + '">' + (v > 0 ? "+" : "") + v.toFixed(d) + "</span>";
+const pct = v => v == null ? '<span class="dim">·</span>' : (100 * v).toFixed(1) + "%";
+
+fetch("signals_latest.json?v=" + Date.now(), { cache: "no-store" })
+  .then(r => { if (!r.ok) throw new Error("missing"); return r.json(); })
+  .then(d => {
+    chipify(document.getElementById("data-asof"), d.meta.generated_at, "signals");
+
+    const m = d.meta;
+    document.getElementById("meta").innerHTML = [
+      ["As of", m.as_of], ["Universe", "S&P 600"],
+      ["Names", m.n_names], ["Ranked", m.n_ranked],
+    ].map(([l, v]) => '<div class="meta-card"><div class="lab">' + l +
+      '</div><div class="val">' + v + "</div></div>").join("");
+
+    const rows = d.top.map(r =>
+      "<tr><td>" + r.rank + '</td><td class="tick">' + r.ticker + '</td><td class="sans">' +
+      (r.sector || "·") + "</td><td>" + fmt(r.composite) + "</td><td>" +
+      fmt(r.score_momentum) + "</td><td>" + fmt(r.score_value) + "</td><td>" +
+      fmt(r.score_pead) + "</td><td>" + r.n_families + "</td><td>" + pct(r.pctl) + "</td></tr>"
+    ).join("");
+    document.getElementById("top-table").innerHTML =
+      "<table><tr><th>#</th><th>Ticker</th><th>Sector</th><th>Composite</th><th>Momentum</th>" +
+      "<th>Value</th><th>PEAD</th><th>Fam</th><th>Pctl</th></tr>" + rows + "</table>";
+
+    document.getElementById("coverage").innerHTML = Object.entries(d.coverage)
+      .map(([name, [n, total]]) =>
+        '<div class="cov-row"><div class="cov-name">' + name + '</div>' +
+        '<div class="cov-track"><div class="cov-fill" style="width:' +
+        (100 * n / total).toFixed(0) + '%"></div></div>' +
+        '<div class="cov-n">' + n + "/" + total + "</div></div>").join("");
+
+    const fams = d.family_correlation.map(r => r.family);
+    document.getElementById("corr").innerHTML =
+      "<table><tr><th></th>" + fams.map(f => "<th>" + f + "</th>").join("") + "</tr>" +
+      d.family_correlation.map(r =>
+        '<tr><td class="sans">' + r.family + "</td>" +
+        fams.map(f => "<td>" + (r[f] == null ? '<span class="dim">·</span>' : r[f].toFixed(2)) + "</td>").join("") +
+        "</tr>").join("") + "</table>";
+
+    const diffEl = document.getElementById("diff");
+    if (!d.diff) {
+      diffEl.innerHTML = '<div class="empty">No prior run to diff against.</div>';
+    } else {
+      const list = (items, label) => items.length === 0 ? "" :
+        "<p class='subtitle'><strong>" + label + " (" + items.length + "):</strong> " +
+        items.map(i => '<span class="tick">' + i.ticker + "</span>").join(", ") + "</p>";
+      diffEl.innerHTML =
+        '<p class="subtitle">vs ' + d.diff.prev_as_of + "</p>" +
+        (list(d.diff.new_entrants, "New top-decile entrants") +
+         list(d.diff.exits, "Top-decile exits") +
+         list(d.diff.rank_jumps, "Large rank moves") ||
+         '<div class="empty">No material moves.</div>');
+    }
+  })
+  .catch(() => {
+    document.getElementById("data-asof").textContent = "signals: not published yet";
+    document.getElementById("data-asof").classList.add("asof-stale");
+  });
+
+fetch("backtests.json?v=" + Date.now(), { cache: "no-store" })
+  .then(r => { if (!r.ok) throw new Error("missing"); return r.json(); })
+  .then(d => {
+    const el = document.getElementById("backtests");
+    el.innerHTML = d.results.map(res => {
+      const s = res.summary;
+      const qs = res.quantile_means;
+      const maxAbs = Math.max(...qs.map(q => Math.abs(q.mean_period_ret))) || 1;
+      const bars = qs.map(q => {
+        const h = Math.max(4, 70 * Math.abs(q.mean_period_ret) / maxAbs);
+        const col = q.mean_period_ret >= 0 ? "var(--pos)" : "var(--neg)";
+        return '<div class="q-bar"><div class="bar" style="height:' + h +
+          "px;background:" + col + '"></div><div>Q' + q.quantile + "</div></div>";
+      }).join("");
+      return '<div class="bt-card"><h3>' + res.name + '</h3><div class="cfg">' + res.config +
+        '</div><div class="bt-stats">' +
+        '<div><div class="lab">Ann. net</div>' + fmt(100 * s.ann_ret_net, 1) + "%</div>" +
+        '<div><div class="lab">Sharpe net</div>' + fmt(s.sharpe_net) + "</div>" +
+        '<div><div class="lab">Sharpe gross</div>' + fmt(s.sharpe_gross) + "</div>" +
+        '<div><div class="lab">Max DD</div>' + (100 * s.max_drawdown).toFixed(1) + "%</div>" +
+        '<div><div class="lab">Turnover</div>' + (100 * s.avg_turnover).toFixed(0) + "%</div>" +
+        '<div><div class="lab">Periods</div>' + s.n_periods + "</div>" +
+        "</div>" + '<div class="q-bars">' + bars + "</div></div>";
+    }).join("") + '<div class="note">' + d.meta.caveats + "</div>";
+    chipify(document.getElementById("data-asof"), d.meta.generated_at, "signals");
+  })
+  .catch(() => {});
+</script>
+</body>
+</html>

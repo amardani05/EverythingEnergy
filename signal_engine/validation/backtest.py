@@ -69,17 +69,32 @@ def walk_forward_ls(
     cost_bps: float = 60.0,
     min_names: int = 30,
     value_col: str = "value",
+    rebalance_dates: list | None = None,
 ) -> BacktestResult:
     """Quantile long-short walk-forward on a (ticker, date, value) panel.
 
     prices: (ticker, date, close). Periods with fewer than `min_names`
     ranked names are skipped (no partial books).
+
+    `rebalance_dates` overrides the every-Nth-trading-day calendar; pass the
+    signal panel's own dates when the signal only exists on a sparse grid
+    (e.g. a month-end composite). Annualization then uses the median gap
+    between rebalances measured in trading days.
     """
     px = prices.select(["ticker", "date", "close"]).sort(["ticker", "date"])
     dates = sorted(px["date"].unique().to_list())
     if len(dates) < 2 * rebalance_every + 2:
         raise ValueError("not enough trading dates for even one holding period")
-    rebs = _period_map(dates, rebalance_every)
+    date_idx = {d: i for i, d in enumerate(dates)}
+    if rebalance_dates is not None:
+        rebs = sorted(d for d in rebalance_dates if d in date_idx)
+        if len(rebs) < 2:
+            raise ValueError("rebalance_dates must contain >= 2 trading dates")
+        gaps = np.diff([date_idx[d] for d in rebs])
+        effective_period = float(np.median(gaps))
+    else:
+        rebs = _period_map(dates, rebalance_every)
+        effective_period = float(rebalance_every)
 
     # Entry price = close at t+1 (next trading date after signal date).
     next_date = {d: dates[i + 1] for i, d in enumerate(dates[:-1])}
@@ -165,7 +180,7 @@ def walk_forward_ls(
 
     net = period["ls_net"].to_numpy()
     gross_arr = period["ls_gross"].to_numpy()
-    periods_per_year = TRADING_DAYS_PER_YEAR / rebalance_every
+    periods_per_year = TRADING_DAYS_PER_YEAR / effective_period
     ann = float(net.mean()) * periods_per_year
     vol = float(net.std(ddof=1)) * np.sqrt(periods_per_year) if net.size > 1 else 0.0
     cum = np.cumprod(1.0 + net)

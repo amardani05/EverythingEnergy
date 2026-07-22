@@ -3674,6 +3674,7 @@ function ViewNav({ view, setView }) {
           {label}
         </button>
       ))}
+      <a className="view-nav-btn" href="signals.html">Signals</a>
       <a className="view-nav-btn" href="methodology.html">Methodology</a>
     </div>
   );

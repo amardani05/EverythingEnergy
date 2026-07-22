@@ -24,19 +24,20 @@ $PY phase3_analysis.py
 $PY phase4_analysis.py
 $PY consolidate_data.py
 
-echo "[refresh_atlas] signals snapshot"
-$PY scripts/signals.py || echo "[refresh_atlas] signals failed (non-fatal for publish)"
+echo "[refresh_atlas] signals snapshot + web artifact"
+$PY scripts/signals.py --emit-json signals_latest.json \
+  || echo "[refresh_atlas] signals failed (non-fatal for publish)"
 
-if git diff --quiet -- dashboard_data.json; then
-  echo "[refresh_atlas] dashboard_data.json unchanged; nothing to publish"
+if git diff --quiet -- dashboard_data.json signals_latest.json; then
+  echo "[refresh_atlas] no data artifacts changed; nothing to publish"
   exit 0
 fi
 
-echo "[refresh_atlas] publishing refreshed dashboard_data.json"
+echo "[refresh_atlas] publishing refreshed data artifacts"
 git pull --rebase --autostash origin main2 || {
-  echo "[refresh_atlas] rebase failed; JSON refreshed locally but NOT pushed"
+  echo "[refresh_atlas] rebase failed; artifacts refreshed locally but NOT pushed"
   exit 1
 }
-git commit -m "data: nightly Atlas refresh ($(date '+%F'))" -- dashboard_data.json
+git commit -m "data: nightly Atlas refresh ($(date '+%F'))" -- dashboard_data.json signals_latest.json
 git push origin main2 main2:main
 echo "[refresh_atlas] $(date '+%F %T') published"

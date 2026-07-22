@@ -34,11 +34,68 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 log = logging.getLogger("signals")
 
 
+def emit_json(df: pl.DataFrame, as_of: date, diff: object, corr: pl.DataFrame,
+              out_path: Path, *, top_n: int = 50) -> None:
+    """Write the web artifact signals.html consumes. Committed to the repo
+    and deployed with the site, same contract as dashboard_data.json:
+    NaN-free, small, self-describing, stamped with its vintage."""
+    import json
+    import math
+    from datetime import datetime
+
+    def clean(obj: object) -> object:
+        if isinstance(obj, dict):
+            return {k: clean(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [clean(v) for v in obj]
+        if isinstance(obj, float):
+            if math.isnan(obj) or math.isinf(obj):
+                return None
+            return round(obj, 5)
+        return obj
+
+    ranked = df.filter(pl.col("composite").is_not_null())
+    keep_cols = [c for c in (
+        "rank", "ticker", "sector", "composite", "score_momentum",
+        "score_value", "score_pead", "score_quality", "n_families", "pctl",
+    ) if c in df.columns]
+    coverage = {
+        c.removeprefix("score_"): [df[c].drop_nulls().len(), df.height]
+        for c in df.columns if c.startswith("score_")
+    }
+    diff_block = None
+    if diff is not None and getattr(diff, "prev_as_of", None) is not None:
+        diff_block = {
+            "prev_as_of": str(diff.prev_as_of),
+            "new_entrants": diff.new_entrants.to_dicts(),
+            "exits": diff.exits.to_dicts(),
+            "rank_jumps": diff.rank_jumps.to_dicts(),
+        }
+    payload = {
+        "meta": {
+            "generated_at": datetime.now().isoformat(),
+            "as_of": str(as_of),
+            "universe": "S&P 600 (ijr_current; survivorship_clean = false)",
+            "n_names": df.height,
+            "n_ranked": ranked.height,
+        },
+        "coverage": coverage,
+        "family_correlation": corr.to_dicts(),
+        "top": ranked.head(top_n).select(keep_cols).to_dicts(),
+        "bottom": ranked.tail(10).select(keep_cols).to_dicts(),
+        "diff": diff_block,
+    }
+    out_path.write_text(json.dumps(clean(payload), default=str))
+    log.info("[emit-json] wrote %s", out_path)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--as-of", default=None, help="YYYY-MM-DD; default = latest price date")
     parser.add_argument("--top", type=int, default=15, help="rows to print")
     parser.add_argument("--no-write", action="store_true", help="skip snapshot/diff files")
+    parser.add_argument("--emit-json", default=None, metavar="PATH",
+                        help="also write the web artifact (e.g. signals_latest.json)")
     args = parser.parse_args()
 
     cfg = Config.load()
@@ -95,6 +152,10 @@ def main() -> int:
         path = write_diff(diff, snapshot_dir)
         print(f"\nsnapshot: {Path(snapshot_dir) / f'signals_{as_of}.parquet'}")
         print(f"diff:     {path}")
+
+    if args.emit_json:
+        diff_obj = diff if not args.no_write else None
+        emit_json(df, as_of, diff_obj, family_correlation(df), Path(args.emit_json))
 
     return 0
 
