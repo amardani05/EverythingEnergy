@@ -74,6 +74,42 @@ A "trustworthy backtest" here means a net return stream that is (1) non-degenera
 
 #### Tier 0 - trust prerequisites (do first)
 
+**Status 2026-08-20.** Items 2 and 3 are DONE and verified; item 1 is unblocked but was
+blocked longer than expected by data corruption found while doing it.
+
+- **0.2 price join** ✅ bounded backward as-of lookup + per-leg `min_book` guard; a period is
+  skipped rather than reported when a leg collapses. `n_long`, `n_short`, `n_periods_skipped`,
+  `n_stale_dropped`, `n_extreme_dropped` in every summary. Also added a counted
+  corporate-action guard (`max_abs_period_return`, default 3.0) after CHRD's post-bankruptcy
+  relisting (+283x in five days) produced a -500% period and an impossible -228% drawdown.
+- **0.3 basket neutralization** ✅ basket -> super-basket -> global ladder with
+  `neutralization_level` per name. Verified discriminating: shocked basket takes 100% of the
+  top half under the old global-z path, 50% under the new one.
+- **Three data bugs found en route, all confirmed against raw EDGAR JSON and all fixed:**
+  EPS truncated to integers at rest by polars dtype inference (VST Q1 2.87 stored as 2.0);
+  standalone quarters discarded by a PK collision with the YTD row sharing period_end and
+  accession; SUE differencing on EDGAR's `fy` (the report's fiscal year) so every quarter was
+  compared against itself, yielding SUE = 0.0. Plus `first_reported`, so a quarter is dated by
+  its own announcement rather than the later 10-Q that restates it as a comparative.
+  `edgar_facts` rebuilt from cache: 1.33M -> 1.62M rows; PEAD coverage 0/202 -> 103/202. The
+  composite had been running on two families while the site claimed three.
+- **0.1 gross edge** ❌ **FAILS on corrected data. Tiers 1 and 2 are frozen.**
+  Composite (monthly, terciles, 60bps, 2019-2026, 90 periods): gross Sharpe **-0.36**, net -0.62,
+  NW t -1.63. Quantiles are INVERTED, not merely flat: Q1 (worst composite score) returns
+  +1.836%/period against Q3 (best) at +1.494%, so top-minus-bottom is **-0.34%/period**.
+  Momentum alone is likewise inverted (gross -0.09; Q1 +0.506% vs Q3 +0.453%).
+  This is not a book-integrity artifact: books ran 45L/44S with 0 periods skipped, 0 stale drops
+  and 1 artifact drop, and the poisoned-signal canary still returns Sharpe > 3, which rules out a
+  sign flip in the harness. Every quantile earns +1.3% to +1.8% per month, i.e. the sector itself
+  rose through the window and the long-short is short the best-performing bucket.
+  Per the plan's own gate, no cost model, borrow model, vol-targeting or deflated-Sharpe work
+  should be built on top of this. The open question is whether the inversion is a genuine
+  small-cap-energy reversal effect or an artifact of the 2020 crash-and-rebound dominating the
+  sample; the cheapest next test is the subsample split (Tier 1), used here as diagnosis rather
+  than polish. Every backtest number in this repo predating 2026-08-20 is void.
+- **0.4 trial ledger** - specified, not yet built (awaiting go-ahead).
+
+
 - **Re-confirm gross edge exists in the new universe** - Before any new machinery, re-run the existing composite (monthly quintile L/S) on the 205-name energy panel and check raw gross Q5 > Q1 monotonicity survives at all. Driver: `scripts/backtest_composite.py` -> `walk_forward_ls`, inspect `quantile_means`. *Acceptance: a printed gross quantile_means vector for the energy universe with a documented pass/fail on Q5 > Q1; if gross alpha is gone, Tiers 1-2 are frozen until a signal that ranks is found.*
 - **Repair the degenerate price join (not just report it)** - The inner joins to `entry_px`/`exit_px` (backtest.py ~124-129) silently drop names with a missing price on either date, so a "quintile mean" can collapse to a handful of names. Apply an explicit point-in-time-valid forward-fill / NaN policy on the price panel, then add a `min_book` guard (default `min_names // n_quantiles`): if a held book falls below it after the joins, skip the period rather than emit a degenerate mean. Emit `n_long`, `n_short`, `eff_n` (1/HHI) per period. *Acceptance: a fixture where half the top-quantile names lack an exit price causes that period to be skipped (not emitted as a 3-name mean); `summary.median_n_long >= min_book` across all emitted periods.*
 - **Basket-relative neutralization with hierarchical fallback** - The sector-neutral z in `composite.py` (over `sector`, MIN_SECTOR_N=8) does nothing because ~all names are GICS Energy, so an upstream-vs-utilities tilt masquerades as selection. Join `ticker_to_basket()` (atlas/clusters.py), add a coarse SUPER_BASKET dict (upstream / midstream / downstream+petrochem / oilfield-services / power+utilities / shipping+other), compute z hierarchically (basket -> super-basket -> global by the `_sector_n` pattern), and emit `neutralization_level` per name. *Acceptance: adding a constant +5.0 to one raw component for every name in a large basket moves that basket's mean composite z < 0.1 (vs > 0.5 under the old global-z path); `neutralization_level` populated for 100% of ranked names.*
