@@ -75,7 +75,7 @@ def emit_json(df: pl.DataFrame, as_of: date, diff: object, corr: pl.DataFrame,
         "meta": {
             "generated_at": datetime.now().isoformat(),
             "as_of": str(as_of),
-            "universe": "S&P 600 (ijr_current; survivorship_clean = false)",
+            "universe": "energy taxonomy (~205 names; survivorship_clean = false)",
             "n_names": df.height,
             "n_ranked": ranked.height,
         },

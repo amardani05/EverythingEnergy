@@ -89,10 +89,12 @@ def write_actions(db_path, df: pl.DataFrame) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    # Energy-only by default: this is an energy platform. 'ijr'/'both' remain
+    # for one-off diagnostics but the nightly job pulls energy names only.
     parser.add_argument(
         "--universe",
         choices=["both", "energy", "ijr"],
-        default="both",
+        default="energy",
     )
     parser.add_argument("--start", default="2018-01-01", help="yfinance start date (YYYY-MM-DD)")
     parser.add_argument("--throttle", type=float, default=0.1)

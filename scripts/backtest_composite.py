@@ -30,6 +30,7 @@ from pathlib import Path
 
 import polars as pl
 
+from signal_engine.atlas.clusters import energy_universe_tickers
 from signal_engine.config import Config
 from signal_engine.data.store import as_of_corporate_actions, as_of_prices, connect
 from signal_engine.factors.momentum import compute_momentum
@@ -82,14 +83,11 @@ def main() -> int:
     cfg = Config.load()
     with connect(cfg.duckdb_path, read_only=True) as con:
         today = date.today()
-        ijr = con.execute("""
-            SELECT DISTINCT ticker FROM ijr_holdings
-            WHERE snapshot_date = (SELECT max(snapshot_date) FROM ijr_holdings)
-        """).pl()["ticker"].to_list()
+        universe = energy_universe_tickers()
         panel = as_of_prices(con, as_of=today).filter(
-            pl.col("ticker").is_in(ijr)).select(["ticker", "date", "close"])
+            pl.col("ticker").is_in(universe)).select(["ticker", "date", "close"])
         divs = as_of_corporate_actions(con, as_of=today, kind="dividend").filter(
-            pl.col("ticker").is_in(ijr))
+            pl.col("ticker").is_in(universe))
 
         trading_dates = sorted(panel["date"].unique().to_list())
         grid = month_end_grid(trading_dates, date.fromisoformat(args.grid_start))
@@ -116,19 +114,22 @@ def main() -> int:
 
     results: list[dict] = []
 
+    # Terciles, not quintiles: the ~205-name energy universe yields only
+    # ~120-170 ranked names, so quintiles would leave ~25/book. Terciles keep
+    # each side meaningful (~40-55 names) at the cost of a milder spread.
     comp_res = walk_forward_ls(
         comp_panel, panel, rebalance_dates=grid,
-        n_quantiles=5, cost_bps=60.0, min_names=100,
+        n_quantiles=3, cost_bps=60.0, min_names=45,
     )
     log.info("[composite monthly] %s", comp_res)
     results.append(result_block(
         "composite (momentum + EV/EBITDA + PEAD)", comp_res,
-        "monthly rebalance on the signal grid, quintiles, 60bps per replaced position",
+        "monthly rebalance on the signal grid, terciles, 60bps per replaced position",
     ))
 
     mom = compute_momentum(panel, dividends=divs).rename({"momentum": "value"})
-    mom_res = walk_forward_ls(mom, panel, rebalance_every=5, n_quantiles=5,
-                              cost_bps=60.0, min_names=100)
+    mom_res = walk_forward_ls(mom, panel, rebalance_every=5, n_quantiles=3,
+                              cost_bps=60.0, min_names=45)
     log.info("[momentum weekly] %s", mom_res)
     results.append(result_block(
         "momentum 12-1 TR alone (cautionary)", mom_res,
@@ -141,7 +142,7 @@ def main() -> int:
         "meta": {
             "generated_at": datetime.now().isoformat(),
             "git_sha": git_sha,
-            "universe": "S&P 600 (ijr_current; survivorship_clean = false)",
+            "universe": "energy taxonomy (~205 names; survivorship_clean = false)",
             "grid": {"start": str(grid[0]), "end": str(grid[-1]), "n_dates": len(grid)},
             "caveats": "survivorship-biased universe; flat 60bps cost model; "
                        "no hysteresis; single configuration per signal (no tuning)",

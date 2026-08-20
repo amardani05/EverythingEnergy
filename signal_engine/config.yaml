@@ -2,12 +2,13 @@
 # Edit freely; nothing in the code hardcodes these values.
 
 universe:
-  # 'ijr_current' = today's IJR membership applied to all dates (biased; flagged in outputs)
-  # 'ijr_pit'     = point-in-time IJR membership (only available from today forward)
-  # 'none'        = no membership filter - diagnostic, see how much IJR contributes
-  membership_mode: ijr_current
-  # Report a comparison row using these alternate modes on every backtest output.
-  report_also: [none]
+  # This engine is ENERGY-ONLY. The selection universe is the hand-curated
+  # energy taxonomy (energy_taxonomy.yaml, ~205 names); the broad-market
+  # S&P 600 is deliberately out of scope.
+  # 'energy_taxonomy' = all taxonomy constituents applied to every date
+  #   (survivorship-biased, since delisted energy names are absent; flagged
+  #   in outputs via survivorship_clean = false).
+  membership_mode: energy_taxonomy
   # Min trailing days of price coverage required to score a name.
   min_price_history_days: 252
 

@@ -99,10 +99,17 @@ def flush_submissions(db_path: Path, rows: list[dict[str, Any]]) -> int:
 
 
 def flush_facts(db_path: Path, rows: list[dict[str, Any]]) -> int:
-    """Insert one CIK's edgar_facts rows."""
+    """Insert one CIK's edgar_facts rows.
+
+    The schema is PINNED (never inferred): polars infers a column dtype from
+    the first ~100 rows, and extract_facts emits big integer values (revenue,
+    total assets) ahead of per-share floats, so `value` was inferred Int64 and
+    every EPS silently truncated at rest.
+    """
     if not rows:
         return 0
-    df = pl.DataFrame(rows)
+    df = pl.DataFrame(rows, schema={k: getattr(pl, v) for k, v in
+                                    edgar.EDGAR_FACTS_SCHEMA.items()})
     with store.connect(db_path) as con:
         con.register("incoming", df)
         con.execute("""
@@ -234,7 +241,9 @@ def coverage_summary(db_path: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--universe", choices=["both", "energy", "ijr"], default="both")
+    # Energy-only by default (this is an energy platform); 'ijr'/'both' remain
+    # for diagnostics but the weekly job pulls energy CIKs only.
+    parser.add_argument("--universe", choices=["both", "energy", "ijr"], default="energy")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--skip-submissions", action="store_true")
     parser.add_argument("--skip-companyfacts", action="store_true")

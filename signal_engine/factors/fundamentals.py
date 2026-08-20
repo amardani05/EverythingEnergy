@@ -239,8 +239,11 @@ def quarterly_eps_series(
     `originals_only=True` (default) excludes amended filings - restatements
     don't rewrite history. The PEAD/SUE path relies on this.
     """
+    # first_reported: date every quarter by its own announcement, not by the
+    # later 10-Q that restates it as a comparative (see as_of_facts docstring).
     facts = as_of_facts(
         con, as_of=as_of, cik=cik, originals_only=originals_only,
+        first_reported=True,
     )
     if facts.height == 0:
         return pl.DataFrame(schema=_QUARTERLY_EPS_SCHEMA)

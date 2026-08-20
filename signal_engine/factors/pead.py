@@ -90,9 +90,12 @@ def compute_sue_series(
             if i == 0:
                 continue
             prior = series[i - 1]
-            # Same-fp prior year only if the fy step is exactly 1.
-            if (row.get("fy") is not None and prior.get("fy") is not None
-                    and (row["fy"] - prior["fy"]) != 1):
+            # Step on the PERIOD's year, never on `fy`. EDGAR's `fy` is the
+            # fiscal year of the REPORT, so a 10-Q carries fy=2026 for both
+            # the current quarter and the prior-year comparative it restates;
+            # differencing on fy compared a quarter against itself and
+            # produced SUE = 0.0 across the book.
+            if (row["period_end"].year - prior["period_end"].year) != 1:
                 continue
             if row["eps_diluted"] is None or prior["eps_diluted"] is None:
                 continue
@@ -106,8 +109,7 @@ def compute_sue_series(
                     continue
                 pprev = series[j - 1]
                 pcurr = series[j]
-                if (pcurr.get("fy") is not None and pprev.get("fy") is not None
-                        and (pcurr["fy"] - pprev["fy"]) != 1):
+                if (pcurr["period_end"].year - pprev["period_end"].year) != 1:
                     continue
                 if pcurr["eps_diluted"] is None or pprev["eps_diluted"] is None:
                     continue

@@ -157,7 +157,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
       regressions, residual stretches, pair signals, regime alerts, and factor-vs-idiosyncratic attribution
       for the energy complex. Descriptive and screening-oriented.</li>
     <li><strong>The signal engine</strong> (<code>signal_engine/</code>): a cross-sectional, point-in-time
-      factor model over the S&amp;P 600 small-cap universe (~600 names) producing a ranked daily composite from
+      factor model over the <em>same</em> energy universe, producing a ranked daily composite from
       momentum, value, and earnings-drift signals. Prediction-oriented, built for backtesting.</li>
   </ul>
 
@@ -166,7 +166,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     <tr><th>Source</th><th>Provides</th><th>Cadence</th><th>Point-in-time handling</th></tr>
     <tr><td>SEC EDGAR XBRL</td><td class="sans">All reported fundamentals (18 canonical concepts with fallback tag chains), filing metadata, SIC codes</td><td>weekly (cron)</td><td class="sans"><code>filed</code> date = knowledge date; restatements stored as new rows, never overwriting; amendments flagged</td></tr>
     <tr><td>yfinance</td><td class="sans">Daily OHLCV (split-adjusted, NOT dividend-adjusted) + cash dividends + splits</td><td>nightly (cron)</td><td class="sans">Trade date = knowledge date; dividends stored separately so total-return is explicit, not baked in</td></tr>
-    <tr><td>iShares IJR</td><td class="sans">S&amp;P 600 membership snapshots (universe definition)</td><td>manual CSV drop + nightly ingest</td><td class="sans">Snapshot-dated; history accumulates from 2026-06 forward</td></tr>
+    <tr><td>energy_taxonomy.yaml</td><td class="sans">The universe itself: ~205 hand-curated energy names across 23 sub-industry baskets, plus the directed commodity-flow edges</td><td>edited by hand</td><td class="sans">Static list applied to all history, so survivorship-biased (see &sect;3)</td></tr>
     <tr><td>Yahoo (dashboard)</td><td class="sans">Price cache behind the Atlas correlation/regression pipeline</td><td>on pipeline rebuild</td><td class="sans">Not PIT - descriptive analytics only</td></tr>
     <tr><td>FINRA / EIA / FRED</td><td class="sans">Short interest, energy fundamentals, macro series</td><td>planned</td><td class="sans">Bitemporal schema ready (vintage-keyed); ingestion not yet live</td></tr>
   </table>
@@ -184,14 +184,16 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     Baskets, not GICS, are the unit of analysis - the taxonomy encodes commodity-flow relationships GICS ignores.
   </p>
   <p>
-    <strong>Signal engine:</strong> the latest IJR (S&amp;P 600) holdings snapshot resolved to SEC CIKs
-    (~600 names), requiring ≥ 252 trading days of price history.
+    <strong>Signal engine:</strong> the <em>same</em> energy taxonomy, resolved to SEC CIKs and filtered to
+    names with ≥ 252 trading days of price history. This platform is energy-only by design: the engine
+    ranks energy names against energy names, and nothing outside the taxonomy is scored, ingested, or
+    published.
   </p>
   <div class="callout">
-    <strong>Survivorship disclosure.</strong> The engine currently applies <em>today's</em> IJR membership to all
-    history (<code>ijr_current</code> mode). Names that fell out of the index are absent from backtests, which
-    biases historical return estimates upward. Every engine output row carries
-    <code>survivorship_clean = false</code> until enough point-in-time membership snapshots accumulate.
+    <strong>Survivorship disclosure.</strong> The taxonomy is a fixed curated list applied to all history,
+    so energy names that were delisted or acquired are absent from backtests, which biases historical
+    return estimates upward. Every engine output row carries <code>survivorship_clean = false</code>.
+    Quantifying the size of that bias is an open roadmap item, not a solved problem.
   </div>
 
   <h2 id="atlas"><span class="secno">§4</span>Atlas analytics</h2>
@@ -287,8 +289,14 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
   <ol>
     <li><strong>Orient</strong> - lower-is-better components (EV/EBITDA, accruals) are sign-flipped.</li>
     <li><strong>Winsorize</strong> - clip at the 1st/99th cross-sectional percentiles.</li>
-    <li><strong>Z-score within sector</strong> - sectors from SEC SIC codes; sectors with &lt; 8 names fall back
-      to the global z so a 3-name sector can't mint ±1.7σ from noise.</li>
+    <li><strong>Z-score within the taxonomy basket</strong> - the peer group is the sub-industry basket
+      (<em>refiners</em>, <em>offshore drillers</em>, <em>regulated gas utilities</em>, ...), not a GICS sector.
+      In an all-energy universe every name carries the same sector label, so a sector z neutralized nothing
+      and a structural upstream-vs-utilities tilt would have been reported as stock selection. Groups thinner
+      than 8 names fall back one level at a time: basket &rarr; super-basket (commodity-chain grouping:
+      upstream, oilfield services, midstream, downstream, power, fuel minerals) &rarr; global. Only 10 of the
+      23 baskets clear that bar alone. Every row carries <code>neutralization_level</code> so the basis used
+      is auditable per name.</li>
     <li><strong>Family scores</strong> - mean of component z's per family (value, momentum, pead).</li>
     <li><strong>Composite</strong> - weight-renormalized mean over the families available for each name;
       names with fewer than 2 families are not ranked. A name with no recent earnings event simply has no
@@ -341,7 +349,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     <tr><td>PEAD / SUE</td><td><span class="pos">+0.123</span></td><td>+2.97</td><td class="sans"><strong>Strongest.</strong> Monotone IC growth 1d→63d, hit rate 0.76 at 21d - textbook drift. Low breadth (~30-40 names/day).</td></tr>
     <tr><td>Value · EV/EBITDA</td><td><span class="pos">+0.040</span></td><td>+2.51</td><td class="sans"><strong>Most robust slow signal.</strong> Monthly grid ⇒ little overlap; NW barely moves it.</td></tr>
     <tr><td>Momentum 12-1 (TR)</td><td>+0.010</td><td>+0.52</td><td class="sans"><strong>Short-horizon only.</strong> 1d NW t = 2.7 is real; the 21/63d "consistency" was an overlapping-window artifact. Kept for diversification.</td></tr>
-    <tr><td>FCF yield · quality</td><td>~0</td><td>&lt; 1.8</td><td class="sans">Noise in this small-cap window; disabled pending sector-neutralized re-test.</td></tr>
+    <tr><td>FCF yield · quality</td><td>~0</td><td>&lt; 1.8</td><td class="sans">Noise in this universe; disabled pending a basket-neutralized re-test.</td></tr>
     <tr><td>Graph · neigh-down</td><td>+0.016 <span style="color:var(--text-dim)">(21d)</span></td><td>+1.03</td><td class="sans"><strong>Experimental.</strong> Beats the own-basket control; below significance. Residualized version is the next iteration (§5).</td></tr>
     <tr><td>Graph · neigh-up</td><td>~0</td><td>&lt; 1.4</td><td class="sans">No supplier-direction propagation detected at 21d lookback.</td></tr>
   </table>
@@ -349,7 +357,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     <strong>First portfolio-level result</strong> (walk-forward quantile long-short harness, weekly
     rebalance, quintiles, 60 bps per replaced position): momentum 12-1 long-short LOSES 10.9%/yr net
     (Sharpe −0.45) with a U-shaped quantile profile: recent losers outperformed at the weekly horizon.
-    Short-term reversal dominates weekly rebalancing in small caps, consistent with the IC finding
+    Short-term reversal dominates weekly rebalancing here, consistent with the IC finding
     that momentum's honest edge lives at the 1-day horizon only. This is exactly the kind of
     conclusion the IC table cannot deliver and the backtester exists to force.
   </p>
@@ -363,7 +371,8 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
   <ol>
     <li><strong>Survivorship</strong> - engine backtests use today's index membership (§3 disclosure).</li>
     <li><strong>Single price source</strong> - yfinance only; unofficial, occasionally revised, no second feed to cross-check against yet.</li>
-    <li><strong>No cost model applied</strong> - S&amp;P 600 spreads are material; net-of-cost validation pending.</li>
+    <li><strong>Flat cost model</strong> - a single 60 bps assumption per replaced position, far too high for
+      a major and far too low for a microcap driller. A per-name spread estimator is the next cost item.</li>
     <li><strong>Sector map is slowly-varying, not strictly PIT</strong> - SIC reclassifications are rare and carry no forward return information, but the shortcut is documented.</li>
     <li><strong>Atlas pipeline is not PIT at all</strong> - descriptive layer only (§4 callout).</li>
     <li><strong>Multiple-testing exposure</strong> - several factor variants were examined to produce §8; family-wise error control arrives with the backtest harness.</li>
@@ -375,8 +384,7 @@ td .pos { color: var(--pos); } td .neg { color: var(--neg); }
     <tr><th>Job</th><th>Schedule</th><th>What it refreshes</th></tr>
     <tr><td>prices + corporate actions</td><td>nightly 21:00</td><td class="sans">yfinance OHLCV, dividends, splits for the ~770-name union universe</td></tr>
     <tr><td>EDGAR fundamentals</td><td>weekly Sun 09:00</td><td class="sans">companyfacts + submissions for all universe CIKs</td></tr>
-    <tr><td>IJR snapshot</td><td>nightly 18:30 (manual CSV drop)</td><td class="sans">S&amp;P 600 membership history accumulation</td></tr>
-    <tr><td>Atlas dashboard pipeline</td><td>nightly 21:40, weekdays</td><td class="sans">Full analysis chain, then <code>dashboard_data.json</code> is committed and pushed; the site redeploys itself. The freshness chip should read green every trading morning.</td></tr>
+        <tr><td>Atlas dashboard pipeline</td><td>nightly 21:40, weekdays</td><td class="sans">Full analysis chain, then <code>dashboard_data.json</code> is committed and pushed; the site redeploys itself. The freshness chip should read green every trading morning.</td></tr>
     <tr><td>composite signals</td><td>with the Atlas job</td><td class="sans">Ranked cross-section snapshot + day-over-day diff in <code>data_store/snapshots/</code></td></tr>
   </table>
   <p>

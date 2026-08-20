@@ -5,15 +5,20 @@ Pipeline per config.yaml `scoring` + `signals.selection`:
   raw component values (factors/)                      e.g. ev_ebitda, sue
     -> sign-orient (lower-is-better components flip)   SIGN_CONVENTIONS
     -> winsorize at cross-sectional percentiles        scoring.winsorize_pct
-    -> z-score, BOTH globally and within sector        data/sectors.py via SIC
+    -> z-score within the name's PEER GROUP            taxonomy basket
     -> family score = mean of component z's
     -> composite = weighted mean of enabled family scores (weights from
        config), renormalized over the families available for each name;
        names with fewer than MIN_FAMILIES families are not ranked.
 
-Sector-relative z is the primary basis (config: emit_sector_relative);
-sectors thinner than MIN_SECTOR_N fall back to the global z so a 3-name
-sector can't mint ±1.7z out of noise.
+Neutralization basis (changed 2026-07-28): the peer group is the taxonomy
+BASKET, not the GICS-ish sector. In an all-energy universe every name maps
+to the same sector label, so a sector z neutralized nothing and a structural
+upstream-vs-utilities tilt would have been reported as stock selection. The
+ladder is basket -> super-basket (SUPER_BASKET, commodity-chain groupings)
+-> global, falling back whenever a group holds fewer than MIN_SECTOR_N
+names; only 10 of the 23 baskets clear that bar on their own. Each row
+carries `neutralization_level` so the basis is auditable per name.
 
 PIT: every factor input arrives through the as_of_* read API (the factors
 themselves enforce this); the sector map is a slowly-varying attribute
@@ -37,6 +42,7 @@ from datetime import date, timedelta
 import duckdb
 import polars as pl
 
+from signal_engine.atlas.clusters import energy_universe_tickers, ticker_to_basket
 from signal_engine.config import Config
 from signal_engine.data.sectors import UNCLASSIFIED, load_sic_ranges, sic_to_sector
 from signal_engine.factors.momentum import momentum_as_of
@@ -69,9 +75,45 @@ FAMILY_COMPONENTS: dict[str, list[str]] = {
 # composite - one lone family would rank on a different effective scale.
 MIN_FAMILIES = 2
 
-# Sectors with fewer names than this use the global z instead - a 3-name
-# sector z is noise dressed up as neutralization.
+# Groups with fewer names than this fall back a level - a 3-name group z is
+# noise dressed up as neutralization.
 MIN_SECTOR_N = 8
+
+# Coarse groupings of the 23 taxonomy baskets. Most baskets are too thin to
+# support their own z (only 10 of 23 clear MIN_SECTOR_N), so the neutralization
+# falls back basket -> super-basket -> global. The groupings follow the
+# commodity chain, which is what actually drives co-movement here.
+SUPER_BASKET: dict[str, str] = {
+    "iocs_integrated": "upstream",
+    "upstream_oil_eandp": "upstream",
+    "upstream_gas_eandp": "upstream",
+    "upstream_offshore_drillers": "upstream",
+    "minerals_royalty": "upstream",
+
+    "ofs_onshore": "oilfield_services",
+    "ofs_offshore": "oilfield_services",
+    "ofs_equipment": "oilfield_services",
+
+    "midstream_gpt": "midstream",
+    "midstream_pipelines": "midstream",
+    "lng_terminals": "midstream",
+    "tanker_shipping": "midstream",
+
+    "downstream_refiners": "downstream",
+    "petrochem": "downstream",
+    "downstream_retail": "downstream",
+    "downstream_biofuels": "downstream",
+
+    "power_utilities_regulated_gas": "power",
+    "power_utilities_regulated_ldc": "power",
+    "power_ipps_merchant": "power",
+    "power_renewables": "power",
+    "nuclear_smr_developers": "power",
+
+    "coal": "fuel_minerals",
+    "uranium_nuclear_fuel": "fuel_minerals",
+}
+UNMAPPED_BASKET = "unmapped"
 
 # PEAD hold window: most recent SUE within ~63 trading days of as_of.
 PEAD_HOLD_CALENDAR_DAYS = 92
@@ -104,16 +146,23 @@ def selection_signals(cfg: Config) -> list[SignalConfig]:
 # ---------- universe + sector plumbing ----------
 
 def universe_ticker_to_cik(con: duckdb.DuckDBPyConnection, as_of: date,
-                           min_price_history_days: int) -> dict[str, int]:
-    """`ijr_current` membership: latest IJR snapshot resolved through the
-    latest ticker->CIK map, filtered to names with enough price history at
-    `as_of`. Survivorship-biased by construction; every output row carries
+                           min_price_history_days: int,
+                           *, tickers: list[str] | None = None) -> dict[str, int]:
+    """Selection universe: the hand-curated ENERGY taxonomy, resolved through
+    the latest ticker->CIK map and filtered to names with enough price history
+    at `as_of`. This engine is energy-only by design; the broad-market S&P 600
+    is not in scope.
+
+    `tickers` overrides the default energy universe (tests inject their own).
+    Survivorship note: the taxonomy is a fixed curated list applied to all
+    history, so delisted energy names are absent; every output row carries
     survivorship_clean = False."""
+    universe = [t.upper() for t in (tickers if tickers is not None
+                                    else energy_universe_tickers())]
+    incoming = pl.DataFrame({"ticker": universe}, schema={"ticker": pl.Utf8})
+    con.register("_universe", incoming)
     rows = con.execute("""
-        WITH ijr AS (
-            SELECT DISTINCT ticker FROM ijr_holdings
-            WHERE snapshot_date = (SELECT max(snapshot_date) FROM ijr_holdings)
-        ), cmap AS (
+        WITH cmap AS (
             SELECT ticker, cik FROM (
                 SELECT ticker, cik,
                        row_number() OVER (PARTITION BY ticker ORDER BY snapshot_date DESC) AS rn
@@ -123,12 +172,13 @@ def universe_ticker_to_cik(con: duckdb.DuckDBPyConnection, as_of: date,
             SELECT ticker, count(*) AS n_days FROM prices
             WHERE date <= ? GROUP BY ticker
         )
-        SELECT ijr.ticker, cmap.cik
-        FROM ijr
+        SELECT u.ticker, cmap.cik
+        FROM _universe u
         JOIN cmap USING (ticker)
         JOIN hist USING (ticker)
         WHERE hist.n_days >= ?
     """, [as_of, min_price_history_days]).fetchall()
+    con.unregister("_universe")
     return {t: int(c) for t, c in rows}
 
 
@@ -226,8 +276,13 @@ def build_composite(
     con: duckdb.DuckDBPyConnection,
     as_of: date,
     cfg: Config,
+    *,
+    universe: list[str] | None = None,
 ) -> pl.DataFrame:
     """Ranked, sector-neutral composite cross-section at `as_of`.
+
+    `universe` overrides the default energy-taxonomy selection universe (tests
+    inject their own ticker list).
 
     Returns one row per ranked ticker plus unranked rows (composite null)
     for names failing the MIN_FAMILIES floor. Columns: ticker, cik, sector,
@@ -244,7 +299,7 @@ def build_composite(
     sector_relative = bool(cfg.raw["scoring"].get("emit_sector_relative", True))
     min_hist = int(cfg.raw["universe"].get("min_price_history_days", 252))
 
-    t2c = universe_ticker_to_cik(con, as_of, min_hist)
+    t2c = universe_ticker_to_cik(con, as_of, min_hist, tickers=universe)
     if not t2c:
         raise ValueError(f"empty universe at {as_of} (min_price_history_days={min_hist})")
     log.info("[composite] %s: %d names in universe", as_of, len(t2c))
@@ -254,8 +309,36 @@ def build_composite(
         pl.col("sector").fill_null(UNCLASSIFIED)
     )
 
-    # Sector sizes for the thin-sector fallback.
-    df = df.with_columns(pl.len().over("sector").alias("_sector_n"))
+    # Neutralization basis: the taxonomy basket, NOT the GICS-ish sector.
+    # In an all-energy universe every name maps to sector "Energy" (or a
+    # handful of utility labels), so a sector z neutralizes essentially
+    # nothing and an upstream-vs-utilities tilt would masquerade as stock
+    # selection. Baskets are the real peer groups here.
+    t2b = ticker_to_basket()
+    basket_map = pl.DataFrame(
+        {"ticker": list(t2b.keys()), "basket": [t2b[k] for k in t2b]},
+        schema={"ticker": pl.Utf8, "basket": pl.Utf8},
+    )
+    df = (
+        df.join(basket_map, on="ticker", how="left")
+        .with_columns(pl.col("basket").fill_null(UNMAPPED_BASKET))
+        .with_columns(
+            pl.col("basket").replace_strict(
+                SUPER_BASKET, default=UNMAPPED_BASKET
+            ).alias("super_basket")
+        )
+    )
+
+    # Group sizes drive the fallback ladder: basket -> super-basket -> global.
+    df = df.with_columns([
+        pl.len().over("basket").alias("_basket_n"),
+        pl.len().over("super_basket").alias("_super_n"),
+    ]).with_columns(
+        pl.when(pl.col("_basket_n") >= MIN_SECTOR_N).then(pl.lit("basket"))
+        .when(pl.col("_super_n") >= MIN_SECTOR_N).then(pl.lit("super_basket"))
+        .otherwise(pl.lit("global"))
+        .alias("neutralization_level")
+    )
 
     components = [c for s in signals for c in s.components if c in df.columns]
     for comp in components:
@@ -265,12 +348,15 @@ def build_composite(
             winsorize_series(oriented, lo, hi).alias(f"_w_{comp}")
         ).with_columns([
             zscore_expr(f"_w_{comp}").alias(f"_zg_{comp}"),
-            zscore_expr(f"_w_{comp}", over="sector").alias(f"_zs_{comp}"),
+            zscore_expr(f"_w_{comp}", over="basket").alias(f"_zb_{comp}"),
+            zscore_expr(f"_w_{comp}", over="super_basket").alias(f"_zs_{comp}"),
         ])
         primary = (
-            pl.when(pl.col("_sector_n") < MIN_SECTOR_N)
-            .then(pl.col(f"_zg_{comp}"))
-            .otherwise(pl.col(f"_zs_{comp}"))
+            pl.when(pl.col("neutralization_level") == "basket")
+            .then(pl.col(f"_zb_{comp}"))
+            .when(pl.col("neutralization_level") == "super_basket")
+            .then(pl.col(f"_zs_{comp}"))
+            .otherwise(pl.col(f"_zg_{comp}"))
             if sector_relative else pl.col(f"_zg_{comp}")
         )
         df = df.with_columns(primary.alias(f"z_{comp}"))
@@ -314,13 +400,14 @@ def build_composite(
         ])
         .with_columns([
             pl.lit(as_of).alias("as_of"),
-            # ijr_current membership applies today's members to all history.
+            # The energy taxonomy is a fixed curated list applied to all
+            # history, so delisted names are absent: survivorship-biased.
             pl.lit(False).alias("survivorship_clean"),
         ])
         .sort("rank", nulls_last=True)
     )
     keep = (
-        ["ticker", "cik", "sector"]
+        ["ticker", "cik", "sector", "basket", "super_basket", "neutralization_level"]
         + components
         + [f"z_{c}" for c in components]
         + [f"score_{s.name}" for s in signals]

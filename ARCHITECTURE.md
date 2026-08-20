@@ -1,4 +1,4 @@
-# IMA Energy Dashboard - UI Architecture
+# Everything Energy - UI Architecture
 
 ## Design direction
 

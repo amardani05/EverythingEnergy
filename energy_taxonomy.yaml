@@ -1,4 +1,4 @@
-# Energy Sector Taxonomy - IMA Dashboard
+# Energy Sector Taxonomy - Everything Energy
 # Version 0.4 - Reconciled against basket correlation results + full utilities universe
 # ====================================================================================
 #
@@ -274,7 +274,7 @@ lng_terminals:
   notes: |
     - Renamed from lng_export → lng_terminals in v0.4. Carrier names (GLNG, FLNG) moved
       to tanker_shipping. This node is now liquefaction + FSRU pure-play.
-    - LNG (C-corp) is the IMA-mandate-clean way to play Cheniere; CQP is the K-1 MLP.
+    - LNG (C-corp) is the C-corp-clean way to play Cheniere; CQP is the K-1 MLP.
     - Most tied to your CRK thesis (Haynesville → Gulf Coast LNG corridor).
 
 midstream_gpt:

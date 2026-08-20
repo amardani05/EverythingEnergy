@@ -36,6 +36,23 @@ import requests
 
 log = logging.getLogger(__name__)
 
+EDGAR_FACTS_SCHEMA: dict[str, Any] = {
+    "cik": "Int64",
+    "taxonomy": "Utf8",
+    "concept": "Utf8",
+    "concept_used": "Utf8",
+    "unit": "Utf8",
+    "period_start": "Utf8",
+    "period_end": "Utf8",
+    "fy": "Int64",
+    "fp": "Utf8",
+    "form": "Utf8",
+    "is_amendment": "Boolean",
+    "accession": "Utf8",
+    "filed": "Utf8",
+    "value": "Float64",
+}
+
 BASE_URL = "https://data.sec.gov"
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 
@@ -143,7 +160,13 @@ class EdgarClient:
                         "concept": canonical_name,
                         "concept_used": chosen_tag,
                         "unit": unit_name,
-                        "period_start": f.get("start"),  # may be None for instant facts
+                        # Coalesce to `end` for instant facts (shares outstanding
+                        # etc.). period_start is part of the edgar_facts primary
+                        # key: EDGAR reports a YTD row AND a standalone-quarter
+                        # row with the SAME period_end + accession, so without it
+                        # the standalone quarter loses the ON CONFLICT race and
+                        # is silently dropped (this is what starved PEAD).
+                        "period_start": f.get("start") or f["end"],
                         "period_end": f["end"],
                         "fy": f.get("fy"),
                         "fp": f.get("fp"),

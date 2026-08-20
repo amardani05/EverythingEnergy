@@ -34,7 +34,7 @@ def _make_row(*, accession: str, filed: str, value: float, is_amendment: bool = 
         "concept": "eps_diluted",
         "concept_used": "EarningsPerShareDiluted",
         "unit": "USD/shares",
-        "period_start": None,
+        "period_start": date(2024, 1, 1),
         "period_end": date(2024, 3, 31),
         "fy": 2024,
         "fp": "Q1",
@@ -101,3 +101,46 @@ def test_as_of_corporate_actions_hides_future_ex_dates(tmp_con) -> None:
     assert visible.row(0, named=True)["value"] == 0.25
     both = as_of_corporate_actions(tmp_con, as_of=date(2024, 12, 31), kind="dividend")
     assert both.height == 2
+
+
+def test_first_reported_dates_a_period_by_its_original_announcement(
+    tmp_con: duckdb.DuckDBPyConnection,
+) -> None:
+    """Every 10-Q restates the prior-year comparative quarter. Under the
+    latest-filed rule that old quarter inherits the NEW filing date and
+    resurfaces as a fresh event, which gave PEAD two tied events per ticker.
+    first_reported=True must return the ORIGINAL announcement instead."""
+    base = _make_row(accession="orig", filed="2025-08-05", value=0.81)
+    base["period_start"] = date(2025, 4, 1)
+    base["period_end"] = date(2025, 6, 30)
+    _insert(tmp_con, **base)
+
+    # A year later the same quarter is restated as a comparative inside the
+    # 2026 10-Q: same period, new accession, new filed date, revised value.
+    comparative = _make_row(accession="restated-in-2026", filed="2026-08-10", value=0.79)
+    comparative["period_start"] = date(2025, 4, 1)
+    comparative["period_end"] = date(2025, 6, 30)
+    _insert(tmp_con, **comparative)
+
+    as_of = date(2026, 12, 31)
+    latest = store.as_of_facts(tmp_con, as_of=as_of, concept="eps_diluted")
+    first = store.as_of_facts(tmp_con, as_of=as_of, concept="eps_diluted",
+                              first_reported=True)
+    assert latest.height == 1 and first.height == 1
+    assert latest.row(0, named=True)["filed"] == date(2026, 8, 10)
+    assert latest.row(0, named=True)["value"] == 0.79
+    # The announcement view: original date, originally reported number.
+    assert first.row(0, named=True)["filed"] == date(2025, 8, 5)
+    assert first.row(0, named=True)["value"] == 0.81
+
+
+def test_first_reported_still_respects_as_of(tmp_con: duckdb.DuckDBPyConnection) -> None:
+    """first_reported must never reach past as_of: if the original filing is
+    still in the future, the period is simply invisible."""
+    base = _make_row(accession="orig", filed="2025-08-05", value=0.81)
+    base["period_start"] = date(2025, 4, 1)
+    base["period_end"] = date(2025, 6, 30)
+    _insert(tmp_con, **base)
+    visible = store.as_of_facts(tmp_con, as_of=date(2025, 8, 4),
+                                concept="eps_diluted", first_reported=True)
+    assert visible.height == 0

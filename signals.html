@@ -113,11 +113,11 @@ td.sans { font-family: var(--sans); }
 <main>
   <h1>Signal Engine</h1>
   <p class="subtitle">
-    The daily output of the cross-sectional factor model: every S&amp;P 600 name ranked by a
-    sector-neutral composite of momentum, EV/EBITDA value, and post-earnings drift. This is a
-    <em>separate system</em> from the Atlas map (which describes the energy complex); the two share
-    only the taxonomy. Recipes and caveats: <a href="methodology.html">methodology</a>,
-    especially &sect;5&ndash;&sect;9.
+    The daily output of the cross-sectional factor model: every name in the energy taxonomy
+    (~205 across 23 baskets) ranked by a basket-neutral composite of momentum, EV/EBITDA value,
+    and post-earnings drift. Same universe as the Atlas map, different job: the map describes
+    the complex, this ranks it. Recipes and caveats:
+    <a href="methodology.html">methodology</a>, especially &sect;5&ndash;&sect;9.
   </p>
   <div id="meta" class="meta-strip"></div>
   <div class="warn-badge">survivorship_clean = false &middot; today's index members applied to history</div>
@@ -177,7 +177,7 @@ fetch("signals_latest.json?v=" + Date.now(), { cache: "no-store" })
 
     const m = d.meta;
     document.getElementById("meta").innerHTML = [
-      ["As of", m.as_of], ["Universe", "S&P 600"],
+      ["As of", m.as_of], ["Universe", "Energy"],
       ["Names", m.n_names], ["Ranked", m.n_ranked],
     ].map(([l, v]) => '<div class="meta-card"><div class="lab">' + l +
       '</div><div class="val">' + v + "</div></div>").join("");

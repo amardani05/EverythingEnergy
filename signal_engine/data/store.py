@@ -3,8 +3,11 @@
 Schema decisions (see turn 5/7 design notes):
 
   * EDGAR XBRL is naturally long-form (concept-keyed). We store one row per
-    (cik, concept, unit, period_end, accession). Restatements (amended forms)
-    arrive on a later `filed` date with a new accession - never overwrite.
+    (cik, concept, unit, period_start, period_end, accession). Restatements
+    (amended forms) arrive on a later `filed` date with a new accession -
+    never overwrite. period_start is in the key because a single 10-Q emits
+    both a year-to-date row and a standalone-quarter row that share an end
+    date and accession; without it the standalone quarter was dropped.
 
   * Prices (Stooq + yfinance fallback) are wide per (ticker, date, source).
     `source` is in the PK so we keep both feeds for cross-checks.
@@ -51,7 +54,9 @@ DDL: dict[str, str] = {
             concept       VARCHAR    NOT NULL,   -- our canonical concept name (e.g. 'eps_diluted')
             concept_used  VARCHAR    NOT NULL,   -- which XBRL tag actually returned the value
             unit          VARCHAR    NOT NULL,   -- 'USD', 'USD/shares', 'shares', ...
-            period_start  DATE,                  -- NULL for instant facts (e.g. shares outstanding)
+            period_start  DATE       NOT NULL,   -- = period_end for instant facts; in the PK
+                                                 -- because EDGAR emits a YTD row and a standalone
+                                                 -- quarter row sharing period_end + accession
             period_end    DATE       NOT NULL,
             fy            INTEGER,
             fp            VARCHAR,               -- 'Q1' | 'Q2' | 'Q3' | 'FY'
@@ -61,7 +66,7 @@ DDL: dict[str, str] = {
             filed         DATE       NOT NULL,   -- knowledge_date
             value         DOUBLE,
             ingest_ts     TIMESTAMP  NOT NULL DEFAULT now(),
-            PRIMARY KEY (cik, concept, unit, period_end, accession)
+            PRIMARY KEY (cik, concept, unit, period_start, period_end, accession)
         );
     """,
     "edgar_submissions": """
@@ -191,12 +196,24 @@ def as_of_facts(
     concept: str | None = None,
     cik: int | None = None,
     originals_only: bool = False,
+    first_reported: bool = False,
 ) -> pl.DataFrame:
-    """Latest-known fact per (cik, concept, period_end) as of `as_of`.
+    """Latest-known fact per (cik, concept, period_start, period_end) as of
+    `as_of`.
 
     Set `originals_only=True` for the PEAD/SUE signal - restatements (forms
     ending in '/A') must NOT retroactively change a surprise that was
     computed at the original announcement date.
+
+    Set `first_reported=True` to take each period's EARLIEST filing instead of
+    its latest. Both are PIT-valid (every candidate row satisfies
+    `filed <= as_of`), but they answer different questions. Every 10-Q
+    restates the prior-year comparative quarter, so under the latest-filed
+    rule that old quarter inherits the NEW filing date and reappears as a
+    fresh event: PEAD then saw two events per ticker tied on signal_date and
+    could score the comparative instead of the quarter just announced.
+    `first_reported` dates each period by its own announcement, which is what
+    an earnings-surprise signal means.
     """
     where_parts = ["filed <= ?"]
     params: list[object] = [as_of]
@@ -209,12 +226,13 @@ def as_of_facts(
     if originals_only:
         where_parts.append("is_amendment = FALSE")
     where = " AND ".join(where_parts)
+    order = "filed ASC, ingest_ts ASC" if first_reported else "filed DESC, ingest_ts DESC"
     sql = f"""
         SELECT * EXCLUDE _rn FROM (
             SELECT *,
               row_number() OVER (
-                PARTITION BY cik, concept, unit, period_end
-                ORDER BY filed DESC, ingest_ts DESC
+                PARTITION BY cik, concept, unit, period_start, period_end
+                ORDER BY {order}
               ) AS _rn
             FROM edgar_facts
             WHERE {where}

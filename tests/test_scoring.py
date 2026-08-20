@@ -22,11 +22,14 @@ from tests.factor_fixtures import insert_annual_bundle, insert_quarterly_eps
 
 AS_OF = date(2026, 7, 17)
 PRICE_START = date(2024, 11, 1)
+# The composite's selection universe is now the energy taxonomy; tests inject
+# their own ticker set via build_composite(..., universe=TEST_UNIVERSE).
+TEST_UNIVERSE = ["MOMHI", "MOMLO", "CHEAP", "EXPNS", "PEADP", "NOFUN"]
 
 
 def _test_cfg() -> Config:
     return Config(raw={
-        "universe": {"membership_mode": "ijr_current", "min_price_history_days": 200},
+        "universe": {"membership_mode": "energy_taxonomy", "min_price_history_days": 200},
         "scoring": {"winsorize_pct": [0.01, 0.99], "emit_sector_relative": True},
         "signals": {"selection": [
             {"name": "value", "enabled": True, "weight": 1.0, "components": ["ev_ebitda"]},
@@ -63,10 +66,6 @@ def _seed_prices(con: duckdb.DuckDBPyConnection, ticker: str,
 
 def _seed_universe(con: duckdb.DuckDBPyConnection, tickers: dict[str, int]) -> None:
     for ticker, cik in tickers.items():
-        con.execute(
-            "INSERT INTO ijr_holdings (snapshot_date, ticker, asset_class) "
-            "VALUES (?, ?, 'equity')", [date(2026, 7, 1), ticker],
-        )
         con.execute(
             "INSERT INTO ticker_cik_map (snapshot_date, ticker, cik) VALUES (?, ?, ?)",
             [date(2026, 7, 1), ticker, cik],
@@ -127,7 +126,7 @@ def seeded(tmp_con: duckdb.DuckDBPyConnection) -> duckdb.DuckDBPyConnection:
 
 
 def test_composite_orders_momentum_and_value(seeded: duckdb.DuckDBPyConnection) -> None:
-    df = build_composite(seeded, AS_OF, _test_cfg())
+    df = build_composite(seeded, AS_OF, _test_cfg(), universe=TEST_UNIVERSE)
     by = {r["ticker"]: r for r in df.iter_rows(named=True)}
 
     # Momentum ordering flows into the composite (same value profile).
@@ -143,7 +142,7 @@ def test_composite_orders_momentum_and_value(seeded: duckdb.DuckDBPyConnection) 
 
 def test_min_families_floor(seeded: duckdb.DuckDBPyConnection) -> None:
     """A momentum-only name (no fundamentals at all) must not be ranked."""
-    df = build_composite(seeded, AS_OF, _test_cfg())
+    df = build_composite(seeded, AS_OF, _test_cfg(), universe=TEST_UNIVERSE)
     row = df.filter(pl.col("ticker") == "NOFUN").row(0, named=True)
     assert row["n_families"] == 1
     assert row["composite"] is None
@@ -153,7 +152,7 @@ def test_min_families_floor(seeded: duckdb.DuckDBPyConnection) -> None:
 def test_composite_pit_canary(seeded: duckdb.DuckDBPyConnection) -> None:
     """THE contract: a fundamental filed AFTER as_of must not move a single
     number in the composite. Extends the leakage canary through scoring."""
-    before = build_composite(seeded, AS_OF, _test_cfg())
+    before = build_composite(seeded, AS_OF, _test_cfg(), universe=TEST_UNIVERSE)
     # Absurd fundamentals for EXPNS filed six weeks after as_of.
     insert_annual_bundle(
         seeded, cik=4, fy=2026, period_end=date(2026, 6, 30), filed=date(2026, 8, 30),
@@ -163,12 +162,12 @@ def test_composite_pit_canary(seeded: duckdb.DuckDBPyConnection) -> None:
                 "shares_outstanding": 1_000_000.0},
         accession_prefix="future-",
     )
-    after = build_composite(seeded, AS_OF, _test_cfg())
+    after = build_composite(seeded, AS_OF, _test_cfg(), universe=TEST_UNIVERSE)
     assert_frame_equal(before, after)
 
 
 def test_family_correlation_shape(seeded: duckdb.DuckDBPyConnection) -> None:
-    df = build_composite(seeded, AS_OF, _test_cfg())
+    df = build_composite(seeded, AS_OF, _test_cfg(), universe=TEST_UNIVERSE)
     corr = family_correlation(df)
     fams = corr["family"].to_list()
     assert set(fams) == {"value", "momentum", "pead"}
@@ -201,3 +200,106 @@ def test_zscore_within_group() -> None:
     # Flat group -> 0.0, not division blow-up; null passes through.
     flat = pl.DataFrame({"x": [5.0, 5.0, None]}).with_columns(zscore_expr("x").alias("z"))
     assert flat["z"].to_list() == [0.0, 0.0, None]
+
+
+# ---------- basket-relative neutralization ----------
+
+def test_basket_shock_is_neutralized(tmp_con: duckdb.DuckDBPyConnection) -> None:
+    """THE acceptance test: lifting one whole basket's raw momentum by a
+    constant must NOT hand that basket the top of the book. Under the old
+    sector-z (which did nothing in an all-energy universe) it would have.
+
+    Two real baskets, each large enough to clear MIN_SECTOR_N so both get
+    their own basket-level z: upstream_oil_eandp and ofs_onshore.
+    """
+    from signal_engine.atlas.clusters import ticker_to_basket
+
+    t2b = ticker_to_basket()
+    oil = [t for t, b in t2b.items() if b == "upstream_oil_eandp"][:12]
+    ofs = [t for t, b in t2b.items() if b == "ofs_onshore"][:12]
+    assert len(oil) >= 10 and len(ofs) >= 10
+
+    # The oil basket rallies hard; OFS is flat. EBITDA is scaled with the
+    # ending price so EV/EBITDA is IDENTICAL across both baskets: without
+    # that, the rally inflates oil's market cap, worsens its value score, and
+    # the two effects cancel, letting this test pass even with the bug.
+    # Momentum must be the only thing that differs.
+    for i, t in enumerate(oil):
+        _seed_prices(tmp_con, t, 100.0, 300.0 + i)      # huge basket-wide move
+    for i, t in enumerate(ofs):
+        _seed_prices(tmp_con, t, 100.0, 100.0 + i)      # flat basket
+    universe = oil + ofs
+    ciks = {t: 100 + i for i, t in enumerate(universe)}
+    _seed_universe(tmp_con, ciks)
+    for i, t in enumerate(oil):
+        _seed_fundamentals(tmp_con, ciks[t], ebitda=1e7 * (300.0 + i) / 100.0)
+    for i, t in enumerate(ofs):
+        _seed_fundamentals(tmp_con, ciks[t], ebitda=1e7 * (100.0 + i) / 100.0)
+
+    cfg = Config(raw={
+        "universe": {"membership_mode": "energy_taxonomy", "min_price_history_days": 200},
+        "scoring": {"winsorize_pct": [0.01, 0.99], "emit_sector_relative": True},
+        "signals": {"selection": [
+            {"name": "value", "enabled": True, "weight": 1.0, "components": ["ev_ebitda"]},
+            {"name": "momentum", "enabled": True, "weight": 1.0},
+            {"name": "pead", "enabled": False, "weight": 1.0},
+        ]},
+    })
+    df = build_composite(tmp_con, AS_OF, cfg, universe=universe)
+    ranked = df.filter(pl.col("composite").is_not_null())
+    assert ranked.height >= 20
+
+    # Both baskets got their own basket-level z (they clear MIN_SECTOR_N).
+    assert set(ranked["neutralization_level"].unique().to_list()) == {"basket"}
+
+    # The decisive check: the rallying basket must NOT sweep the top half.
+    # Under global-z neutralization it would take essentially every top slot.
+    top_half = ranked.head(ranked.height // 2)
+    oil_share = top_half.filter(pl.col("basket") == "upstream_oil_eandp").height / top_half.height
+    assert 0.3 <= oil_share <= 0.7, (
+        f"basket shock leaked into ranks: oil holds {oil_share:.0%} of the top half"
+    )
+
+    # And the basket means of the momentum z must be ~equal (that is what
+    # neutralization means), even though raw momentum differs enormously.
+    means = (ranked.group_by("basket")
+             .agg(pl.col("z_momentum").mean().alias("m"))
+             .sort("basket"))
+    spread = float(means["m"].max() - means["m"].min())
+    assert abs(spread) < 0.15, f"basket z means differ by {spread:.3f}"
+
+
+def test_thin_basket_falls_back_to_super_basket(tmp_con: duckdb.DuckDBPyConnection) -> None:
+    """A basket below MIN_SECTOR_N must not mint its own z; it falls back to
+    the super-basket (commodity-chain group), and only then to global."""
+    from signal_engine.atlas.clusters import ticker_to_basket
+
+    t2b = ticker_to_basket()
+    # coal (3 names) and uranium (2) are both 'fuel_minerals': 5 total, still
+    # under MIN_SECTOR_N, so these must land on 'global'.
+    tiny = [t for t, b in t2b.items() if b in ("coal", "uranium_nuclear_fuel")]
+    # ofs_onshore is large enough to keep its own basket z.
+    big = [t for t, b in t2b.items() if b == "ofs_onshore"][:12]
+    universe = tiny + big
+    for i, t in enumerate(universe):
+        _seed_prices(tmp_con, t, 100.0, 120.0 + i)
+    ciks = {t: 200 + i for i, t in enumerate(universe)}
+    _seed_universe(tmp_con, ciks)
+    for cik in ciks.values():
+        _seed_fundamentals(tmp_con, cik, ebitda=1e7)
+
+    cfg = Config(raw={
+        "universe": {"membership_mode": "energy_taxonomy", "min_price_history_days": 200},
+        "scoring": {"winsorize_pct": [0.01, 0.99], "emit_sector_relative": True},
+        "signals": {"selection": [
+            {"name": "value", "enabled": True, "weight": 1.0, "components": ["ev_ebitda"]},
+            {"name": "momentum", "enabled": True, "weight": 1.0},
+            {"name": "pead", "enabled": False, "weight": 1.0},
+        ]},
+    })
+    df = build_composite(tmp_con, AS_OF, cfg, universe=universe)
+    lvl = {r["ticker"]: r["neutralization_level"] for r in df.iter_rows(named=True)}
+    for t in tiny:
+        assert lvl[t] == "global", f"{t} should fall through to global, got {lvl[t]}"
+    for t in big:
+        assert lvl[t] == "basket", f"{t} should keep its basket z, got {lvl[t]}"

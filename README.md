@@ -1,6 +1,13 @@
-# IMA Energy Atlas
+# Everything Energy
 
-Institutional research dashboard mapping ~205 energy names across the S&P 500/400/600 onto 23 sub-industry baskets in 10 districts. Tracks basket cohesion, factor exposures (CL · NG · CRACK · WTI–BRENT · SPX · TNX · URA · BDRY), pair-trade signals, residual stretches, and factor-vs-idiosyncratic attribution.
+Energy-only research platform. ~205 hand-curated energy names mapped onto 23 sub-industry baskets in 10 districts, with a directed commodity-flow graph connecting them.
+
+Two systems share that taxonomy and nothing else:
+
+- **Energy Atlas** (`dashboard.html`) - descriptive: basket cohesion, factor exposures (CL · NG · CRACK · WTI-BRENT · SPX · TNX · URA · BDRY), pair-trade signals, residual stretches, factor-vs-idiosyncratic attribution.
+- **Signal engine** (`signal_engine/`) - predictive: a point-in-time, basket-neutral composite of momentum, EV/EBITDA value, and post-earnings drift, ranked daily and held to a walk-forward backtest. Published at `signals.html`.
+
+Nothing outside the energy taxonomy is scored, ingested, or published.
 
 ---
 

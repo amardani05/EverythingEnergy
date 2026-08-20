@@ -15,7 +15,7 @@ Panels:
 Phase 1 upgrades folded in: Newey-West t (lag = horizon) reported next to
 the iid t, momentum is total-return, SUE includes derived Q4 events.
 Remaining caveats stamped into the report: no costs, no neutralization,
-ijr_current survivorship bias.
+energy-taxonomy survivorship bias.
 
 Usage:
   .venv/bin/python scripts/baseline_ic.py                 # full run (~10-15 min)
@@ -36,6 +36,7 @@ from pathlib import Path
 import duckdb
 import polars as pl
 
+from signal_engine.atlas.clusters import energy_universe_tickers
 from signal_engine.config import Config
 from signal_engine.data.store import as_of_prices, connect
 from signal_engine.factors.momentum import compute_momentum
@@ -51,15 +52,13 @@ HOLD_WINDOW_DAYS = 63  # PEAD broadcast horizon (trading days)
 
 
 def universe_ticker_to_cik(con: duckdb.DuckDBPyConnection) -> dict[str, int]:
-    """Latest IJR snapshot tickers resolved through the latest ticker_cik_map.
+    """Energy taxonomy tickers resolved through the latest ticker_cik_map.
 
-    This is `membership_mode: ijr_current` - today's members applied to all
-    history. Survivorship-biased by construction; flagged in the report.
+    Energy-only by design. The taxonomy is a fixed curated list applied to
+    all history, so it is survivorship-biased; flagged in the report.
     """
-    ijr = con.execute("""
-        SELECT DISTINCT ticker FROM ijr_holdings
-        WHERE snapshot_date = (SELECT max(snapshot_date) FROM ijr_holdings)
-    """).pl()
+    energy = pl.DataFrame({"ticker": energy_universe_tickers()},
+                          schema={"ticker": pl.Utf8})
     cmap = con.execute("""
         SELECT ticker, cik FROM (
             SELECT ticker, cik,
@@ -67,10 +66,10 @@ def universe_ticker_to_cik(con: duckdb.DuckDBPyConnection) -> dict[str, int]:
             FROM ticker_cik_map
         ) WHERE _rn = 1
     """).pl()
-    joined = ijr.join(cmap, on="ticker", how="left")
+    joined = energy.join(cmap, on="ticker", how="left")
     missing = joined.filter(pl.col("cik").is_null())
     if missing.height:
-        log.warning("[universe] %d IJR tickers have no CIK (sample: %s)",
+        log.warning("[universe] %d energy tickers have no CIK (sample: %s)",
                     missing.height, missing["ticker"].to_list()[:8])
     resolved = joined.drop_nulls("cik")
     return dict(zip(resolved["ticker"].to_list(), resolved["cik"].to_list(), strict=True))
@@ -180,7 +179,7 @@ def main() -> int:
     with connect(cfg.duckdb_path, read_only=True) as con:
         today = date.today()
         t2c = universe_ticker_to_cik(con)
-        log.info("[universe] %d tickers resolved to CIKs (ijr_current mode)", len(t2c))
+        log.info("[universe] %d energy tickers resolved to CIKs", len(t2c))
 
         panel = as_of_prices(con, as_of=today).filter(
             pl.col("ticker").is_in(list(t2c.keys()))
@@ -233,8 +232,8 @@ def main() -> int:
             "# Baseline IC scorecard",
             "",
             f"*Generated {today} on `{git_sha}`. Spearman rank IC; forward return "
-            "t+1 -> t+H+1 (no formation-day return). Universe: latest IJR snapshot "
-            f"({len(t2c)} names, `ijr_current` - survivorship-biased by construction).*",
+            "t+1 -> t+H+1 (no formation-day return). Universe: energy taxonomy "
+            f"({len(t2c)} names, survivorship-biased curated list).*",
             "",
             f"*Data watermarks: prices through {trading_dates[-1]}, "
             f"edgar_facts = {n_facts:,} rows.*",
@@ -244,7 +243,7 @@ def main() -> int:
             "the honest significance. Momentum is total-return (dividends folded "
             "in); SUE includes derived Q4 events (FY - sum(Q1..3), filed at the 10-K). "
             "Remaining caveats: no costs, no neutralization - raw single-factor "
-            "IC only; `ijr_current` survivorship bias.",
+            "IC only; energy-taxonomy survivorship bias.",
             "",
         ]
         for name, summaries in results.items():
