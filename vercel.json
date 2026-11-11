@@ -20,6 +20,12 @@
       ]
     },
     {
+      "source": "/(oil_balance|flows_data|signals_latest|backtests).json",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+      ]
+    },
+    {
       "source": "/map_config.json",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }

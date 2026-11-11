@@ -1,0 +1,1848 @@
+{
+ "meta": {
+  "compiled": "2026-11-10",
+  "note": "Compiled from primary statistical sources where available (EIA, Eurostat, GIIGNL, China customs, Gassco, Norwegian Offshore Directorate, World Nuclear Association) and from Kpler, Vortexa, S&P Global and AXS Marine ship-tracking figures as quoted in trade press. Most flows are calendar 2025, the last full year before the 2026 Strait of Hormuz closure, so the map shows the pre-crisis baseline; a few coal and uranium flows are 2024. Chokepoint totals are EIA first-half 2025 averages. The Energy Institute Statistical Review 2026 trade tables could not be retrieved, so several crude and product flows are importer-side or tracker-based and definitions differ (customs versus tanker tracking, EU versus all Europe, crude versus total products including LPG). Flows are selected major routes, not an exhaustive or additive trade matrix, and hub pairs sometimes stand for wider regions as described in each note. Confidence: high = taken directly from a primary table, medium = single secondary source or simple derivation, low = rounded estimate with the derivation given in the note. Uranium bilateral trade is opaque and those figures are indicative only. Conversions: 7.33 bbl per tonne of crude, 10.34 bcm/yr per Bcf/d.",
+  "sources": [
+   {
+    "id": "eia_chokepoints",
+    "title": "EIA, World Oil Transit Chokepoints (updated 3 March 2026; annual 2020-2024 and 1H25 tables)",
+    "url": "https://www.eia.gov/international/content/analysis/special_topics/World_Oil_Transit_Chokepoints"
+   },
+   {
+    "id": "eia_steo_chokepoints",
+    "title": "EIA, Short-Term Energy Outlook energy security article (quarterly chokepoint flows 1Q25-2Q26)",
+    "url": "https://www.eia.gov/outlooks/steo/report/energysecurity/article.php"
+   },
+   {
+    "id": "eia_crude_imports",
+    "title": "EIA, U.S. Crude Oil Imports by Country of Origin (annual, thousand b/d)",
+    "url": "https://www.eia.gov/dnav/pet/pet_move_impcus_a2_nus_epc0_im0_mbblpd_a.htm"
+   },
+   {
+    "id": "eia_crude_exports",
+    "title": "EIA, U.S. Crude Oil Exports by Destination (annual, thousand b/d)",
+    "url": "https://www.eia.gov/dnav/pet/pet_move_expc_a_EPC0_EEX_mbblpd_a.htm"
+   },
+   {
+    "id": "eia_product_exports",
+    "title": "EIA, U.S. Total Petroleum Products Exports by Destination (annual, thousand b/d; includes hydrocarbon gas liquids)",
+    "url": "https://www.eia.gov/dnav/pet/pet_move_expc_a_EPP0_EEX_mbblpd_a.htm"
+   },
+   {
+    "id": "eia_natgas_trade",
+    "title": "EIA Today in Energy, U.S. natural gas trade 2025 (pipeline imports from Canada, total pipeline exports)",
+    "url": "https://www.eia.gov/todayinenergy/detail.php?id=67484"
+   },
+   {
+    "id": "eia_canada_trade",
+    "title": "EIA Today in Energy, U.S.-Canada energy trade in 2025",
+    "url": "https://www.eia.gov/todayinenergy/detail.php?id=67904"
+   },
+   {
+    "id": "cgep_china_crude",
+    "title": "Columbia CGEP, Where China Gets Its Oil: Crude Imports in 2025 (China customs and Kpler data)",
+    "url": "https://www.energypolicy.columbia.edu/where-china-gets-its-oil-crude-imports-in-2025-reveal-stockpiling-and-changing-fortunes-of-certain-suppliers-including-those-sanctioned/"
+   },
+   {
+    "id": "kpler_china_mideast",
+    "title": "Reuters via Gas Processing News (Apr 2026), Kpler: Middle East supplied about 52% of China's 2025 seaborne crude",
+    "url": "https://gasprocessingnews.com/news/2026/04/how-china-is-plugging-energy-supply-gaps-left-by-us-iran-conflict/"
+   },
+   {
+    "id": "kpler_india_crude",
+    "title": "Kpler data on India's 2025 crude imports as reported by Informist / PTI / Business Today",
+    "url": "https://informistmedia.com/CommodityWire/41718/Crude-Imports-India-s-crude-imports-from-Russia-slump-almost-35-37-in-Dec-says-Kpler"
+   },
+   {
+    "id": "argus_japan_crude",
+    "title": "Argus, Japanese government figures for 2025 crude imports by region",
+    "url": "https://www.argusmedia.com/en/news-and-insights/latest-market-news/2811107-japan-has-enough-oil-supply-to-last-into-next-year-pm"
+   },
+   {
+    "id": "mees_korea_crude",
+    "title": "MEES (Jan 2026), Korea crude imports 2025: Mideast volumes and share (KNOC data)",
+    "url": "https://www.mees.com/2026/1/23/news-in-brief/korea-crude-imports-mideast-volumes-share-drop-to-3-year-low/a19d6060-f880-11f0-9e38-7919118bf855"
+   },
+   {
+    "id": "eurostat_oil",
+    "title": "Eurostat 2025 EU crude import statistics, as published by Eurostat and the Council of the EU infographic 'Where does the EU get its oil from?'",
+    "url": "https://www.consilium.europa.eu/en/infographics/where-does-the-eu-get-its-oil-from/"
+   },
+   {
+    "id": "reuters_turkey_urals",
+    "title": "Reuters via Daily Sabah (Jan 2026), Turkey's Urals imports averaged about 275,000 b/d in 2025",
+    "url": "https://www.dailysabah.com/business/energy/russian-oil-exports-to-china-surge-as-india-turkiye-curb-buying"
+   },
+   {
+    "id": "tmx_exports",
+    "title": "Reuters via Gulf News (2026), Canada non-US crude exports about 430,000 b/d in 2025 (Canada Energy Regulator / Asia Pacific Foundation)",
+    "url": "https://gulfnews.com/amp/story/business%2Fenergy%2Fchina-leads-canadas-oil-pivot-to-asia-as-mid-east-war-reshapes-crude-trade-1.500691641"
+   },
+   {
+    "id": "argus_waf",
+    "title": "Argus viewpoint (Dec 2025), West African crude export destinations in 2025 (Vortexa and Kpler data)",
+    "url": "https://www.argusmedia.com/en/news-and-insights/latest-market-news/2772284-viewpoint-latam-crudes-pose-competition-to-waf-in-2026"
+   },
+   {
+    "id": "argus_guyana",
+    "title": "Argus viewpoint (Dec 2025), Guyanese crude flows 2025 (Vortexa data) and OilNOW export volume report",
+    "url": "https://www.argusmedia.com/news-and-insights/latest-market-news/2771370-viewpoint-rising-guyanese-crude-flows-open-new-markets"
+   },
+   {
+    "id": "cpc_2025",
+    "title": "Astana Times / Interfax (Feb 2026), CPC shipped 70.5 Mt in 2025",
+    "url": "https://astanatimes.com/2026/02/around-63-million-tons-of-kazakh-oil-transported-via-cpc-pipeline-in-2025/"
+   },
+   {
+    "id": "norskpetroleum",
+    "title": "Norwegian Petroleum (Offshore Directorate / Ministry of Energy), Exports of oil and gas, 2025 data",
+    "url": "https://www.norskpetroleum.no/en/production-and-exports/exports-of-oil-and-gas/"
+   },
+   {
+    "id": "giignl_2026",
+    "title": "GIIGNL Annual Report 2026 Edition, table 'LNG quantities (in MT) received in 2025' (GIIGNL, Kpler)",
+    "url": "https://giignl.org/annual-report/"
+   },
+   {
+    "id": "gassco",
+    "title": "Gassco key figures: 114.9 bcm delivered to Europe in 2025",
+    "url": "https://gassco.eu/en/about-us/what-we-do/key-figures/"
+   },
+   {
+    "id": "gazprom_pos",
+    "title": "Moscow Times (30 Dec 2025), Gazprom CEO: 38.8 bcm via Power of Siberia in 2025",
+    "url": "https://www.themoscowtimes.com/2025/12/30/gazproms-gas-exports-to-europe-fall-to-lowest-level-since-early-1970s-a91591"
+   },
+   {
+    "id": "spglobal_turkstream",
+    "title": "S&P Global (Feb 2026), TurkStream deliveries to Europe reached 16.8 bcm in 2025",
+    "url": "https://www.spglobal.com/energy/en/news-research/latest-news/natural-gas/020226-russian-gas-flows-to-europe-via-turkstream-remain-at-sustained-high-in-jan"
+   },
+   {
+    "id": "osw_turkey_gas",
+    "title": "OSW Commentary (Mar 2026), Turkey's gas imports by supplier in 2025",
+    "url": "https://www.osw.waw.pl/en/publikacje/osw-commentary/2026-03-17/turkeys-lng-game-amid-war-middle-east"
+   },
+   {
+    "id": "cidob_algeria",
+    "title": "CIDOB (Jan 2026), A tale of two gas suppliers to Europe: Algeria and Libya",
+    "url": "https://www.cidob.org/en/publications/tale-two-gas-suppliers-europe-algeria-and-libya"
+   },
+   {
+    "id": "interfax_azerbaijan",
+    "title": "Interfax (Jan 2026), Azerbaijan gas exports 2025 by destination (Energy Ministry)",
+    "url": "https://www.interfax.com/newsroom/top-stories/115574/"
+   },
+   {
+    "id": "kpler_china_gas",
+    "title": "Kpler (Jan 2026), China gas supply strength caps LNG demand growth (2025 pipeline import estimates)",
+    "url": "https://www.kpler.com/blog/china-gas-supply-strength-caps-lng-demand-growth"
+   },
+   {
+    "id": "china_customs_coal",
+    "title": "China customs 2025 coal imports by origin, as reported by sxcoal/APBI-ICMA and TheCoalHub",
+    "url": "https://apbi-icma.org/media-article/why-china-s-import-share-of-indonesian-coal-hit-multi-yr-low-in-2025"
+   },
+   {
+    "id": "coalhub_russia_china",
+    "title": "TheCoalHub (2026), Russian coal exports to China in 2025 (China customs: Mongolia 89.0 Mt, Russia 88.9 Mt)",
+    "url": "https://thecoalhub.com/?p=17231"
+   },
+   {
+    "id": "axs_coal_2025",
+    "title": "Banchero Costa / AXS Marine via SunSirs, global seaborne coal trade 2025 by exporter and importer",
+    "url": "https://www.sunsirs.com/uk/detail_news-29822.html"
+   },
+   {
+    "id": "banchero_australia",
+    "title": "Banchero Costa via Hellenic Shipping News, Australian coal exports by destination (2024 full year, 1H 2025)",
+    "url": "https://www.hellenicshippingnews.com/australian-coal-exports-down-in-2025/"
+   },
+   {
+    "id": "coalhub_india",
+    "title": "TheCoalHub / Banchero Costa, India's seaborne coal imports by origin, Jan-Sep 2025",
+    "url": "https://thecoalhub.com/indias-seaborne-coal-imports-map-is-being-redrawn-as-russian-and-south-african-flows-surge/"
+   },
+   {
+    "id": "apbi_indonesia",
+    "title": "APBI-ICMA / sxcoal review of Indonesia's 2025 coal exports (BPS data)",
+    "url": "https://apbi-icma.org/media-article/review-indonesia-2025-coal-exports-end-5-yr-uptrend"
+   },
+   {
+    "id": "wna_mining",
+    "title": "World Nuclear Association, World Uranium Mining Production (updated 23 Oct 2026; 2024 country table)",
+    "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/mining-of-uranium/world-uranium-mining-production"
+   },
+   {
+    "id": "wna_kazakhstan",
+    "title": "World Nuclear Association, Uranium and Nuclear Power in Kazakhstan",
+    "url": "https://world-nuclear.org/information-library/country-profiles/countries-g-n/kazakhstan"
+   },
+   {
+    "id": "wna_namibia",
+    "title": "World Nuclear Association, Uranium in Namibia",
+    "url": "https://world-nuclear.org/information-library/country-profiles/countries-g-n/namibia"
+   },
+   {
+    "id": "kz_uranium_press",
+    "title": "Kazakh trade statistics on uranium export destinations, Jan-Sep 2025, as reported in regional press (Kapital.kz / Orda.kz / Times of Central Asia)",
+    "url": "https://kapital.kz/economic/136176/eksport-kazahstanskogo-urana-rezko-snizilsya.html"
+   },
+   {
+    "id": "cer_uranium",
+    "title": "Canada Energy Regulator, Market Snapshot: Canadian uranium exports (2026)",
+    "url": "https://www.cer-rec.gc.ca/en/data-analysis/energy-markets/market-snapshots/2026/market-snapshot-canadian-uranium-exports-help-fuel-nuclear-generation-around-the-world.html"
+   },
+   {
+    "id": "kpler_products_europe",
+    "title": "Kpler blogs and Kpler data via Reuters (2025-2026) on Europe's jet and diesel imports from the Middle East and India",
+    "url": "https://www.kpler.com/blog/how-europe-rebalanced-its-jet-fuel-supplies-to-keep-planes-in-the-air"
+   },
+   {
+    "id": "kpler_india_diesel",
+    "title": "Reuters via Pipeline and Gas Journal (Jan 2026), Kpler: India's diesel exports to the EU averaged 137,000 b/d in 2025",
+    "url": "https://pgjonline.com/news/2026/january/indian-diesel-flows-shift-to-west-africa-after-eu-bans-russian-crude-linked-fuel"
+   },
+   {
+    "id": "spglobal_russia_products",
+    "title": "S&P Global Commodities at Sea monthly reports on Russian seaborne product exports, 2025",
+    "url": "https://www.spglobal.com/energy/en/news-research/latest-news/energy-transition/090325-russian-crude-product-exports-rise-in-aug-as-china-steps-up-purchases"
+   },
+   {
+    "id": "vortexa_gasoline_waf",
+    "title": "Vortexa data via Breakwave Advisors (Aug 2025), Europe to West Africa gasoline flows",
+    "url": "https://www.breakwaveadvisors.com/insights/2025/8/21/tankers-research-update"
+   }
+  ]
+ },
+ "hubs": [
+  {
+   "id": "me_gulf",
+   "name": "Middle East Gulf",
+   "lon": 51.0,
+   "lat": 26.5,
+   "region": "Middle East"
+  },
+  {
+   "id": "qatar",
+   "name": "Qatar (Ras Laffan)",
+   "lon": 51.6,
+   "lat": 25.95,
+   "region": "Middle East"
+  },
+  {
+   "id": "china",
+   "name": "China (east coast)",
+   "lon": 122.0,
+   "lat": 30.0,
+   "region": "Asia"
+  },
+  {
+   "id": "india",
+   "name": "India (west coast)",
+   "lon": 70.5,
+   "lat": 21.5,
+   "region": "Asia"
+  },
+  {
+   "id": "japan",
+   "name": "Japan (Tokyo Bay)",
+   "lon": 139.9,
+   "lat": 35.2,
+   "region": "Asia"
+  },
+  {
+   "id": "korea",
+   "name": "South Korea (Ulsan)",
+   "lon": 129.4,
+   "lat": 35.45,
+   "region": "Asia"
+  },
+  {
+   "id": "se_asia",
+   "name": "Southeast Asia (Singapore)",
+   "lon": 103.8,
+   "lat": 1.25,
+   "region": "Asia"
+  },
+  {
+   "id": "south_asia",
+   "name": "Pakistan and Bangladesh (Karachi)",
+   "lon": 67.0,
+   "lat": 24.8,
+   "region": "Asia"
+  },
+  {
+   "id": "nw_europe",
+   "name": "NW Europe (Rotterdam)",
+   "lon": 4.0,
+   "lat": 51.95,
+   "region": "Europe"
+  },
+  {
+   "id": "med_europe",
+   "name": "Mediterranean Europe (Italy/Spain/Greece)",
+   "lon": 15.2,
+   "lat": 37.2,
+   "region": "Europe"
+  },
+  {
+   "id": "turkey",
+   "name": "Turkey (Marmara)",
+   "lon": 29.5,
+   "lat": 40.75,
+   "region": "Europe"
+  },
+  {
+   "id": "norway",
+   "name": "Norway (west coast)",
+   "lon": 5.0,
+   "lat": 60.3,
+   "region": "Europe"
+  },
+  {
+   "id": "russia_baltic",
+   "name": "Russia Baltic (Primorsk/Ust-Luga)",
+   "lon": 28.7,
+   "lat": 60.3,
+   "region": "Russia/CIS"
+  },
+  {
+   "id": "black_sea",
+   "name": "Black Sea (Novorossiysk/CPC, TurkStream, Blue Stream)",
+   "lon": 37.8,
+   "lat": 44.7,
+   "region": "Russia/CIS"
+  },
+  {
+   "id": "russia_far_east",
+   "name": "Russia Far East (Kozmino/ESPO, Sakhalin, Power of Siberia)",
+   "lon": 133.0,
+   "lat": 42.7,
+   "region": "Russia/CIS"
+  },
+  {
+   "id": "russia_arctic",
+   "name": "Russia Arctic (Yamal, Sabetta)",
+   "lon": 72.0,
+   "lat": 71.3,
+   "region": "Russia/CIS"
+  },
+  {
+   "id": "azerbaijan",
+   "name": "Azerbaijan (Sangachal)",
+   "lon": 49.5,
+   "lat": 40.2,
+   "region": "Russia/CIS"
+  },
+  {
+   "id": "central_asia",
+   "name": "Central Asia gas (Turkmenistan)",
+   "lon": 62.0,
+   "lat": 37.8,
+   "region": "Russia/CIS"
+  },
+  {
+   "id": "kazakhstan",
+   "name": "Kazakhstan (southern uranium province)",
+   "lon": 68.0,
+   "lat": 44.5,
+   "region": "Russia/CIS"
+  },
+  {
+   "id": "uzbekistan",
+   "name": "Uzbekistan (Navoi)",
+   "lon": 65.4,
+   "lat": 40.1,
+   "region": "Russia/CIS"
+  },
+  {
+   "id": "us_gulf",
+   "name": "US Gulf Coast",
+   "lon": -93.0,
+   "lat": 28.5,
+   "region": "North America"
+  },
+  {
+   "id": "us_east",
+   "name": "US East Coast (Hampton Roads)",
+   "lon": -76.3,
+   "lat": 36.9,
+   "region": "North America"
+  },
+  {
+   "id": "us_midwest",
+   "name": "US Midwest (Chicago area)",
+   "lon": -87.6,
+   "lat": 41.8,
+   "region": "North America"
+  },
+  {
+   "id": "canada",
+   "name": "Western Canada (Alberta/Saskatchewan)",
+   "lon": -111.3,
+   "lat": 52.7,
+   "region": "North America"
+  },
+  {
+   "id": "canada_pacific",
+   "name": "Canada Pacific (Vancouver)",
+   "lon": -123.2,
+   "lat": 49.3,
+   "region": "North America"
+  },
+  {
+   "id": "mexico",
+   "name": "Mexico (Gulf coast)",
+   "lon": -94.4,
+   "lat": 18.3,
+   "region": "Latin America"
+  },
+  {
+   "id": "venezuela",
+   "name": "Venezuela (Jose)",
+   "lon": -64.8,
+   "lat": 10.1,
+   "region": "Latin America"
+  },
+  {
+   "id": "colombia",
+   "name": "Colombia (Caribbean coast)",
+   "lon": -72.5,
+   "lat": 11.8,
+   "region": "Latin America"
+  },
+  {
+   "id": "guyana",
+   "name": "Guyana (Stabroek offshore)",
+   "lon": -57.5,
+   "lat": 7.6,
+   "region": "Latin America"
+  },
+  {
+   "id": "brazil",
+   "name": "Brazil (Santos/Rio)",
+   "lon": -43.0,
+   "lat": -23.5,
+   "region": "Latin America"
+  },
+  {
+   "id": "pacific_south_america",
+   "name": "Pacific South America (Chile/Peru/Ecuador)",
+   "lon": -77.2,
+   "lat": -12.1,
+   "region": "Latin America"
+  },
+  {
+   "id": "west_africa",
+   "name": "West Africa (Nigeria, Bonny)",
+   "lon": 7.2,
+   "lat": 4.2,
+   "region": "Africa"
+  },
+  {
+   "id": "algeria",
+   "name": "Algeria (Arzew)",
+   "lon": -0.3,
+   "lat": 35.9,
+   "region": "Africa"
+  },
+  {
+   "id": "south_africa",
+   "name": "South Africa (Richards Bay)",
+   "lon": 32.1,
+   "lat": -28.8,
+   "region": "Africa"
+  },
+  {
+   "id": "namibia",
+   "name": "Namibia (Walvis Bay)",
+   "lon": 14.5,
+   "lat": -22.95,
+   "region": "Africa"
+  },
+  {
+   "id": "niger",
+   "name": "Niger (Arlit)",
+   "lon": 7.4,
+   "lat": 18.7,
+   "region": "Africa"
+  },
+  {
+   "id": "mongolia",
+   "name": "Mongolia (South Gobi)",
+   "lon": 105.5,
+   "lat": 43.0,
+   "region": "Asia"
+  },
+  {
+   "id": "indonesia",
+   "name": "Indonesia (East Kalimantan)",
+   "lon": 117.3,
+   "lat": -1.0,
+   "region": "Asia"
+  },
+  {
+   "id": "malaysia",
+   "name": "Malaysia (Bintulu)",
+   "lon": 113.0,
+   "lat": 3.2,
+   "region": "Asia"
+  },
+  {
+   "id": "australia_west",
+   "name": "Australia NW Shelf (Dampier)",
+   "lon": 116.7,
+   "lat": -20.6,
+   "region": "Oceania"
+  },
+  {
+   "id": "australia_east",
+   "name": "Australia east coast (Newcastle)",
+   "lon": 151.8,
+   "lat": -32.9,
+   "region": "Oceania"
+  }
+ ],
+ "chokepoints": [
+  {
+   "id": "hormuz",
+   "name": "Strait of Hormuz",
+   "lon": 56.4,
+   "lat": 26.6,
+   "oil_mbd": 20.9,
+   "lng_note": "LNG 11.4 Bcf/d in 1H25 (about a fifth of world LNG trade), mostly Qatar; about one-third of China's LNG passes here",
+   "year": 2025,
+   "note": "1H25 average (2024: 20.7; EIA quarterly 4Q25: 21.6). 74% of crude went to China, India, Japan and Korea. Effectively closed from about 1 March 2026 after US-Israel strikes on Iran: EIA shows 14.9 mb/d in 1Q26 and 4.9 mb/d in 2Q26, so 2025 volumes are the pre-crisis baseline.",
+   "source": "eia_chokepoints"
+  },
+  {
+   "id": "malacca",
+   "name": "Strait of Malacca",
+   "lon": 101.0,
+   "lat": 2.5,
+   "oil_mbd": 23.2,
+   "lng_note": "LNG 9.2 Bcf/d in 1H25 (10.1 in 2024)",
+   "year": 2025,
+   "note": "1H25 average (2024: 22.5); largest oil chokepoint, about 29% of seaborne oil trade. Fell to 16.6 mb/d in 2Q26 as the Hormuz closure cut Gulf supply to Asia.",
+   "source": "eia_chokepoints"
+  },
+  {
+   "id": "suez",
+   "name": "Suez Canal and SUMED Pipeline",
+   "lon": 32.55,
+   "lat": 30.3,
+   "oil_mbd": 4.9,
+   "lng_note": "LNG 0.9 Bcf/d in 1H25, down from 4.1 in 2023",
+   "year": 2025,
+   "note": "1H25 average (2024: 4.8; 2023: 8.8). Flows roughly halved after Houthi attacks in the Red Sea from late 2023 pushed tankers around the Cape; partial recovery to 5.9 mb/d by 4Q25.",
+   "source": "eia_chokepoints"
+  },
+  {
+   "id": "bab_el_mandeb",
+   "name": "Bab el-Mandeb",
+   "lon": 43.4,
+   "lat": 12.6,
+   "oil_mbd": 4.2,
+   "lng_note": "LNG 0.0 Bcf/d in 2024 and 1H25 (4.2 in 2023): LNG carriers avoid the route entirely",
+   "year": 2025,
+   "note": "1H25 average (2024: 4.1; 2023: 9.3). Red Sea rerouting after Houthi attacks; EIA shows a rebound to 5.4 mb/d in 4Q25 and 8.1 mb/d in 2Q26.",
+   "source": "eia_chokepoints"
+  },
+  {
+   "id": "turkish",
+   "name": "Turkish Straits (Bosporus and Dardanelles)",
+   "lon": 29.05,
+   "lat": 41.1,
+   "oil_mbd": 3.7,
+   "lng_note": "LNG 0.6 Bcf/d via the Dardanelles (to Marmara terminals); no LNG transits the Bosporus",
+   "year": 2025,
+   "note": "1H25 Dardanelles figure (Bosporus alone: 3.3; 2024 Dardanelles: 3.6). Carries Russian Black Sea and Kazakh CPC crude; CPC terminal and tankers were hit by drone attacks in 2025.",
+   "source": "eia_chokepoints"
+  },
+  {
+   "id": "danish",
+   "name": "Danish Straits",
+   "lon": 10.9,
+   "lat": 55.4,
+   "oil_mbd": 4.9,
+   "lng_note": "LNG 1.6 Bcf/d in 1H25",
+   "year": 2025,
+   "note": "1H25 average (2024: 4.9; 2021: 3.1). Volumes rose after 2022 as Russian Baltic crude was redirected from European pipelines and nearby buyers to long-haul shipments to India and China; shadow-fleet scrutiny is the main current risk.",
+   "source": "eia_chokepoints"
+  },
+  {
+   "id": "panama",
+   "name": "Panama Canal",
+   "lon": -79.7,
+   "lat": 9.1,
+   "oil_mbd": 2.3,
+   "lng_note": "LNG below 0.3 Bcf/d in FY2025, down from about 2.5 Bcf/d in FY2021",
+   "year": 2025,
+   "note": "Fiscal year 2025 (FY2024: 2.0). Almost all products and LPG (2.2 of 2.3 mb/d), mainly US Gulf Coast to Asia and Pacific South America. The 2023-24 drought cut transits; US LNG has not returned to the route.",
+   "source": "eia_chokepoints"
+  },
+  {
+   "id": "cape",
+   "name": "Cape of Good Hope",
+   "lon": 19.0,
+   "lat": -35.5,
+   "oil_mbd": 9.1,
+   "lng_note": "LNG 5.7 Bcf/d in 1H25 (7.8 in 2024, 2.1 in 2023)",
+   "year": 2025,
+   "note": "1H25 average (2024: 9.3; 2023: 6.2). Not a true chokepoint but the main bypass: volumes jumped about 50% when Red Sea traffic rerouted in 2024.",
+   "source": "eia_chokepoints"
+  }
+ ],
+ "flows": [
+  {
+   "commodity": "crude",
+   "from": "me_gulf",
+   "to": "china",
+   "volume": 5.2,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "malacca"
+   ],
+   "confidence": "medium",
+   "note": "Kpler: Middle East was about 52% (about 1.9bn of 3.6bn barrels) of China's 2025 seaborne crude. Believed to include Iranian crude (about 1.38 mb/d per Kpler), which China customs records as Malaysian or Indonesian; treat as approximate.",
+   "source": "kpler_china_mideast",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "me_gulf",
+   "to": "india",
+   "volume": 2.1,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "hormuz"
+   ],
+   "confidence": "low",
+   "note": "Derived: Kpler total imports about 4.8 mb/d times a Middle East share of about 44% (Iraq, Saudi Arabia, UAE, Kuwait monthly shares in 2025). No full-year bilateral figure found.",
+   "source": "kpler_india_crude",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "me_gulf",
+   "to": "japan",
+   "volume": 2.22,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "malacca"
+   ],
+   "confidence": "high",
+   "note": "Japanese government figures: 2.22 of 2.36 mb/d total imports (94%) came from the Middle East, mainly UAE and Saudi Arabia.",
+   "source": "argus_japan_crude",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "me_gulf",
+   "to": "korea",
+   "volume": 1.95,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "malacca"
+   ],
+   "confidence": "high",
+   "note": "KNOC data: 69.9% of 2.80 mb/d total imports, a three-year low share.",
+   "source": "mees_korea_crude",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "me_gulf",
+   "to": "med_europe",
+   "volume": 1.12,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "suez"
+   ],
+   "confidence": "medium",
+   "note": "EU only: Eurostat 55.9 Mt (13.0% of 429.3 Mt EU crude imports), led by Saudi Arabia 29.6 Mt and Iraq 25.1 Mt; converted at 7.33 bbl/t. Part moves via Yanbu/SUMED or the Cape rather than Bab el-Mandeb.",
+   "source": "eurostat_oil",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "me_gulf",
+   "to": "us_gulf",
+   "volume": 0.49,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "cape"
+   ],
+   "confidence": "high",
+   "note": "EIA Persian Gulf origin total; Saudi Arabia 0.27, Iraq 0.18. Much of it lands on the US West Coast.",
+   "source": "eia_crude_imports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "russia_far_east",
+   "to": "china",
+   "volume": 2.02,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "China customs: Russia 17.4% of 578 Mt (about 100.6 Mt), down 6.9% y/y. Includes ESPO pipeline (about 0.6-0.7 mb/d), Kozmino seaborne and Urals/Arctic cargoes from western ports, plus 0.2 mb/d transiting Kazakhstan.",
+   "source": "cgep_china_crude",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "russia_baltic",
+   "to": "india",
+   "volume": 1.7,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "danish",
+    "suez",
+    "bab_el_mandeb"
+   ],
+   "confidence": "medium",
+   "note": "Kpler: about 1.70 mb/d average in 2025 (1.78 in 2024), roughly 35% of India's imports. Mostly Urals from Baltic and Black Sea ports; fell sharply from December 2025 after US sanctions on Rosneft and Lukoil.",
+   "source": "kpler_india_crude",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "black_sea",
+   "to": "turkey",
+   "volume": 0.3,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "turkish"
+   ],
+   "confidence": "medium",
+   "note": "Urals averaged about 275 kb/d in 2025 (Reuters); Kpler shows 317 kb/d of all Russian crude in Jan-Oct. Not drawn: about 0.19 mb/d (2.2% of EU imports) still reaching Hungary and Slovakia via the Druzhba pipeline.",
+   "source": "reuters_turkey_urals",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "us_gulf",
+   "to": "nw_europe",
+   "volume": 1.76,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "EIA sum of European destinations: Netherlands 0.86, UK 0.19, Spain 0.19, France 0.12, Germany 0.11, Italy 0.11. Down about 7% y/y.",
+   "source": "eia_crude_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "us_gulf",
+   "to": "korea",
+   "volume": 0.51,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "cape",
+    "malacca"
+   ],
+   "confidence": "high",
+   "note": "Largest Asian buyer. All Asia about 1.45 mb/d (Taiwan 0.22, Thailand 0.15, Japan 0.10); China collapsed to 0.02 from 0.22 on tariffs.",
+   "source": "eia_crude_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "us_gulf",
+   "to": "india",
+   "volume": 0.32,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "cape"
+   ],
+   "confidence": "high",
+   "note": "Up from 0.22 mb/d in 2024.",
+   "source": "eia_crude_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "canada",
+   "to": "us_midwest",
+   "volume": 3.91,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Largest single bilateral crude flow in the world, almost all by pipeline; down 4% y/y as Trans Mountain diverted barrels to the Pacific.",
+   "source": "eia_crude_imports",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "crude",
+   "from": "canada_pacific",
+   "to": "china",
+   "volume": 0.43,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "All Canadian non-US crude exports (Canada Energy Regulator basis), nearly all via the Trans Mountain expansion; China is the largest buyer but the figure also includes Korea, India and others.",
+   "source": "tmx_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "west_africa",
+   "to": "nw_europe",
+   "volume": 0.59,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Nigeria only (Vortexa: 46% of Nigerian exports). Angolan and other West African barrels to Europe are not included.",
+   "source": "argus_waf",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "west_africa",
+   "to": "india",
+   "volume": 0.49,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "cape"
+   ],
+   "confidence": "medium",
+   "note": "Vortexa year-to-date 2025: West African crude to India and Indonesia combined (0.38 in 2024).",
+   "source": "argus_waf",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "west_africa",
+   "to": "china",
+   "volume": 0.6,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "cape",
+    "malacca"
+   ],
+   "confidence": "low",
+   "note": "Derived: Kpler says about half of Nigerian plus Angolan exports (roughly 2.2 mb/d) went to Asia, less the 0.49 mb/d to India and Indonesia. Mostly Angolan crude.",
+   "source": "argus_waf",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "brazil",
+   "to": "china",
+   "volume": 0.95,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "cape",
+    "malacca"
+   ],
+   "confidence": "medium",
+   "note": "Derived from China customs change (+208 kb/d, +28% y/y). Brazilian trade data show 44 Mt (about 0.88 mb/d), 45% of Brazil's crude exports.",
+   "source": "cgep_china_crude",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "venezuela",
+   "to": "china",
+   "volume": 0.39,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "cape",
+    "malacca"
+   ],
+   "confidence": "medium",
+   "note": "Kpler tanker-tracking estimate of sanctioned Venezuelan crude; China customs records under 7 kb/d because cargoes are relabelled.",
+   "source": "cgep_china_crude",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "venezuela",
+   "to": "us_gulf",
+   "volume": 0.14,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Down from 0.23 mb/d in 2024 as the Chevron licence was curtailed.",
+   "source": "eia_crude_imports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "mexico",
+   "to": "us_gulf",
+   "volume": 0.38,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Down from 0.46 mb/d in 2024 as Pemex output fell and Dos Bocas absorbed crude.",
+   "source": "eia_crude_imports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "guyana",
+   "to": "us_gulf",
+   "volume": 0.21,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Up from 0.18 mb/d in 2024.",
+   "source": "eia_crude_imports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "guyana",
+   "to": "nw_europe",
+   "volume": 0.43,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Derived: about 60% (Vortexa) of roughly 0.71 mb/d total exports (260 million barrels in 2025).",
+   "source": "argus_guyana",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "colombia",
+   "to": "us_gulf",
+   "volume": 0.19,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "EIA imports from Colombia.",
+   "source": "eia_crude_imports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "black_sea",
+   "to": "med_europe",
+   "volume": 1.1,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "turkish"
+   ],
+   "confidence": "medium",
+   "note": "EU imports from Kazakhstan (Eurostat 12.8% of 429.3 Mt), nearly all CPC Blend loaded near Novorossiysk. Total CPC terminal loadings were a record 70.5 Mt (about 1.45 mb/d) in 2025, including Russian crude and non-EU buyers.",
+   "source": "eurostat_oil",
+   "mode": "sea"
+  },
+  {
+   "commodity": "crude",
+   "from": "norway",
+   "to": "nw_europe",
+   "volume": 1.5,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "About 89 million Sm3 of crude exported directly, mostly to NW Europe (UK, Netherlands, Sweden, Poland, Germany). EU share of Norway: 12.8% of EU crude imports.",
+   "source": "norskpetroleum",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "us_gulf",
+   "to": "mexico",
+   "volume": 1.08,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "EIA total petroleum products including LPG; mostly gasoline and diesel. Largest bilateral product flow.",
+   "source": "eia_product_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "us_gulf",
+   "to": "brazil",
+   "volume": 0.3,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "EIA total products. All Latin America and Caribbean including Mexico is about 2.85 mb/d.",
+   "source": "eia_product_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "us_gulf",
+   "to": "pacific_south_america",
+   "volume": 0.51,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "panama"
+   ],
+   "confidence": "high",
+   "note": "Ecuador 0.19, Chile 0.19, Peru 0.13; mainly diesel, gasoline and LPG.",
+   "source": "eia_product_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "us_gulf",
+   "to": "nw_europe",
+   "volume": 0.89,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Sum of European destinations above 20 kb/d (Netherlands 0.27, UK 0.15, Belgium 0.11); diesel plus LPG and ethane.",
+   "source": "eia_product_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "us_gulf",
+   "to": "china",
+   "volume": 0.63,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "panama"
+   ],
+   "confidence": "high",
+   "note": "EIA total products: overwhelmingly propane and ethane (hydrocarbon gas liquids), not refined fuels.",
+   "source": "eia_product_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "us_gulf",
+   "to": "japan",
+   "volume": 0.56,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "panama"
+   ],
+   "confidence": "high",
+   "note": "EIA total products: mostly LPG (propane, butane). Korea takes a further 0.22 mb/d.",
+   "source": "eia_product_exports",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "india",
+   "to": "nw_europe",
+   "volume": 0.25,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "cape"
+   ],
+   "confidence": "low",
+   "note": "Estimate: diesel to the EU averaged 137 kb/d (Kpler) plus roughly 100-130 kb/d of jet. Many cargoes rerouted around the Cape; EU ban on fuels made from Russian crude took effect in January 2026.",
+   "source": "kpler_india_diesel",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "me_gulf",
+   "to": "nw_europe",
+   "volume": 0.5,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "cape"
+   ],
+   "confidence": "low",
+   "note": "Estimate: about 400 kb/d of jet (Kpler, May-Sep 2025) plus roughly 100 kb/d of diesel. No full-year figure found; flows fell to near zero after the 2026 Hormuz closure.",
+   "source": "kpler_products_europe",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "black_sea",
+   "to": "turkey",
+   "volume": 0.4,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "turkish"
+   ],
+   "confidence": "low",
+   "note": "Estimate from monthly tracking (288 kb/d of gasoil in Aug, up to 508 kb/d of all products in Jul 2025). Turkey is the top buyer of Russian products; Russia's total product exports were 114 Mt (about 2.3 mb/d) in 2025.",
+   "source": "spglobal_russia_products",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "russia_baltic",
+   "to": "brazil",
+   "volume": 0.1,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [
+    "danish"
+   ],
+   "confidence": "low",
+   "note": "Estimate from monthly tracking (about 80-120 kb/d in mid-2025), mostly diesel.",
+   "source": "spglobal_russia_products",
+   "mode": "sea"
+  },
+  {
+   "commodity": "products",
+   "from": "nw_europe",
+   "to": "west_africa",
+   "volume": 0.27,
+   "unit": "mb/d",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Gasoline, Vortexa average to 18 Aug 2025; Nigeria's share of European gasoline exports halved to about 10% as the Dangote refinery ramped up.",
+   "source": "vortexa_gasoline_waf",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "us_gulf",
+   "to": "nw_europe",
+   "volume": 73.8,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "All Europe including Turkey (6.6): 68% of US exports of 109.1 Mt. Netherlands 12.8, France 10.9, Spain 7.3, UK 7.3, Germany 7.0, Italy 6.8.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "us_gulf",
+   "to": "japan",
+   "volume": 4.7,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [
+    "cape"
+   ],
+   "confidence": "high",
+   "note": "US to all Asia was only 17.9 Mt; most now sails via the Cape rather than Panama.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "us_gulf",
+   "to": "korea",
+   "volume": 4.5,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [
+    "cape"
+   ],
+   "confidence": "high",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "us_gulf",
+   "to": "india",
+   "volume": 3.0,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [
+    "cape"
+   ],
+   "confidence": "high",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "qatar",
+   "to": "china",
+   "volume": 20.2,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "malacca"
+   ],
+   "confidence": "high",
+   "note": "Qatar exported 80.5 Mt in total, 66.4 Mt of it to Asia.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "qatar",
+   "to": "india",
+   "volume": 11.6,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [
+    "hormuz"
+   ],
+   "confidence": "high",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "qatar",
+   "to": "south_asia",
+   "volume": 10.8,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [
+    "hormuz"
+   ],
+   "confidence": "high",
+   "note": "Pakistan 6.6 and Bangladesh 4.2.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "qatar",
+   "to": "korea",
+   "volume": 7.3,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "malacca"
+   ],
+   "confidence": "high",
+   "note": "Taiwan took a further 7.8 Mt and Japan 3.4 Mt.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "qatar",
+   "to": "med_europe",
+   "volume": 9.0,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [
+    "hormuz",
+    "cape"
+   ],
+   "confidence": "high",
+   "note": "All Europe: Italy 4.8, Belgium 1.7, Poland 1.6. Rerouted around the Cape since 2024 (zero LNG through Bab el-Mandeb).",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "australia_west",
+   "to": "japan",
+   "volume": 26.2,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Australia exported 78.8 Mt in total, from both the NW Shelf/Darwin and Queensland (Gladstone).",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "australia_west",
+   "to": "china",
+   "volume": 21.2,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Australia overtook Qatar as China's largest LNG supplier as total Chinese imports fell to 67.0 Mt.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "australia_west",
+   "to": "korea",
+   "volume": 15.4,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "russia_arctic",
+   "to": "nw_europe",
+   "volume": 14.7,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Yamal LNG plus Baltic plants to Europe (France, Belgium, Spain, Netherlands). EU phase-out of Russian LNG is scheduled from 2026-27.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "russia_arctic",
+   "to": "china",
+   "volume": 5.1,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Yamal and sanctioned Arctic LNG 2 cargoes via the Northern Sea Route or Suez; China took a further 2.4 Mt from Sakhalin.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "russia_far_east",
+   "to": "japan",
+   "volume": 5.7,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Sakhalin-2.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "malaysia",
+   "to": "japan",
+   "volume": 9.6,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Malaysia exported 27.3 Mt in total.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "malaysia",
+   "to": "korea",
+   "volume": 8.0,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "malaysia",
+   "to": "china",
+   "volume": 7.2,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "west_africa",
+   "to": "nw_europe",
+   "volume": 6.7,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Nigeria LNG to all Europe (of 14.2 Mt total exports); a further 6.1 Mt went to Asia.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "lng",
+   "from": "algeria",
+   "to": "med_europe",
+   "volume": 9.3,
+   "unit": "mtpa",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Nearly all of Algeria's 9.4 Mt: Turkey 3.2, France 2.3, Italy 1.6, Spain 1.4.",
+   "source": "giignl_2026",
+   "mode": "sea"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "norway",
+   "to": "nw_europe",
+   "volume": 114.9,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Gassco deliveries to Europe, second highest ever (117.6 in 2024); Germany took 58 bcm.",
+   "source": "gassco",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "russia_far_east",
+   "to": "china",
+   "volume": 38.8,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Power of Siberia, above its 38 bcm design capacity; origin is East Siberia (Chayanda/Kovykta), crossing at Blagoveshchensk.",
+   "source": "gazprom_pos",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "black_sea",
+   "to": "turkey",
+   "volume": 21.2,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Russian gas to Turkey via Blue Stream and TurkStream (OSW: 21.16 bcm; Atlantic Council: 21.57), about 37-41% of Turkish imports.",
+   "source": "osw_turkey_gas",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "black_sea",
+   "to": "med_europe",
+   "volume": 16.8,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "TurkStream onward to SE Europe (Bulgaria, Serbia, Hungary, Greece); S&P Global 16.8 bcm, Reuters/ENTSOG about 18. The only remaining Russian pipeline route to Europe after Ukraine transit ended on 1 Jan 2025.",
+   "source": "spglobal_turkstream",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "algeria",
+   "to": "med_europe",
+   "volume": 31.0,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Approximate: Italy via TransMed about 21-22 bcm (annualised from 14.5 bcm in Jan-Aug) plus Spain via Medgaz about 9.4 bcm. Sonatrach total pipeline exports about 35 bcm.",
+   "source": "cidob_algeria",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "azerbaijan",
+   "to": "med_europe",
+   "volume": 12.8,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Southern Gas Corridor (TANAP/TAP) to Italy, Greece, Bulgaria and others; half of Azerbaijan's 25.2 bcm exports.",
+   "source": "interfax_azerbaijan",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "azerbaijan",
+   "to": "turkey",
+   "volume": 9.6,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "Including 5.6 bcm via TANAP.",
+   "source": "interfax_azerbaijan",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "canada",
+   "to": "us_midwest",
+   "volume": 88.9,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "EIA 8.6 Bcf/d converted at 10.34 bcm per Bcf/d.",
+   "source": "eia_natgas_trade",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "us_gulf",
+   "to": "mexico",
+   "volume": 70.0,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Derived: about 6.8 Bcf/d, from total US pipeline exports of 9.5 Bcf/d less about 2.7 Bcf/d to Canada (2024 Mexico: 6.4 Bcf/d; monthly record 7.5 Bcf/d in May 2025).",
+   "source": "eia_natgas_trade",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "pipe_gas",
+   "from": "central_asia",
+   "to": "china",
+   "volume": 36.0,
+   "unit": "bcm/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Kpler estimate for Turkmenistan, Kazakhstan and Uzbekistan combined (China customs no longer publishes volumes). In 2025 Russia overtook Central Asia as China's largest pipeline supplier.",
+   "source": "kpler_china_gas",
+   "mode": "pipeline"
+  },
+  {
+   "commodity": "coal",
+   "from": "indonesia",
+   "to": "china",
+   "volume": 211.0,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "China customs; almost all thermal (largely lignite). Down 12% y/y to 43.1% of China's 490.3 Mt imports.",
+   "source": "china_customs_coal",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "indonesia",
+   "to": "india",
+   "volume": 105.0,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [
+    "malacca"
+   ],
+   "confidence": "medium",
+   "note": "Indonesian export data (BPS basis), down 7% y/y; all thermal. Ship-tracking shows 70.6 Mt in Jan-Sep.",
+   "source": "apbi_indonesia",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "indonesia",
+   "to": "se_asia",
+   "volume": 80.0,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "low",
+   "note": "Rough estimate: Indonesian share of AXS seaborne imports by the Philippines (36.4 Mt), Malaysia (36.7 Mt) and Vietnam (65.4 Mt). All thermal.",
+   "source": "axs_coal_2025",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "australia_east",
+   "to": "japan",
+   "volume": 105.3,
+   "unit": "Mt/yr",
+   "year": 2024,
+   "via": [],
+   "confidence": "high",
+   "note": "Full-year 2024 (AXS Marine); 1H 2025 was 43.7 Mt, down 10.5% y/y. Roughly two-thirds thermal, one-third metallurgical.",
+   "source": "banchero_australia",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "australia_east",
+   "to": "china",
+   "volume": 77.4,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Derived from China customs share (15.79% of 490.27 Mt). AXS shows 84.8 Mt in 2024. Mix of thermal and coking coal.",
+   "source": "china_customs_coal",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "australia_east",
+   "to": "india",
+   "volume": 42.0,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [
+    "malacca"
+   ],
+   "confidence": "medium",
+   "note": "Annualised from 31.6 Mt in Jan-Sep 2025 (2024: 40.3 Mt). Overwhelmingly metallurgical coal.",
+   "source": "coalhub_india",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "australia_east",
+   "to": "nw_europe",
+   "volume": 14.8,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [
+    "cape"
+   ],
+   "confidence": "high",
+   "note": "EU seaborne imports from Australia (AXS), down 16% y/y; mostly metallurgical.",
+   "source": "axs_coal_2025",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "russia_far_east",
+   "to": "china",
+   "volume": 88.9,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "China customs, rail plus seaborne; roughly one-third coking coal.",
+   "source": "coalhub_russia_china",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "mongolia",
+   "to": "china",
+   "volume": 89.0,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "China customs, by truck and rail; about 60 Mt is coking coal (51% of China's coking coal imports). Mongolia edged past Russia as China's second supplier.",
+   "source": "coalhub_russia_china",
+   "mode": "rail"
+  },
+  {
+   "commodity": "coal",
+   "from": "russia_far_east",
+   "to": "india",
+   "volume": 28.0,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [
+    "malacca"
+   ],
+   "confidence": "medium",
+   "note": "Annualised from a record 21.2 Mt in Jan-Sep 2025; shipped from both Far East and Baltic/Black Sea ports.",
+   "source": "coalhub_india",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "south_africa",
+   "to": "india",
+   "volume": 30.0,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Annualised from 22.7 Mt in Jan-Sep 2025 (+5.6% y/y), nearly half of South Africa's 64.5 Mt exports. Thermal.",
+   "source": "coalhub_india",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "us_east",
+   "to": "india",
+   "volume": 20.0,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [
+    "cape"
+   ],
+   "confidence": "medium",
+   "note": "Annualised from 15.3 Mt in Jan-Sep 2025; India is the top US coal market. Mix of metallurgical and thermal/petcoke-substitute coal.",
+   "source": "coalhub_india",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "us_east",
+   "to": "nw_europe",
+   "volume": 18.2,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "EU seaborne imports from the US (AXS), 28.5% of EU imports.",
+   "source": "axs_coal_2025",
+   "mode": "sea"
+  },
+  {
+   "commodity": "coal",
+   "from": "colombia",
+   "to": "nw_europe",
+   "volume": 9.2,
+   "unit": "Mt/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "high",
+   "note": "EU seaborne imports from Colombia (AXS); Colombia's total exports fell about 15% to roughly 47 Mt. Thermal.",
+   "source": "axs_coal_2025",
+   "mode": "sea"
+  },
+  {
+   "commodity": "uranium",
+   "from": "kazakhstan",
+   "to": "china",
+   "volume": 13000,
+   "unit": "tU/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "medium",
+   "note": "Approximate: WNA says China now receives more than half of production (25,839 tU in 2025); trade data show China at about 60% of exports in Jan-Sep 2025. Moves by rail via Alashankou.",
+   "source": "wna_kazakhstan",
+   "mode": "direct"
+  },
+  {
+   "commodity": "uranium",
+   "from": "kazakhstan",
+   "to": "us_midwest",
+   "volume": 2500,
+   "unit": "tU/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "low",
+   "note": "Derived: about 10% of Kazakh exports in Jan-Sep 2025, applied to 2025 production. Ships via St Petersburg or the Trans-Caspian route to Western converters.",
+   "source": "kz_uranium_press",
+   "mode": "direct"
+  },
+  {
+   "commodity": "uranium",
+   "from": "kazakhstan",
+   "to": "nw_europe",
+   "volume": 2300,
+   "unit": "tU/yr",
+   "year": 2025,
+   "via": [],
+   "confidence": "low",
+   "note": "Derived: France about 9% of Kazakh exports in Jan-Sep 2025 (Orano markets KATCO output). Deliveries to Russia under JV offtake are also material but no volume could be sourced.",
+   "source": "kz_uranium_press",
+   "mode": "direct"
+  },
+  {
+   "commodity": "uranium",
+   "from": "canada",
+   "to": "us_midwest",
+   "volume": 7000,
+   "unit": "tU/yr",
+   "year": 2024,
+   "via": [],
+   "confidence": "low",
+   "note": "Estimate: Canada supplied about a third of US reactor purchases in 2024 and 58% of long-term contract exports go to the Americas; CER shows 4.6-8.5 kt/yr to the US in recent years. Canadian mine output was 14,309 tU in 2024.",
+   "source": "cer_uranium",
+   "mode": "direct"
+  },
+  {
+   "commodity": "uranium",
+   "from": "canada",
+   "to": "nw_europe",
+   "volume": 3900,
+   "unit": "tU/yr",
+   "year": 2024,
+   "via": [],
+   "confidence": "low",
+   "note": "Derived: 26% of long-term contract exports to Europe, applied to roughly 15 kt exported.",
+   "source": "cer_uranium",
+   "mode": "direct"
+  },
+  {
+   "commodity": "uranium",
+   "from": "namibia",
+   "to": "china",
+   "volume": 5000,
+   "unit": "tU/yr",
+   "year": 2024,
+   "via": [],
+   "confidence": "low",
+   "note": "Estimate: Husab (4,437 tU, CGN, most output supplied to China) plus part of CNNC-controlled Rossing (2,205 tU). National production 7,333 tU.",
+   "source": "wna_namibia",
+   "mode": "direct"
+  },
+  {
+   "commodity": "uranium",
+   "from": "australia_east",
+   "to": "us_midwest",
+   "volume": 4598,
+   "unit": "tU/yr",
+   "year": 2024,
+   "via": [],
+   "confidence": "low",
+   "note": "National mine production (Olympic Dam, Four Mile/Beverley, Honeymoon), not a bilateral figure: exports go to converters in North America, Europe and China and the split was not sourced.",
+   "source": "wna_mining",
+   "mode": "direct"
+  },
+  {
+   "commodity": "uranium",
+   "from": "uzbekistan",
+   "to": "china",
+   "volume": 4000,
+   "unit": "tU/yr",
+   "year": 2024,
+   "via": [],
+   "confidence": "low",
+   "note": "WNA estimate of national production, not a bilateral figure: buyers include China, Japan, India, the US and France and the split was not sourced.",
+   "source": "wna_mining",
+   "mode": "direct"
+  },
+  {
+   "commodity": "uranium",
+   "from": "niger",
+   "to": "nw_europe",
+   "volume": 962,
+   "unit": "tU/yr",
+   "year": 2024,
+   "via": [],
+   "confidence": "low",
+   "note": "2024 national production. Historic route to France (Orano): exports have been largely blocked since the 2023 coup and SOMAIR was nationalised in 2025, so treat as a disrupted or legacy flow.",
+   "source": "wna_mining",
+   "mode": "direct"
+  }
+ ]
+}

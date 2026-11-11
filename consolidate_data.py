@@ -483,6 +483,10 @@ def main():
     payload = {
         'meta': {
             'generated_at': datetime.now().isoformat(),
+            # Last price date actually in the analysis. The freshness chip keys
+            # off this, not the run time: a re-run over old prices is still old.
+            'prices_through': (prices.index.max().strftime('%Y-%m-%d')
+                               if prices is not None and len(prices) else None),
             'taxonomy_version': tax.get('meta', {}).get('version', '0.4'),
             'n_nodes': len(nodes),
             'n_constituents': sum(n['n_constituents'] for n in nodes),

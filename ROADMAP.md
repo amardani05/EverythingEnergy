@@ -27,6 +27,78 @@ The repo holds two disjoint systems: the legacy **Energy Atlas** dashboard (work
 
 ---
 
+## Reassessment (2026-11-10)
+
+*Written against `main2` @ `85a6a43` plus the working tree. Supersedes the ordering below where they conflict; the phase detail underneath is kept as the record.*
+
+### What changed since August
+
+1. **The engine has been idle for eleven weeks and the gate is still shut.** Tier 0.1 failed on 2026-08-20 (composite gross Sharpe -0.36, quantiles inverted) and nothing was built after it. The one test the roadmap named as next, the subsample split, is now run: see "Composite diagnosis" below.
+2. **The Atlas was publishing six-month-old numbers under a green chip.** `basket_check.py` and `driver_analysis_v5.py` treated a cache that covered every ticker as fresh forever, so the nightly job re-ran the analysis on prices frozen at 2026-05-06 and stamped it with the run time. Fixed: caches older than 4 days refetch, `meta.prices_through` carries the last real price date, and the chip keys off that. Two more faults surfaced by the first real refresh: WTI/Brent/Henry Hub came from `pandas_datareader`, which is not installed (now a key-free FRED CSV fallback, plus a guard that refuses to overwrite a good driver cache with one missing core series), and `CRACK_321` was `2*RB + HO - 3*CL` with RB/HO in $/gal, i.e. minus three times WTI (now a real $/bbl 3-2-1 crack). Every crack-spread loading published before today was a WTI loading with the sign flipped.
+3. **The project has no view of the physical market.** Everything so far ranks or correlates equities. In a year when the oil balance swung by several mb/d, the site could not say whether the world was building or drawing. That is the gap the two new surfaces start to close: `balances.html` (global liquids + US crude bridges, `signal_engine/macro/oil_balance.py`) and `flows.html` (trade routes and chokepoint exposure).
+
+### Composite diagnosis (Tier 0.1 follow-up)
+
+`scripts/diagnose_composite.py` runs the composite and each family alone through the same tercile harness and splits each into embargoed thirds and halves (`validation.backtest.subsample_report`). Result: the inversion is **not** a 2020 artifact, and it is mostly one family (93 monthly periods, 2019-01 to 2026-09, gross, terciles; full table in `docs/composite_diagnosis.json`).
+
+| Signal | Full-sample Sharpe | Third 1 (2019-21) | Third 2 (2021-24) | Third 3 (2024-26) | Same sign throughout |
+|---|---|---|---|---|---|
+| Composite | -0.37 | -0.79 | -0.55 | +0.31 | no |
+| Momentum 12-1 | -0.39 | -0.55 | -0.81 | -0.32 | **yes, negative** |
+| EV/EBITDA value | +0.25 | +0.39 | -0.66 | +0.60 | no |
+| PEAD (SUE) | +0.01 | +0.29 | -0.59 | +0.63 | no |
+
+Reading: momentum loses in every window, so in this universe it behaves as a reversal signal and its positive weight is what inverts the composite. Value and PEAD are positive in the first and last thirds and both fail in 2021-09 to 2024-01, the post-2022 mean-reverting stretch; neither is stable enough to certify. Thirty-period windows are noisy (a Sharpe of 0.6 on 30 months is about one standard error from zero), so this localises the problem rather than proving a fix. Next, in order, and each one a logged trial: (a) composite without momentum, (b) momentum with the sign flipped as a short-horizon reversal sleeve at its natural weekly horizon, (c) the same split conditioned on WTI trend, since the middle third is also when crude round-tripped. Do not re-weight on these numbers without the trial ledger: three families times two signs times three windows is already eighteen looks at the data.
+
+### Where the roadmap was wrong
+
+- **It assumed the factor book was the product.** Three generic factors on ~200 survivorship-biased names in one sector was always a weak prior, and the harness has now said so. The differentiated assets are the taxonomy graph, the commodity linkage, and (new) the physical balances. The plan should be organised around those.
+- **It treated the Atlas as legacy to be frozen.** The Atlas is the part people look at, and freezing it is how a six-month staleness bug survived. It needs the same QA as the engine (see 5.9).
+- **Usability (Phase 3) was "parallel" and so never happened.** No CLI, no `doctor`, no CI. A `doctor` command would have caught the stale cache in May.
+
+### Revised order
+
+1. **Trust floor (days).** `se doctor` with per-artifact staleness (prices, drivers, STEO vintage, WPSR week, flows vintage) and a non-zero exit wired into the nightly job; CI running ruff + mypy + pytest; the Tier 0.4 trial ledger, because the diagnosis above is itself several more trials.
+2. **Markets layer (Phase 5, below).** Balances and curves for the commodities the taxonomy already names. This is new breadth, and it is also the feature set the equity signals have been missing.
+3. **Re-aim the engine at conditional signals.** Stop asking "does momentum + value + PEAD rank energy stocks unconditionally" (answered: no). Ask whether physical state predicts basket-relative returns: does a tightening balance favour upstream over refiners, does a crack-spread shock propagate along `feeds_into` with a lag. Tier 1 and Tier 2 machinery stays frozen until one of these shows gross edge.
+4. **Phase 3 and 4 items** as they are touched, not as a block.
+
+---
+
+## Phase 5 - Markets layer: energy as a whole, not WTI and uranium
+
+*Goal: for every commodity the taxonomy names, a balance, a price structure and a link to the baskets that carry it. Each item lists its free data source; all enter through the same vintage-stamped `macro_series` table.*
+
+**Shipped 2026-11-10:** global liquids balance and US crude bridge (EIA STEO bulk + WPSR, key-free), variance bridges, an implied-to-observed stock model with a measured error bar, STEO vintage archiving, and the trade-flow map with chokepoint exposure.
+
+- **5.1 Forecast-error variance on the build.** The current sigma is the fit residual. The better one is EIA's own forecast error: backfill monthly STEO archives (`eia.gov/outlooks/steo/archives`, xlsx) into `macro_series` as vintages, then report the distribution of (forecast build at t-k) minus (latest estimate) by horizon k. That turns "EIA says +2 mb/d next year" into "+2 with a one-sigma of X at 12 months".
+- **5.2 Refinery-side crude balance outside the US.** JODI publishes refinery intake, direct use, production and trade by country as key-free CSV (probed 2026-11-10: about 40 reporters, ~43 mb/d of intake, several large refiners missing from the crude rows). Usable as a bloc-level check on demand, not as a world total. Add PADD-level WPSR detail (PADD 3 runs, Cushing stocks) first: same source as today, much more signal.
+- **5.3 Products.** Gasoline, distillate and jet stocks, implied demand and cracks from WPSR; this is what the refiners, retail and biofuels baskets actually trade on. Bridges identical in form to the crude one.
+- **5.4 Natural gas and LNG.** US storage vs five-year band (EIA weekly), production, LNG feedgas and power burn; EU storage fill (AGSI, free key). Henry Hub, TTF and JKM spreads feed the LNG, gas E&P and utility baskets.
+- **5.5 Power.** EIA-930 hourly load and generation mix by balancing authority; spark and dark spreads from gas, coal and regional power prices. The IPP and regulated-utility baskets (the largest in the universe) currently have no fundamental series at all.
+- **5.6 Coal and uranium.** Coal: EIA quarterly production and exports, China and India import data. Uranium: WNA reactor requirements vs mine supply (annual), plus the spot/term spread; small, slow, but the nuclear baskets are where the taxonomy is most distinctive.
+- **5.7 Curve structure.** Front spreads (M1-M2, M1-M12) for WTI, Brent, HH, RBOB and HO from yfinance futures. Backwardation is the market's own real-time read on the balance; plotting it against the modelled build is the first sanity check on 5.1, and curve shape is a classic conditioning variable for equity signals.
+- **5.8 Positioning and activity.** CFTC Commitments of Traders (managed-money net length, weekly, free), Baker Hughes rig counts, frac spread counts. Crowding and capex-cycle state for the OFS and E&P baskets.
+- **5.9 Flows upkeep.** `flows_data.json` is a hand-compiled 2025 baseline with 15 low-confidence routes (uranium and products mostly). Make it reproducible where a primary table exists (EIA `PET_IMPORTS` bulk for US crude by origin, GIIGNL for LNG), add a "what changed" layer for disruptions (the 2026 Hormuz closure is the obvious first one: baseline vs current transit), and stamp a review-by date so it cannot go stale silently.
+- **5.10 The commodity desk UI.** One page per market joining its balance, routes, curve and exposed baskets (mock: `docs/ui_concepts.html`, concept A). This is what makes the layer navigable.
+
+## Backtester: ideas beyond the Tier list
+
+*The Tier 0-2 plan above is about making one cross-sectional long-short number trustworthy. These widen what the harness can test. None is started.*
+
+- **Event-study mode.** Most energy information arrives as dated events: WPSR Wednesdays, STEO releases, OPEC meetings, hurricane landfalls, earnings. Add `event_study(events, prices, window)` returning mean abnormal basket return by day relative to the event with bootstrap bands. Far better powered than monthly cross-sections on 200 names, and it is the natural test for the balance model ("does a 2-sigma surprise build move refiners vs E&Ps over the next five days").
+- **Basket-level and pair-level backtests.** The unit of account in this project is the basket, and the Lab already backtests pairs in the browser with no cost model and no rigor. Run the 13 taxonomy pairs and the 23 baskets through `walk_forward_ls` (or a time-series variant) so the Lab's pair z-scores get the same NW/permutation treatment as the factors.
+- **Conditional (regime-sliced) performance.** Report every result split by state variables known at the time: curve shape (backwardation vs contango), balance sign (building vs drawing), vol regime. An edge that exists only in one state is still an edge if the state is observable. Requires 5.1 and 5.7 as inputs.
+- **Commodity-neutral attribution.** Regress each book on the eight drivers and report alpha net of WTI, gas, cracks and rates. The Tier 1 WTI-hedge item is the one-factor version; the driver matrix already exists in the Atlas pipeline.
+- **Time-series backtests for macro signals.** A balance or curve signal is one series, not a cross-section. Add a simple `timeseries_backtest(signal, asset_returns, lag)` with the same cost and NW conventions, so "long upstream vs refiners when the 3-month implied build is below zero" can be tested at all.
+- **Purged, embargoed cross-validation.** `subsample_report` is the two-fold version. Combinatorial purged CV (Lopez de Prado) gives a distribution of out-of-sample Sharpes instead of one path, and a probability of backtest overfitting, which is the right headline for a sample this short.
+- **Point-in-time macro.** `macro_series` is bitemporal and now has its first vintages. Any macro signal must read through `as_of_macro`, never the latest revision; add the same poisoned-vintage canary the fundamentals have.
+- **Bootstrap bands on everything shown.** The Lab's block bootstrap is client-side only. Port it so every published Sharpe and quantile spread carries an interval.
+- **Capacity and liquidity realism at the basket level.** ADV-weighted capacity per basket, so a signal that only works in the six-name SMR basket is labelled as such.
+- **A results registry on the site.** Trial ledger rendered on `signals.html`: every configuration ever run, with its date, git SHA and outcome. The August failure and today's diagnosis should be as visible as a success would be.
+
+---
+
 ## Phase 0 - Restore the data spine ✅ DONE (2026-07-17)
 
 *Goal: every table populated, fresh, and refreshable by cron - because nothing downstream is testable against reality until this is done.*

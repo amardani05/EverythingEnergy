@@ -65,6 +65,23 @@ Click any node to open the side drawer. Tabs:
 
 The strip below the map shows top active signals (or, if no `|z| > 0.5` pairs, the top 8 strongest correlations as a fallback).
 
+### Flows (`flows.html`)
+
+Atlas Plate II: a world map of the largest crude, products, LNG, pipeline gas, coal and uranium trade routes. Arcs are routed over a sea-lane graph and forced through the chokepoints each route depends on; click a chokepoint to see what share of mapped trade passes it. Data is the curated, sourced `flows_data.json` (mostly calendar 2025, each flow carrying its year, source and a confidence grade). It is a baseline of what normally moves, not a live tracker.
+
+### Balances (`balances.html`)
+
+A barebones oil supply/demand model, `stock build = supply - demand + unexplained`:
+
+- **Global liquids (monthly)** from the EIA Short-Term Energy Outlook. A variance bridge shows which supply and demand blocs moved the implied build; a one-variable fit of observed OECD stock changes on the implied build gives the error bar.
+- **US crude (weekly)** from the Weekly Petroleum Status Report: production + imports - exports - refinery inputs, bridged against the five-year seasonal normal, with EIA's adjustment as the residual.
+
+```bash
+.venv/bin/python scripts/oil_balance.py     # key-free EIA downloads -> oil_balance.json
+```
+
+The nightly job runs it; each STEO release is archived to `macro_series` so forecast error accumulates. Model code and tests: `signal_engine/macro/oil_balance.py`, `tests/test_oil_balance.py`.
+
 ---
 
 ## File layout

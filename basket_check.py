@@ -67,14 +67,28 @@ def get_all_constituents(tax):
     return pd.DataFrame(rows)
 
 # -----------------------------------------------------------------
+def _cache_is_stale(df, max_age_days=4):
+    """A cache that covers every ticker can still be months old. Without this
+    check the nightly job re-published May prices under a fresh timestamp."""
+    if df.empty:
+        return True
+    age = (pd.Timestamp.today().normalize() - pd.Timestamp(df.index.max()).normalize()).days
+    if age > max_age_days:
+        print(f"[cache] stale - last price {pd.Timestamp(df.index.max()).date()} is {age}d old, refetching")
+        return True
+    return False
+
 def fetch_prices(tickers, years=LOOKBACK_YEARS, force_refresh=False):
     if not force_refresh and Path(CACHE_PATH).exists():
         cached = pd.read_parquet(CACHE_PATH)
         missing = set(tickers) - set(cached.columns)
-        if not missing:
+        if _cache_is_stale(cached):
+            pass
+        elif not missing:
             print(f"[cache] hit - {len(tickers)} tickers")
             return cached[tickers]
-        print(f"[cache] missing {len(missing)} tickers, refetching all")
+        else:
+            print(f"[cache] missing {len(missing)} tickers, refetching all")
 
     print(f"[yf] fetching {years}y daily prices for {len(tickers)} tickers...")
     data = yf.download(

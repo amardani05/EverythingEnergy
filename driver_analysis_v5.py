@@ -91,7 +91,9 @@ ALL_DRIVER_KINDS = {**{k: v[2] for k, v in DRIVERS.items()},
 def compute_derived(prices_df):
     df = prices_df.copy()
     if all(c in df.columns for c in ['RB', 'HO', 'CL']):
-        df['CRACK_321'] = 2*df['RB'] + df['HO'] - 3*df['CL']
+        # 3-2-1 crack in $/bbl of crude. RB and HO quote in $/gal (42 gal/bbl);
+        # the old 2*RB + HO - 3*CL mixed units and was just -3x WTI.
+        df['CRACK_321'] = (2*42*df['RB'] + 42*df['HO'] - 3*df['CL']) / 3
     if all(c in df.columns for c in ['CL', 'BRENT']):
         df['WTI_BRENT'] = df['CL'] - df['BRENT']
     # No JKM proxy from free data - placeholder for FactSet integration
@@ -140,13 +142,24 @@ def get_constituents(tax):
     return pd.DataFrame(rows)
 
 # -----------------------------------------------------------------
+def _cache_is_stale(df, max_age_days=4):
+    """A cache that covers every ticker can still be months old. Without this
+    check the nightly job re-published May prices under a fresh timestamp."""
+    if df.empty:
+        return True
+    age = (pd.Timestamp.today().normalize() - pd.Timestamp(df.index.max()).normalize()).days
+    if age > max_age_days:
+        print(f"[cache] stale - last price {pd.Timestamp(df.index.max()).date()} is {age}d old, refetching")
+        return True
+    return False
+
 def fetch_prices(tickers, years=LOOKBACK_YEARS, force=False):
     """Smart cache: only refetch if cache is missing >5% of needed tickers."""
     if not force and Path(PRICE_CACHE).exists():
         cached = pd.read_parquet(PRICE_CACHE)
         missing = set(tickers) - set(cached.columns)
         miss_pct = len(missing) / max(len(tickers), 1)
-        if miss_pct < 0.05:
+        if miss_pct < 0.05 and not _cache_is_stale(cached):
             print(f"[cache] price cache hit ({len(missing)} missing, {miss_pct:.1%}) - using cache")
             return cached.reindex(columns=[t for t in tickers if t in cached.columns])
         print(f"[cache] missing {len(missing)} tickers ({miss_pct:.1%}); refetching all")
@@ -175,7 +188,7 @@ def fetch_drivers(years=LOOKBACK_YEARS, force=False):
         # Check for new drivers added in v2
         all_keys = list(DRIVERS.keys())
         missing = [k for k in all_keys if k not in cached.columns]
-        if not missing:
+        if not missing and not _cache_is_stale(cached):
             print(f"[cache] driver cache hit - {cached.shape[1]} series, {cached.shape[0]} obs")
             return cached
         print(f"[cache] driver cache missing {missing} - refetching")
@@ -187,11 +200,20 @@ def fetch_drivers(years=LOOKBACK_YEARS, force=False):
     fred_drivers = {k: v[1] for k, v in DRIVERS.items() if v[0] == 'fred'}
     yf_drivers = {k: v[1] for k, v in DRIVERS.items() if v[0] == 'yf'}
     
-    if PDR_AVAILABLE and fred_drivers:
+    if fred_drivers:
         print(f"[fred] pulling {len(fred_drivers)} series...")
         for k, sym in fred_drivers.items():
             try:
-                s = pdr.DataReader(sym, 'fred', start, end)
+                if PDR_AVAILABLE:
+                    s = pdr.DataReader(sym, 'fred', start, end)
+                else:
+                    # Key-free CSV endpoint: no pandas_datareader dependency.
+                    # Without this fallback a refetch silently dropped CL/BRENT/NG.
+                    url = (f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={sym}"
+                           f"&cosd={start:%Y-%m-%d}&coed={end:%Y-%m-%d}")
+                    s = pd.read_csv(url, index_col=0, parse_dates=True, na_values='.')
+                    s.index.name = 'DATE'
+                    s = s.apply(pd.to_numeric, errors='coerce').dropna()
                 series[k] = s.iloc[:, 0]
                 print(f"  ✓ {k} ({sym}): {len(s)} obs")
             except Exception as e:
@@ -221,6 +243,10 @@ def fetch_drivers(years=LOOKBACK_YEARS, force=False):
         print(f"[drivers] dropping unusable columns (<50% obs): {bad_cols}")
         df = df.drop(columns=bad_cols)
     df = compute_derived(df)
+    lost = [c for c in ('CL', 'BRENT', 'NG', 'SPX') if c not in df.columns]
+    if lost and Path(DRIVER_CACHE).exists():
+        print(f"[drivers] refetch lost core drivers {lost} - keeping the existing cache")
+        return pd.read_parquet(DRIVER_CACHE)
     df.to_parquet(DRIVER_CACHE)
     print(f"[fetched] {df.shape[1]} drivers, {df.shape[0]} daily obs")
     return df

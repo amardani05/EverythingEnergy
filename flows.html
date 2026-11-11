@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flows - Everything Energy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0d12'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='18' font-weight='600' fill='%23d4af37'%3EE%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<style>
+:root {
+  --bg-deep: #0a0d12; --bg: #11151c; --bg-card: #161b25;
+  --border: #232a3a; --border-hi: #344056;
+  --text: #dde1e8; --text-mute: #98a0b0; --text-dim: #737b8c;
+  --accent: #d4af37;
+  --water-deep: oklch(0.58 0.105 230); --water-shelf: oklch(0.64 0.090 225);
+  --land-base: oklch(0.62 0.045 78); --land-edge: oklch(0.42 0.04 240);
+  --serif: "EB Garamond", Georgia, serif;
+  --sans: "Inter", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", "SF Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg-deep); color: var(--text); font-family: var(--sans); font-weight: 300; font-size: 14px;
+  -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums lining-nums;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.top-bar {
+  display: flex; align-items: center; gap: 24px; padding: 18px 32px; border-bottom: 1px solid var(--border);
+  height: 72px; flex: none; background: rgba(10,13,18,0.92);
+}
+.brand { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 22px; color: var(--text); text-decoration: none; white-space: nowrap; }
+.brand .gold { color: var(--accent); }
+.nav-link {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-mute);
+  text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px;
+}
+.nav-link:hover { color: var(--text); }
+.nav-link.active { color: var(--text); border-bottom-color: var(--accent); }
+.asof-chip {
+  margin-left: auto; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--text-mute);
+  padding: 4px 10px; border: 1px solid var(--border); border-radius: 3px; white-space: nowrap;
+}
+.stage { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 380px; }
+.map-wrap { position: relative; background: var(--water-deep); overflow: hidden; min-height: 0; }
+#map { width: 100%; height: 100%; display: block; cursor: grab; }
+#map:active { cursor: grabbing; }
+.map-title { position: absolute; top: 22px; left: 28px; pointer-events: none; }
+.map-title .kicker { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+.map-title h1 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 30px; color: #fff; letter-spacing: -0.01em; }
+.map-title .unit { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+.modes { position: absolute; left: 24px; bottom: 24px; display: flex; flex-direction: column; background: rgba(10,13,18,0.9); border: 1px solid var(--border-hi); }
+.modes button {
+  display: flex; align-items: center; gap: 10px; background: transparent; border: none; border-bottom: 1px solid var(--border);
+  color: var(--text-mute); font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 9px 16px 9px 12px; cursor: pointer; text-align: left;
+}
+.modes button:last-child { border-bottom: none; }
+.modes button i { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+.modes button.on { color: var(--accent); background: rgba(212,175,55,0.1); }
+.modes button:hover { color: var(--text); }
+.scale-key { position: absolute; right: 20px; bottom: 20px; background: rgba(10,13,18,0.86); border: 1px solid var(--border-hi); padding: 10px 14px; font-family: var(--mono); font-size: 10.5px; color: var(--text-mute); }
+.scale-key div { display: flex; align-items: center; gap: 10px; margin: 3px 0; }
+.scale-key svg { flex: none; }
+.zoom-reset { position: absolute; right: 20px; top: 20px; background: rgba(10,13,18,0.86); border: 1px solid var(--border-hi); color: var(--text-mute); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 10px; cursor: pointer; }
+.zoom-reset:hover { color: var(--accent); border-color: var(--accent); }
+.side { border-left: 1px solid var(--border); background: var(--bg); overflow-y: auto; padding: 22px 22px 40px; min-height: 0; }
+.side .kicker { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); }
+.side h2 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 25px; margin: 2px 0 6px; }
+.side p { color: var(--text-mute); font-size: 13px; line-height: 1.55; }
+.side h3 { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-mute); margin: 22px 0 8px; padding-top: 14px; border-top: 1px solid var(--border); }
+.stat-row { display: flex; gap: 10px; margin: 14px 0 2px; }
+.stat { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; }
+.stat .lab { font-size: 9.5px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+.stat .val { font-family: var(--mono); font-size: 17px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 11px; color: var(--text-mute); background: transparent; border: 1px solid var(--border-hi); border-radius: 3px; padding: 4px 8px; cursor: pointer; }
+.chip:hover { color: var(--text); }
+.chip.on { color: var(--accent); border-color: var(--accent); background: rgba(212,175,55,0.1); }
+.chip b { font-weight: 500; color: var(--text); margin-left: 6px; }
+.focus-box { border: 1px solid var(--border); border-left: 2px solid var(--accent); background: rgba(212,175,55,0.05); border-radius: 3px; padding: 10px 14px; margin-top: 12px; font-size: 13px; color: var(--text); line-height: 1.5; }
+.focus-box .x { float: right; cursor: pointer; color: var(--text-dim); font-family: var(--mono); background: none; border: none; font-size: 12px; }
+.focus-box .x:hover { color: var(--accent); }
+.focus-box small { display: block; color: var(--text-mute); font-size: 12px; margin-top: 4px; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 7px 6px; border-bottom: 1px solid var(--border); cursor: pointer; border-left: 2px solid transparent; }
+.row:hover, .row.hot { background: rgba(255,255,255,0.03); border-left-color: var(--accent); }
+.row.off { opacity: 0.32; }
+.row .rt { font-size: 12.5px; font-weight: 400; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .rt span { color: var(--text-dim); margin: 0 5px; }
+.row .rv { font-family: var(--mono); font-size: 12.5px; text-align: right; }
+.row .bar { grid-column: 1 / -1; height: 3px; background: var(--bg-card); border-radius: 2px; overflow: hidden; }
+.row .bar i { display: block; height: 100%; border-radius: 2px; }
+.row .rm { grid-column: 1 / -1; font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+.conf-low { color: #d98a4e; }
+.foot { margin-top: 26px; font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); line-height: 1.6; }
+.foot a { color: var(--text-mute); }
+#tip { position: fixed; pointer-events: none; z-index: 50; display: none; background: #0d1118; border: 1px solid var(--border-hi); border-radius: 3px; padding: 8px 11px; font-family: var(--mono); font-size: 11.5px; line-height: 1.55; max-width: 300px; color: var(--text); }
+#tip b { font-family: var(--sans); font-weight: 500; }
+#tip .m { color: var(--text-mute); }
+.land { fill: var(--land-base); stroke: var(--land-edge); stroke-width: 0.4; }
+.graticule { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 0.5; }
+.sphere { fill: none; stroke: rgba(255,255,255,0.25); stroke-width: 0.8; }
+.flow { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-dash { fill: none; stroke: rgba(255,255,255,0.75); stroke-linecap: round; stroke-dasharray: 1 13; animation: drift 1.6s linear infinite; pointer-events: none; }
+@keyframes drift { to { stroke-dashoffset: -14; } }
+@media (prefers-reduced-motion: reduce) { .flow-dash { animation: none; } }
+.hub circle { fill: #0d1118; stroke: #fff; stroke-width: 1.1; cursor: pointer; }
+.hub text { font-family: var(--serif); font-style: italic; font-size: 11.5px; fill: #fff; paint-order: stroke; stroke: rgba(10,13,18,0.75); stroke-width: 2.6px; pointer-events: none; }
+.choke path { fill: var(--accent); stroke: #0a0d12; stroke-width: 0.9; cursor: pointer; }
+.choke text { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--accent); paint-order: stroke; stroke: rgba(10,13,18,0.8); stroke-width: 2.4px; pointer-events: none; }
+.err { color: #d05252; font-family: var(--mono); padding: 30px; }
+@media (max-width: 980px) {
+  body { overflow: auto; } .stage { grid-template-columns: 1fr; } .map-wrap { height: 62vh; }
+  .side { border-left: none; border-top: 1px solid var(--border); overflow: visible; }
+  .top-bar { height: auto; flex-wrap: wrap; padding: 14px 16px; gap: 14px; } .scale-key { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="brand" href="dashboard.html">Everything <span class="gold">Energy</span></a>
+  <a class="nav-link" href="dashboard.html">Dashboard</a>
+  <a class="nav-link active" href="flows.html">Flows</a>
+  <a class="nav-link" href="balances.html">Balances</a>
+  <a class="nav-link" href="signals.html">Signals</a>
+  <a class="nav-link" href="methodology.html">Methodology</a>
+  <div class="asof-chip" id="asof">flows: loading&hellip;</div>
+</div>
+
+<div class="stage">
+  <div class="map-wrap">
+    <svg id="map" role="img" aria-label="World map of energy commodity trade flows"></svg>
+    <div class="map-title"><div class="kicker">Atlas &middot; Plate II</div><h1>Trade Flows</h1><div class="unit" id="unit"></div></div>
+    <button class="zoom-reset" id="reset">Reset view</button>
+    <div class="modes" id="modes"></div>
+    <div class="scale-key" id="key"></div>
+  </div>
+  <aside class="side" id="side"></aside>
+</div>
+<div id="tip"></div>
+
+<script>
+"use strict";
+const COMMODITIES = [
+  { id: "crude",    label: "Crude oil",        color: "#f3c47c", fmt: ".2f" },
+  { id: "products", label: "Refined products", color: "#f28f62", fmt: ".2f" },
+  { id: "lng",      label: "LNG",              color: "#f6f2df", fmt: ".1f" },
+  { id: "pipe_gas", label: "Pipeline gas",     color: "#b9e6a6", fmt: ".0f" },
+  { id: "coal",     label: "Coal",             color: "#15171c", fmt: ".0f" },
+  { id: "uranium",  label: "Uranium",          color: "#d9b3f2", fmt: ",.0f" },
+];
+const CMAP = Object.fromEntries(COMMODITIES.map(c => [c.id, c]));
+
+/* Sea-lane graph. Flows are routed over it by shortest path, forced through
+   any chokepoints the flow lists in `via`, so arcs follow water rather than
+   cutting across continents. [lon, lat] */
+const SEA = {
+  us_gulf: [-90, 26], fl_strait: [-80.5, 24], us_east: [-72, 37], caribbean: [-68, 14.5], guyana: [-55, 9],
+  brazil_ne: [-33, -5], santos: [-41, -25], plate: [-50, -37], horn: [-68, -57.5], chile: [-76, -32], peru: [-82, -8],
+  panama: [-79.5, 9], pac_camerica: [-96, 12], us_west: [-124, 35], bc: [-131, 51], alaska: [-150, 57],
+  aleutian: [-175, 51], npac_w: [165, 46], hawaii: [-160, 27], pac_mid: [170, 28], spac_e: [-125, -18], spac_w: [175, -18],
+  natl_mid: [-40, 42], natl_s: [-28, 18], satl_mid: [-12, -22], canaries: [-17, 29], dakar: [-19, 13], w_africa: [2, 2],
+  angola: [9, -11], cape: [18.5, -36], biscay: [-9, 46.5], channel: [-3, 49.6], north_sea: [3.5, 54], norway: [3, 63],
+  barents: [34, 71.5], danish: [11.3, 56.6], baltic: [19, 57], gulf_finland: [27, 59.9],
+  gibraltar: [-5.6, 35.95], w_med: [5, 38.3], c_med: [15.5, 35.3], adriatic: [16.5, 42], e_med: [28, 34], aegean: [25.5, 38.5],
+  turkish: [28.2, 40.7], black_sea: [34.5, 43.5], suez: [32.5, 30.2], red_sea: [38.5, 20], bab: [43.4, 12.5],
+  gulf_aden: [51, 13], arabian_sea: [62, 17], hormuz: [56.6, 26.4], gulf: [51.5, 27.3], india_w: [70.5, 19],
+  sri_lanka: [80.5, 5], bay_bengal: [88, 15.5], e_africa: [47, -4], mozambique: [41.5, -18], io_south: [62, -28],
+  malacca_n: [96, 6.5], malacca: [101.2, 2.6], singapore: [104.6, 1.1], sunda: [105.6, -6.6], lombok: [115.8, -9],
+  nw_australia: [114.5, -20.5], sw_australia: [113.5, -35], s_australia: [135, -37.5], newcastle: [153, -32], coral: [154, -17],
+  png: [147.5, -11], makassar: [118.6, -2], celebes: [124, 5], phil_e: [130, 12], scs_s: [109.5, 6], scs_n: [114.5, 17.5],
+  taiwan: [120, 24], ecs: [124, 30.5], yellow: [122.5, 36.5], korea: [129, 34.3], japan_s: [136, 32.5], japan_e: [142.5, 36.5],
+  sakhalin: [143.5, 47], japan_sea: [134, 40.5],
+};
+const LANES = [
+  ["us_gulf","fl_strait"],["fl_strait","us_east"],["fl_strait","caribbean"],["us_gulf","caribbean"],["us_gulf","panama"],["caribbean","panama"],
+  ["caribbean","guyana"],["guyana","brazil_ne"],["brazil_ne","santos"],["santos","plate"],["plate","horn"],["horn","chile"],["chile","peru"],["peru","panama"],
+  ["panama","pac_camerica"],["pac_camerica","us_west"],["us_west","bc"],["bc","alaska"],["alaska","aleutian"],["bc","aleutian"],["aleutian","npac_w"],["npac_w","japan_e"],["npac_w","sakhalin"],
+  ["pac_camerica","hawaii"],["us_west","hawaii"],["hawaii","pac_mid"],["pac_mid","japan_e"],["pac_mid","phil_e"],["peru","spac_e"],["chile","spac_e"],["spac_e","spac_w"],["spac_w","coral"],["spac_w","phil_e"],["panama","spac_e"],
+  ["us_east","natl_mid"],["fl_strait","natl_mid"],["natl_mid","biscay"],["natl_mid","channel"],["natl_mid","gibraltar"],["caribbean","natl_s"],["guyana","natl_s"],["natl_s","canaries"],["natl_s","natl_mid"],["brazil_ne","natl_s"],["brazil_ne","dakar"],
+  ["canaries","gibraltar"],["canaries","biscay"],["canaries","dakar"],["dakar","w_africa"],["w_africa","angola"],["angola","cape"],["brazil_ne","satl_mid"],["santos","satl_mid"],["satl_mid","cape"],["satl_mid","angola"],["santos","cape"],["us_east","natl_s"],
+  ["biscay","channel"],["channel","north_sea"],["north_sea","norway"],["norway","barents"],["north_sea","danish"],["danish","baltic"],["baltic","gulf_finland"],["biscay","gibraltar"],
+  ["gibraltar","w_med"],["w_med","c_med"],["c_med","adriatic"],["c_med","e_med"],["e_med","aegean"],["aegean","turkish"],["turkish","black_sea"],["e_med","suez"],["c_med","aegean"],
+  ["suez","red_sea"],["red_sea","bab"],["bab","gulf_aden"],["gulf_aden","arabian_sea"],["gulf_aden","e_africa"],["arabian_sea","hormuz"],["hormuz","gulf"],["arabian_sea","india_w"],["india_w","sri_lanka"],["arabian_sea","sri_lanka"],["gulf_aden","sri_lanka"],
+  ["sri_lanka","bay_bengal"],["sri_lanka","malacca_n"],["bay_bengal","malacca_n"],["malacca_n","malacca"],["malacca","singapore"],["singapore","scs_s"],["scs_s","scs_n"],["scs_n","taiwan"],["taiwan","ecs"],["ecs","yellow"],["ecs","korea"],["korea","japan_s"],["japan_s","japan_e"],["scs_n","phil_e"],["ecs","japan_s"],["korea","japan_sea"],["japan_sea","sakhalin"],["sakhalin","japan_e"],
+  ["cape","mozambique"],["mozambique","e_africa"],["e_africa","arabian_sea"],["cape","io_south"],["io_south","sri_lanka"],["io_south","sunda"],["io_south","sw_australia"],["mozambique","io_south"],["io_south","india_w"],
+  ["sunda","singapore"],["sunda","scs_s"],["sunda","lombok"],["lombok","nw_australia"],["lombok","makassar"],["makassar","celebes"],["celebes","phil_e"],["phil_e","japan_s"],["phil_e","taiwan"],["makassar","scs_s"],["celebes","scs_n"],
+  ["nw_australia","sw_australia"],["sw_australia","s_australia"],["s_australia","newcastle"],["newcastle","coral"],["coral","png"],["png","phil_e"],["png","celebes"],["nw_australia","sunda"],
+];
+/* chokepoint id -> sea node the route must pass */
+const CHOKE_NODE = { hormuz: "hormuz", malacca: "malacca", suez: "suez", sumed: "suez", suez_sumed: "suez", bab_el_mandeb: "bab", bab: "bab",
+  turkish_straits: "turkish", turkish: "turkish", bosporus: "turkish", danish_straits: "danish", danish: "danish", panama: "panama", panama_canal: "panama",
+  cape: "cape", cape_of_good_hope: "cape", good_hope: "cape" };
+
+const R = Math.PI / 180;
+const hav = (a, b) => { const dl = (b[0] - a[0]) * R, dp = (b[1] - a[1]) * R;
+  const h = Math.sin(dp / 2) ** 2 + Math.cos(a[1] * R) * Math.cos(b[1] * R) * Math.sin(dl / 2) ** 2; return 2 * Math.asin(Math.sqrt(h)); };
+const ADJ = {}; for (const [a, b] of LANES) { const w = hav(SEA[a], SEA[b]); (ADJ[a] ||= []).push([b, w]); (ADJ[b] ||= []).push([a, w]); }
+function shortest(src, dst) {
+  if (src === dst) return [src];
+  const dist = { [src]: 0 }, prev = {}, done = new Set(), q = [src];
+  while (q.length) {
+    q.sort((a, b) => dist[a] - dist[b]); const u = q.shift(); if (done.has(u)) continue; done.add(u); if (u === dst) break;
+    for (const [v, w] of ADJ[u] || []) { const nd = dist[u] + w; if (nd < (dist[v] ?? Infinity)) { dist[v] = nd; prev[v] = u; q.push(v); } }
+  }
+  const path = [dst]; while (path[0] !== src && prev[path[0]]) path.unshift(prev[path[0]]); return path[0] === src ? path : [src, dst];
+}
+const nearestSea = pt => Object.keys(SEA).reduce((best, k) => hav(SEA[k], pt) < hav(SEA[best], pt) ? k : best, "us_gulf");
+/* Unwrap longitudes so consecutive points never jump the antimeridian, then
+   Chaikin-smooth the polyline; d3.geoPath re-clips it at the map edge. */
+function smoothRoute(pts) {
+  const u = [pts[0].slice()];
+  for (let i = 1; i < pts.length; i++) { let lon = pts[i][0]; const p = u[i - 1][0];
+    while (lon - p > 180) lon -= 360; while (lon - p < -180) lon += 360; u.push([lon, pts[i][1]]); }
+  let cur = u;
+  for (let k = 0; k < 2 && cur.length > 2; k++) { const nx = [cur[0]];
+    for (let i = 0; i < cur.length - 1; i++) { const a = cur[i], b = cur[i + 1];
+      nx.push([a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25], [a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75]); }
+    nx.push(cur[cur.length - 1]); cur = nx; }
+  return cur.map(([lon, lat]) => [((lon + 540) % 360) - 180, lat]);
+}
+
+const tip = document.getElementById("tip");
+function showTip(ev, html) { tip.innerHTML = html; tip.style.display = "block";
+  tip.style.left = Math.min(ev.clientX + 14, innerWidth - tip.offsetWidth - 10) + "px";
+  tip.style.top = Math.min(ev.clientY + 14, innerHeight - tip.offsetHeight - 10) + "px"; }
+const hideTip = () => { tip.style.display = "none"; };
+
+Promise.all([
+  fetch("flows_data.json?t=" + Date.now()).then(r => { if (!r.ok) throw new Error("flows_data.json HTTP " + r.status); return r.json(); }),
+  fetch("https://unpkg.com/world-atlas@2.0.2/countries-110m.json").then(r => r.json()),
+]).then(([D, world]) => init(D, world)).catch(e => { document.getElementById("side").innerHTML = `<div class="err">Could not load the map: ${e.message}</div>`; });
+
+function init(D, world) {
+  D.hubs.forEach(h => { h.full = h.name; h.name = h.name.replace(/\s*\(.*\)\s*$/, ""); });
+  const HUB = Object.fromEntries(D.hubs.map(h => [h.id, h])), CHK = Object.fromEntries(D.chokepoints.map(c => [c.id, c]));
+  const SRC = Object.fromEntries((D.meta.sources || []).map(s => [s.id, s]));
+  document.getElementById("asof").textContent = `flows compiled ${D.meta.compiled}`;
+  const state = { commodity: "crude", hub: null, choke: null, hot: null };
+
+  /* route every flow once */
+  D.flows.forEach((f, i) => {
+    f.i = i; const a = HUB[f.from], b = HUB[f.to];
+    const land = f.mode && f.mode !== "sea";
+    if (land) { f.route = [[a.lon, a.lat], [b.lon, b.lat]]; return; }
+    const stops = [a.sea || nearestSea([a.lon, a.lat]), ...(f.via || []).map(v => CHOKE_NODE[v]).filter(Boolean), b.sea || nearestSea([b.lon, b.lat])];
+    let nodes = [stops[0]];
+    for (let k = 1; k < stops.length; k++) nodes = nodes.concat(shortest(stops[k - 1], stops[k]).slice(1));
+    f.route = smoothRoute([[a.lon, a.lat], ...nodes.map(n => SEA[n]), [b.lon, b.lat]]);
+  });
+
+  const svg = d3.select("#map"), wrap = document.querySelector(".map-wrap");
+  const root = svg.append("g");
+  const gBase = root.append("g"), gFlows = root.append("g"), gDash = root.append("g"), gChoke = root.append("g"), gHubs = root.append("g");
+  const projection = d3.geoNaturalEarth1().rotate([-12, 0]);
+  const path = d3.geoPath(projection);
+  const land = topojson.feature(world, world.objects.land);
+  const borders = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
+  gBase.append("path").attr("class", "graticule").datum(d3.geoGraticule10());
+  gBase.append("path").attr("class", "land").datum(land);
+  gBase.append("path").datum(borders).attr("fill", "none").attr("stroke", "rgba(10,13,18,0.22)").attr("stroke-width", 0.4).attr("class", "borders");
+  gBase.append("path").attr("class", "sphere").datum({ type: "Sphere" });
+
+  let k = 1;
+  const zoom = d3.zoom().scaleExtent([1, 9]).on("zoom", ev => { k = ev.transform.k; root.attr("transform", ev.transform); restyle(); });
+  svg.call(zoom);
+  document.getElementById("reset").onclick = () => svg.transition().duration(450).call(zoom.transform, d3.zoomIdentity);
+
+  function layout() {
+    const w = wrap.clientWidth, h = wrap.clientHeight;
+    svg.attr("viewBox", `0 0 ${w} ${h}`);
+    projection.fitExtent([[10, 70], [w - 10, h - 10]], { type: "MultiPoint", coordinates: [[-167.9, 0], [191.9, 0], [12, 80], [12, -56]] });
+    gBase.selectAll("path").attr("d", path);
+    draw();
+  }
+  const active = () => D.flows.filter(f => f.commodity === state.commodity);
+  const isLit = f => (!state.hub || f.from === state.hub || f.to === state.hub) && (!state.choke || (f.via || []).includes(state.choke));
+  const fmtV = v => d3.format(CMAP[state.commodity].fmt)(v);
+  let wScale = () => 1;
+
+  function draw() {
+    const C = CMAP[state.commodity], fl = active().slice().sort((a, b) => b.volume - a.volume);
+    const unit = fl[0] ? fl[0].unit : "";
+    wScale = d3.scaleSqrt().domain([0, d3.max(fl, f => f.volume) || 1]).range([0.6, 11]);
+    document.getElementById("unit").textContent = `${C.label} · ${unit} · line width = volume`;
+    const geo = f => ({ type: "LineString", coordinates: f.route });
+
+    gFlows.selectAll("path").data(fl, f => f.i).join("path").attr("class", "flow")
+      .attr("d", f => path(geo(f))).attr("stroke", C.color)
+      .attr("stroke-dasharray", f => f.confidence === "low" ? "5 4" : null)
+      .on("mousemove", (ev, f) => { state.hot = f.i; restyle(); showTip(ev, flowTip(f)); })
+      .on("mouseleave", () => { state.hot = null; restyle(); hideTip(); });
+    gDash.selectAll("path").data(fl, f => f.i).join("path").attr("class", "flow-dash").attr("d", f => path(geo(f)));
+
+    const tot = {}; fl.forEach(f => { (tot[f.from] ||= { out: 0, inn: 0 }).out += f.volume; (tot[f.to] ||= { out: 0, inn: 0 }).inn += f.volume; });
+    const hubs = D.hubs.filter(h => tot[h.id]).map(h => ({ ...h, ...tot[h.id], xy: projection([h.lon, h.lat]) }));
+    const hs = gHubs.selectAll("g.hub").data(hubs, h => h.id).join(en => { const g = en.append("g").attr("class", "hub"); g.append("circle"); g.append("text"); return g; });
+    hs.attr("transform", h => `translate(${h.xy})`);
+    hs.select("circle").attr("stroke", h => h.out >= h.inn ? C.color === "#15171c" ? "#fff" : C.color : "#fff")
+      .on("mousemove", (ev, h) => showTip(ev, `<b>${h.full}</b><br>exports ${fmtV(h.out)} · imports ${fmtV(h.inn)} ${unit}<br><span class="m">click to isolate</span>`))
+      .on("mouseleave", hideTip)
+      .on("click", (ev, h) => { ev.stopPropagation(); state.hub = state.hub === h.id ? null : h.id; side(); restyle(); });
+    hs.select("text").text(h => h.name).attr("text-anchor", h => h.xy[0] > wrap.clientWidth * 0.82 ? "end" : "start");
+
+    const used = new Set(fl.flatMap(f => f.via || []));
+    const cs = gChoke.selectAll("g.choke").data(D.chokepoints.filter(c => used.has(c.id) || c.oil_mbd), c => c.id)
+      .join(en => { const g = en.append("g").attr("class", "choke"); g.append("path"); g.append("text"); return g; });
+    cs.attr("transform", c => `translate(${projection([c.lon, c.lat])})`);
+    cs.select("path").on("mousemove", (ev, c) => showTip(ev, chokeTip(c))).on("mouseleave", hideTip)
+      .on("click", (ev, c) => { ev.stopPropagation(); state.choke = state.choke === c.id ? null : c.id; side(); restyle(); });
+    cs.select("text").text(c => c.name.replace(/^Strait of /, "").replace(/ Canal.*$/, "").replace(/ Straits?$/, ""));
+    restyle(); key(unit);
+  }
+
+  /* counter-scale strokes and markers so zooming magnifies geography, not ink */
+  function restyle() {
+    const z = Math.sqrt(k), dim = state.hub || state.choke || state.hot != null;
+    gFlows.selectAll("path").attr("stroke-width", f => wScale(f.volume) / z)
+      .attr("stroke-opacity", f => state.hot === f.i ? 1 : !isLit(f) ? 0.07 : state.hot != null ? 0.25 : 0.8);
+    gDash.selectAll("path").attr("stroke-width", f => Math.max(0.7, wScale(f.volume) * 0.28) / z)
+      .attr("stroke-opacity", f => (state.hot === f.i || (isLit(f) && state.hot == null)) ? 0.8 : 0);
+    gHubs.selectAll("circle").attr("r", h => (2.5 + Math.sqrt(Math.max(h.out, h.inn)) * (4 / Math.sqrt(wScale.domain()[1]))) / z).attr("stroke-width", 1.2 / z)
+      .attr("fill", h => state.hub === h.id ? "#d4af37" : "#0d1118");
+    gHubs.selectAll("text").style("font-size", 11.5 / z + "px").style("stroke-width", 2.6 / z + "px").attr("x", function (h) { return (this.getAttribute("text-anchor") === "end" ? -1 : 1) * 9 / z; }).attr("y", 3.5 / z)
+      .style("opacity", h => !dim || state.hub === h.id || active().some(f => (isLit(f) || state.hot === f.i) && (f.from === h.id || f.to === h.id) && (state.hot == null || state.hot === f.i)) ? 1 : 0.25);
+    gChoke.selectAll("path").attr("d", c => { const s = (state.choke === c.id ? 7.5 : 5) / z; return `M0,${-s}L${s},0L0,${s}L${-s},0Z`; })
+      .style("fill", c => state.choke === c.id ? "#fff" : null).attr("stroke-width", 0.9 / z);
+    gChoke.selectAll("text").style("font-size", 8.5 / z + "px").style("stroke-width", 2.4 / z + "px").attr("y", -8 / z).attr("text-anchor", "middle");
+    gBase.select(".land").attr("stroke-width", 0.4 / z); gBase.select(".borders").attr("stroke-width", 0.4 / z);
+    document.querySelectorAll(".row").forEach(r => { const f = D.flows[+r.dataset.i]; r.classList.toggle("off", !isLit(f)); r.classList.toggle("hot", state.hot === f.i); });
+  }
+  svg.on("click", () => { if (state.hub || state.choke) { state.hub = state.choke = null; side(); restyle(); } });
+
+  const srcLink = id => SRC[id] ? `<a href="${SRC[id].url}" target="_blank" rel="noopener">${SRC[id].title}</a>` : (id || "");
+  const flowTip = f => `<b>${HUB[f.from].name} → ${HUB[f.to].name}</b><br>${fmtV(f.volume)} ${f.unit} · ${f.year}` +
+    `${(f.via || []).length ? `<br><span class="m">via ${f.via.map(v => CHK[v] ? CHK[v].name : v).join(", ")}</span>` : ""}` +
+    `<br><span class="m">confidence: </span><span class="${f.confidence === "low" ? "conf-low" : ""}">${f.confidence}</span>` +
+    `${f.note ? `<br><span class="m">${f.note}</span>` : ""}${SRC[f.source] ? `<br><span class="m">src: ${SRC[f.source].title}</span>` : ""}`;
+  const chokeTip = c => `<b>${c.name}</b>${c.oil_mbd ? `<br>${d3.format(".1f")(c.oil_mbd)} mb/d oil transit · ${c.year}` : ""}` +
+    `${c.lng_note ? `<br><span class="m">${c.lng_note}</span>` : ""}${c.note ? `<br><span class="m">${c.note}</span>` : ""}<br><span class="m">click: what depends on it</span>`;
+
+  function key(unit) {
+    const C = CMAP[state.commodity], mx = wScale.domain()[1], col = C.color === "#15171c" ? "#15171c" : C.color;
+    const steps = [mx, mx / 4, mx / 16].map(v => +d3.format(".2g")(v));
+    document.getElementById("key").innerHTML = steps.map(v => `<div><svg width="46" height="12"><line x1="2" x2="44" y1="6" y2="6" stroke="${col}" stroke-width="${wScale(v)}" stroke-linecap="round" style="filter:drop-shadow(0 0 1px #fff6)"/></svg>${d3.format(C.fmt)(v)} ${unit}</div>`).join("") +
+      `<div><svg width="46" height="12"><line x1="2" x2="44" y1="6" y2="6" stroke="${col}" stroke-width="2" stroke-dasharray="5 4" style="filter:drop-shadow(0 0 1px #fff6)"/></svg>low-confidence estimate</div>` +
+      `<div><svg width="46" height="12"><path d="M23,1L28,6L23,11L18,6Z" fill="#d4af37"/></svg>chokepoint</div>`;
+  }
+
+  function side() {
+    const C = CMAP[state.commodity], fl = active().slice().sort((a, b) => b.volume - a.volume), unit = fl[0] ? fl[0].unit : "";
+    const lit = fl.filter(isLit), total = d3.sum(fl, f => f.volume), litTot = d3.sum(lit, f => f.volume), mx = fl[0] ? fl[0].volume : 1;
+    const years = [...new Set(fl.map(f => f.year))].sort(), barCol = C.color === "#15171c" ? "#8a8f9a" : C.color;
+    const chokes = D.chokepoints.map(c => ({ c, v: d3.sum(fl.filter(f => (f.via || []).includes(c.id)), f => f.volume) })).filter(d => d.v > 0).sort((a, b) => b.v - a.v);
+    let focus = "";
+    if (state.choke) { const c = CHK[state.choke];
+      focus = `<div class="focus-box"><button class="x" data-clear>clear ✕</button><b>${c.name}</b>: ${fmtV(litTot)} ${unit} of mapped ${C.label.toLowerCase()} (${d3.format(".0%")(litTot / total)}) across ${lit.length} routes passes here.<small>${c.note || ""}</small></div>`; }
+    else if (state.hub) { const h = HUB[state.hub], out = d3.sum(lit.filter(f => f.from === h.id), f => f.volume), inn = d3.sum(lit.filter(f => f.to === h.id), f => f.volume);
+      focus = `<div class="focus-box"><button class="x" data-clear>clear ✕</button><b>${h.name}</b>: ships ${fmtV(out)} and receives ${fmtV(inn)} ${unit} on the mapped routes.</div>`; }
+    document.getElementById("side").innerHTML =
+      `<div class="kicker">Commodity</div><h2>${C.label}</h2>
+       <p>The largest inter-regional routes, routed over sea lanes and through the chokepoints each one depends on. Click a hub or a chokepoint to isolate what touches it.</p>
+       <p style="margin-top:8px;color:var(--text)">Baseline: ${years.join(" and ")} trade, before the 2026 Hormuz disruption. This is the map of what normally moves, not a live tracker.</p>
+       <div class="stat-row"><div class="stat"><div class="lab">Mapped volume</div><div class="val">${fmtV(total)}</div></div><div class="stat"><div class="lab">Unit</div><div class="val">${unit}</div></div><div class="stat"><div class="lab">Routes</div><div class="val">${fl.length}</div></div></div>
+       ${chokes.length ? `<h3>Chokepoint exposure, ${unit}</h3><div class="chips">${chokes.map(d => `<button class="chip${state.choke === d.c.id ? " on" : ""}" data-choke="${d.c.id}">${d.c.name.replace(/^Strait of /, "")}<b>${fmtV(d.v)}</b></button>`).join("")}</div>` : ""}
+       ${focus}
+       <h3>Routes, largest first</h3>
+       <div>${fl.map(f => `<div class="row" data-i="${f.i}"><div class="rt">${HUB[f.from].name}<span>→</span>${HUB[f.to].name}</div><div class="rv">${fmtV(f.volume)}</div>
+          <div class="bar"><i style="width:${(100 * f.volume / mx).toFixed(1)}%;background:${barCol}"></i></div>
+          <div class="rm">${f.year}${(f.via || []).length ? " · via " + f.via.map(v => CHK[v] ? CHK[v].name.replace(/^Strait of /, "") : v).join(", ") : ""}${f.confidence === "low" ? ' · <span class="conf-low">low confidence</span>' : ""}</div></div>`).join("")}</div>
+       <div class="foot">Data years: ${years.join(", ")}. Mapped volume is the sum of the routes shown, not total world trade. ${D.meta.note || ""}<br><br>Sources: ${(D.meta.sources || []).map(s => srcLink(s.id)).join(" · ")}</div>`;
+    const el = document.getElementById("side");
+    el.querySelectorAll("[data-choke]").forEach(b => b.onclick = () => { state.choke = state.choke === b.dataset.choke ? null : b.dataset.choke; state.hub = null; side(); restyle(); });
+    el.querySelectorAll("[data-clear]").forEach(b => b.onclick = () => { state.hub = state.choke = null; side(); restyle(); });
+    el.querySelectorAll(".row").forEach(r => { const i = +r.dataset.i;
+      r.onmouseenter = () => { state.hot = i; restyle(); }; r.onmouseleave = () => { state.hot = null; restyle(); }; });
+    restyle();
+  }
+
+  document.getElementById("modes").innerHTML = COMMODITIES.filter(c => D.flows.some(f => f.commodity === c.id))
+    .map(c => `<button data-c="${c.id}" class="${c.id === state.commodity ? "on" : ""}"><i style="background:${c.color};${c.color === "#15171c" ? "outline:1px solid #666" : ""}"></i>${c.label}</button>`).join("");
+  document.getElementById("modes").onclick = e => { const b = e.target.closest("button"); if (!b) return;
+    state.commodity = b.dataset.c; state.hub = state.choke = state.hot = null;
+    document.querySelectorAll("#modes button").forEach(x => x.classList.toggle("on", x === b)); draw(); side(); };
+
+  new ResizeObserver(layout).observe(wrap);
+  layout(); side();
+}
+</script>
+</body>
+</html>

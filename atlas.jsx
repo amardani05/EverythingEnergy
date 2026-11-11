@@ -489,7 +489,11 @@
        on stale prices is a different (worse) object than a fresh one, so
        the age is shown wherever numbers are shown. */
     (function stampFreshness() {
-      const iso = (data.meta || {}).generated_at || null;
+      // Age is measured from the last price in the analysis when the pipeline
+      // reports it; run time alone once showed green over six-month-old prices.
+      const genIso = (data.meta || {}).generated_at || null;
+      const through = (data.meta || {}).prices_through || null;
+      const iso = through ? through + "T21:00:00" : genIso;
       let label = "data: unknown vintage", cls = "asof-stale", ageDays = null, pretty = "";
       if (iso) {
         const gen = new Date(iso);
@@ -497,7 +501,8 @@
         pretty = gen.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         const age = ageDays <= 0 ? "today" : ageDays === 1 ? "1d old" : `${ageDays}d old`;
         label = `data: ${pretty} · ${age}`;
-        cls = ageDays < 2 ? "asof-fresh" : ageDays < 7 ? "asof-warn" : "asof-stale";
+        // prices lag a weekend by up to 3 days, so allow that before warning
+        cls = ageDays < (through ? 4 : 2) ? "asof-fresh" : ageDays < 7 ? "asof-warn" : "asof-stale";
       }
       window.DATA_ASOF = { iso, ageDays, label, cls, pretty };
       const chip = document.getElementById("data-asof");
@@ -506,7 +511,7 @@
         chip.classList.add(cls);
         chip.innerHTML = '<span class="asof-dot"></span>' + label;
         chip.title = iso
-          ? `dashboard_data.json generated ${iso}. Rebuild via the analysis pipeline (see Methodology).`
+          ? `Prices through ${through || "unknown"}; dashboard_data.json generated ${genIso}. Rebuild via the analysis pipeline (see Methodology).`
           : "dashboard_data.json carries no meta.generated_at - rebuild via consolidate_data.py";
       }
     })();

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UI Concepts - Everything Energy</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
+<style>
+:root { --bg-deep:#0a0d12; --bg:#11151c; --bg-card:#161b25; --border:#232a3a; --border-hi:#344056; --text:#dde1e8; --text-mute:#98a0b0; --text-dim:#737b8c; --accent:#d4af37; --pos:#3fb96f; --neg:#d05252; --build:#5b9bd5; --draw:#d98a4e;
+  --serif:"EB Garamond",Georgia,serif; --sans:"Inter",system-ui,sans-serif; --mono:"IBM Plex Mono",Consolas,monospace; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg-deep); color:var(--text); font-family:var(--sans); font-weight:300; font-size:14px; line-height:1.55; font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased; }
+main { max-width:1240px; margin:0 auto; padding:40px 28px 100px; }
+h1 { font-family:var(--serif); font-style:italic; font-weight:500; font-size:34px; }
+.lede { color:var(--text-mute); max-width:78ch; margin:6px 0 10px; }
+.lede a { color:var(--accent); }
+section { margin-top:54px; padding-top:22px; border-top:1px solid var(--border); }
+.kick { font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); }
+h2 { font-family:var(--serif); font-style:italic; font-weight:500; font-size:26px; margin:2px 0 4px; }
+.why { color:var(--text-mute); max-width:86ch; margin-bottom:6px; }
+.why b { color:var(--text); font-weight:500; }
+.trade { font-family:var(--mono); font-size:11.5px; color:var(--text-dim); margin-bottom:16px; }
+.frame { border:1px solid var(--border-hi); border-radius:5px; background:var(--bg); overflow:hidden; }
+.chrome { display:flex; gap:20px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--border); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); }
+.chrome b { font-family:var(--serif); font-style:italic; font-size:16px; letter-spacing:0; text-transform:none; color:var(--text); font-weight:500; }
+.chrome .on { color:var(--text); border-bottom:1px solid var(--accent); }
+.pad { padding:18px; }
+.pos { color:var(--pos); } .neg { color:var(--neg); } .dim { color:var(--text-dim); } .mono { font-family:var(--mono); }
+/* A: desk */
+.tabs { display:flex; gap:0; border-bottom:1px solid var(--border); }
+.tabs button { background:none; border:none; border-right:1px solid var(--border); color:var(--text-mute); font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:11px 18px; cursor:pointer; }
+.tabs button.on { color:var(--accent); background:rgba(212,175,55,.08); }
+.desk { display:grid; grid-template-columns:1fr 1.25fr 1.1fr; gap:0; }
+.desk > div { padding:18px; border-right:1px solid var(--border); min-width:0; }
+.desk > div:last-child { border-right:none; }
+h4 { font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--text-mute); margin-bottom:10px; }
+.big { font-family:var(--mono); font-size:26px; }
+.kv { display:flex; justify-content:space-between; gap:10px; font-family:var(--mono); font-size:12px; padding:4px 0; border-bottom:1px solid var(--border); }
+.kv span:first-child { font-family:var(--sans); color:var(--text-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rt { display:grid; grid-template-columns:1fr auto; gap:1px 10px; padding:5px 0; font-size:12.5px; }
+.rt .bar { grid-column:1/-1; height:3px; background:var(--bg-card); border-radius:2px; } .rt .bar i { display:block; height:100%; background:var(--accent); border-radius:2px; opacity:.8; }
+.todo { border:1px dashed var(--border-hi); border-radius:4px; padding:12px; color:var(--text-dim); font-size:12.5px; }
+/* B: wall */
+table { border-collapse:collapse; width:100%; font-size:12px; }
+th { font-size:9.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); text-align:center; padding:6px 4px; border-bottom:1px solid var(--border-hi); white-space:nowrap; }
+th:first-child, td:first-child { text-align:left; }
+td { font-family:var(--mono); text-align:center; padding:0; border-bottom:1px solid var(--bg-deep); height:27px; }
+td:first-child { font-family:var(--sans); padding:0 10px 0 0; white-space:nowrap; }
+td.cell { color:#fff; font-size:11px; border-left:1px solid var(--bg-deep); }
+tr.layer td { font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); height:30px; vertical-align:bottom; padding-bottom:3px; font-family:var(--sans); }
+.scroll { overflow-x:auto; }
+/* C: brief */
+.brief { display:grid; grid-template-columns:1.5fr 1fr; gap:0; }
+.brief > div { padding:20px 22px; } .brief > div:first-child { border-right:1px solid var(--border); }
+.item { display:grid; grid-template-columns:54px 1fr; gap:14px; padding:12px 0; border-bottom:1px solid var(--border); }
+.item .mag { font-family:var(--mono); font-size:15px; text-align:right; padding-top:1px; }
+.item .hd { font-family:var(--serif); font-size:17.5px; line-height:1.3; }
+.item .sub { font-family:var(--mono); font-size:11px; color:var(--text-dim); margin-top:2px; }
+.item .tag { font-size:9.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+@media (max-width:900px) { .desk, .brief { grid-template-columns:1fr; } .desk > div, .brief > div:first-child { border-right:none; border-bottom:1px solid var(--border); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>UI concepts</h1>
+  <p class="lede">Three directions for everything that is not the map. The Atlas plate and the dashboard-to-map handoff stay as they are.
+    Each mock below runs on the live site data, so what you see is what the screen would actually say today.
+    Already built in this style and live: <a href="../flows.html">Flows</a> (Plate II) and <a href="../balances.html">Balances</a>.</p>
+
+  <section>
+    <div class="kick">Concept A</div><h2>The commodity desk</h2>
+    <p class="why"><b>One screen per molecule.</b> Today the site is organised by tool (map, lab, signals). A desk is organised by market: pick crude, gas, coal, uranium or power and see its balance, its trade routes, its chokepoint exposure and the equity baskets that carry it, side by side. This is the layout that makes "energy as a whole" navigable, and it gives every future balance model an obvious home.</p>
+    <p class="trade">cost: medium · needs a balance model per commodity (crude exists; gas storage is the cheapest next one) · replaces: nothing, adds a front door</p>
+    <div class="frame"><div class="tabs" id="a-tabs"></div><div class="desk" id="a-body"></div></div>
+  </section>
+
+  <section>
+    <div class="kick">Concept B</div><h2>The wall</h2>
+    <p class="why"><b>Every basket, every lens, one glance.</b> The dashboard currently shows the top five of four separate lists, so a basket that is mildly stretched on everything never appears. A dense matrix shows all 23 baskets against all the lenses at once; colour does the ranking and anomalies show up as rows that light up across columns. Click-through goes to the existing basket drawer.</p>
+    <p class="trade">cost: low · all data already in dashboard_data.json · replaces: the four top-five lists under Active Signals</p>
+    <div class="frame"><div class="chrome"><b>Everything Energy</b><span class="on">Wall</span><span>Atlas</span><span>Lab</span><span>Flows</span><span>Balances</span></div><div class="pad scroll" id="b-body"></div></div>
+  </section>
+
+  <section>
+    <div class="kick">Concept C</div><h2>The morning brief</h2>
+    <p class="why"><b>Sentences, ranked by size of move.</b> Cards make you decode a z-score, a sparkline and two tickers before you know whether to care. A brief states each finding in plain words, largest first, mixing physical (balances, flows) and financial (pairs, regime breaks) in one list. The map stays docked on the right as the way into detail, the same handoff you have now.</p>
+    <p class="trade">cost: low to medium · templated text from existing fields · replaces: the Active Signals card grid</p>
+    <div class="frame"><div class="chrome"><b>Everything Energy</b><span class="on">Brief</span><span>Atlas</span><span>Lab</span><span>Flows</span><span>Balances</span></div><div class="brief"><div id="c-body"></div><div id="c-side"></div></div></div>
+  </section>
+</main>
+<script>
+"use strict";
+const pct = d3.format("+.1%"), f2 = d3.format("+.2f"), n2 = d3.format(".2f");
+const cls = v => v >= 0 ? "pos" : "neg";
+Promise.all(["../dashboard_data.json", "../oil_balance.json", "../flows_data.json"].map(u => fetch(u + "?t=" + Date.now()).then(r => r.json())))
+  .then(([D, B, F]) => { deskUI(D, B, F); wallUI(D); briefUI(D, B); })
+  .catch(e => { document.querySelector(".lede").insertAdjacentHTML("afterend", `<p class="neg mono">Could not load site data: ${e.message}. Open this page through the dev server.</p>`); });
+
+function ret(node, weeks) { const c = node.cumulative_returns || []; if (c.length <= weeks) return null;
+  return (1 + c[c.length - 1].value) / (1 + c[c.length - 1 - weeks].value) - 1; }  // series is cumulative return since start
+
+/* ---------- A ---------- */
+function deskUI(D, B, F) {
+  const DESKS = [
+    { id: "crude", label: "Crude + products", flows: ["crude", "products"], tags: /^(CL1|BRENT|CRACK|WTI|RB1|HO1|VLCC|BDTI|BCTI|WORLDSCALE|BASIN|BAKKEN|FRAC_SPREAD|OFFSHORE)/ },
+    { id: "gas", label: "Gas + LNG", flows: ["lng", "pipe_gas"], tags: /^(NG1|HENRY|JKM|TTF|LNG|NGL)/ },
+    { id: "coal", label: "Coal", flows: ["coal"], tags: /^(API2|COAL|MET_COAL|NEWCASTLE)/ },
+    { id: "uranium", label: "Uranium", flows: ["uranium"], tags: /^(U3O8|SWU)/ },
+    { id: "power", label: "Power", flows: [], tags: /^(ERCOT|PJM|PPA|RATE_BASE|ITC|INTEREST)/ },
+  ];
+  const hub = Object.fromEntries(F.hubs.map(h => [h.id, h.name.replace(/\s*\(.*\)$/, "")]));
+  const G = B.global, U = B.us_weekly, iL = G.periods.indexOf(G.last_hist.supply), uN = U.dates.length - 1;
+  const tabs = document.getElementById("a-tabs"), body = document.getElementById("a-body");
+  function show(d) {
+    tabs.innerHTML = DESKS.map(x => `<button class="${x.id === d.id ? "on" : ""}" data-id="${x.id}">${x.label}</button>`).join("");
+    const fl = F.flows.filter(f => d.flows.includes(f.commodity)).sort((a, b) => (a.commodity === d.flows[0] ? 0 : 1) - (b.commodity === d.flows[0] ? 0 : 1) || b.volume - a.volume);
+    const main = fl.filter(f => f.commodity === d.flows[0]), mx = main[0] ? main[0].volume : 1;
+    const chk = F.chokepoints.map(c => [c.name.replace(/^Strait of /, ""), d3.sum(main.filter(f => (f.via || []).includes(c.id)), f => f.volume)]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 4);
+    const nodes = D.nodes.filter(n => (n.commodity_exposure || []).some(t => d.tags.test(t))).map(n => ({ n, r: ret(n, 4) })).sort((a, b) => (b.r ?? -9) - (a.r ?? -9));
+    const balance = d.id === "crude"
+      ? `<div class="big ${G.implied_build[iL] >= 0 ? "" : "neg"}" style="color:${G.implied_build[iL] >= 0 ? "var(--build)" : "var(--draw)"}">${f2(G.implied_build[iL])} <span style="font-size:13px">mb/d</span></div>
+         <div class="dim mono" style="font-size:11px;margin-bottom:12px">implied global build, ${G.periods[iL].slice(4)}/${G.periods[iL].slice(0, 4)} (EIA est.)</div>
+         <div class="kv"><span>World supply</span><span>${n2(G.supply_total[iL])}</span></div><div class="kv"><span>World demand</span><span>${n2(G.demand_total[iL])}</span></div>
+         <div class="kv"><span>OECD stocks, mb</span><span>${d3.format(",.0f")(G.oecd_stocks[iL])}</span></div>
+         <div class="kv"><span>US crude build, wk ${U.dates[uN].slice(5)}</span><span>${f2(U.build[uN])}</span></div>
+         <div class="kv"><span>  vs seasonal normal</span><span>${f2(U.build[uN] - U.build_norm[uN])}</span></div>
+         <div class="kv"><span>Model error, 1σ</span><span>±${n2(B.stock_model.sigma)}</span></div>`
+      : `<div class="todo">No balance model yet for this market. ${{ gas: "Cheapest next build: US storage vs five-year norm (EIA weekly) and EU storage fill (AGSI).", coal: "Candidate: seaborne thermal balance from China and India import data.", uranium: "Candidate: reactor requirements vs primary mine supply (WNA), annual.", power: "Candidate: regional load vs dispatchable capacity, spark spreads (EIA-930)." }[d.id]}</div>`;
+    body.innerHTML =
+      `<div><h4>Balance</h4>${balance}</div>
+       <div><h4>${main.length ? "Largest routes, " + main[0].unit : "Trade routes"}</h4>${main.length ? main.slice(0, 7).map(f => `<div class="rt"><span>${hub[f.from]} → ${hub[f.to]}</span><span class="mono">${d3.format(f.volume < 20 ? ".2f" : ",.0f")(f.volume)}</span><div class="bar"><i style="width:${100 * f.volume / mx}%"></i></div></div>`).join("") : `<div class="todo">Power does not ship by sea. This panel would show interconnector flows and regional prices.</div>`}
+         ${chk.length ? `<h4 style="margin-top:16px">Chokepoint exposure</h4>${chk.map(c => `<div class="kv"><span>${c[0]}</span><span>${d3.format(c[1] < 20 ? ".2f" : ",.0f")(c[1])}</span></div>`).join("")}` : ""}</div>
+       <div><h4>Equity baskets exposed · 1m return</h4>${nodes.slice(0, 11).map(x => `<div class="kv"><span>${x.n.display_name}</span><span class="${x.r == null ? "dim" : cls(x.r)}">${x.r == null ? "n/a" : pct(x.r)}</span></div>`).join("") || `<div class="todo">No baskets tagged.</div>`}</div>`;
+  }
+  tabs.onclick = e => { const b = e.target.closest("button"); if (b) show(DESKS.find(x => x.id === b.dataset.id)); };
+  show(DESKS[0]);
+}
+
+/* ---------- B ---------- */
+function wallUI(D) {
+  const pairZ = {}; D.pairs.forEach(p => { for (const k of [p.long, p.short]) if (Math.abs(p.z_60d) > Math.abs(pairZ[k] || 0)) pairZ[k] = p.z_60d; });
+  const regZ = {}; D.regime_alerts.forEach(r => { if (Math.abs(r.z_score) > Math.abs(regZ[r.basket] || 0)) regZ[r.basket] = r.z_score; });
+  const cols = [
+    ["1m", n => ret(n, 4), pct, 0.15], ["3m", n => ret(n, 13), pct, 0.3], ["1y", n => ret(n, 52), pct, 0.6],
+    ["Pair z", n => pairZ[n.id] ?? null, f2, 2.5], ["Regime z", n => regZ[n.id] ?? null, f2, 5],
+    ["IV gap 4w", n => n.ivr ? n.ivr.gap_4w : null, pct, 0.1], ["Intra ρ", n => n.intra_corr ? n.intra_corr.mean : null, n2, null], ["Driver R²", n => n.r2, n2, null],
+  ];
+  const div = d3.scaleLinear().domain([-1, 0, 1]).range(["#b0473f", "#1b2130", "#2f8f58"]).clamp(true), seq = d3.scaleLinear().domain([0, 1]).range(["#1b2130", "#8a7424"]).clamp(true);
+  const layers = d3.groups(D.nodes, n => n.layer);
+  let h = `<table><thead><tr><th>Basket</th>${cols.map(c => `<th>${c[0]}</th>`).join("")}<th>Driver</th></tr></thead><tbody>`;
+  for (const [layer, ns] of layers) {
+    h += `<tr class="layer"><td colspan="${cols.length + 2}">${layer.replace(/_/g, " ")}</td></tr>`;
+    for (const n of ns) h += `<tr><td>${n.display_name}</td>${cols.map(([, fn, fmt, sc]) => { const v = fn(n);
+      return v == null || !isFinite(v) ? `<td class="cell dim" style="background:#12161e">·</td>` : `<td class="cell" style="background:${sc ? div(v / sc) : seq(v)}">${fmt(v)}</td>`; }).join("")}<td class="dim" style="font-size:11px;padding-left:8px">${n.dominant_driver || ""}</td></tr>`;
+  }
+  document.getElementById("b-body").innerHTML = h + "</tbody></table>";
+}
+
+/* ---------- C ---------- */
+function briefUI(D, B) {
+  const name = Object.fromEntries(D.nodes.map(n => [n.id, n.display_name]));
+  const G = B.global, U = B.us_weekly, iL = G.periods.indexOf(G.last_hist.supply), uN = U.dates.length - 1, items = [];
+  const yoy = G.implied_build[iL] - G.implied_build[iL - 12];
+  const mover = ["supply", "demand"].flatMap(s => Object.keys(G[s]).map(k => ({ lab: G.labels[s][k] + " " + s, d: (s === "supply" ? 1 : -1) * (G[s][k][iL] - G[s][k][iL - 12]) }))).sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
+  items.push({ w: Math.abs(yoy) / B.stock_model.sigma, mag: f2(G.implied_build[iL]), tag: "Balance", hd: `The world oil balance implies a ${G.implied_build[iL] >= 0 ? "build" : "draw"} of ${n2(Math.abs(G.implied_build[iL]))} mb/d, ${n2(Math.abs(yoy))} ${yoy >= 0 ? "looser" : "tighter"} than a year ago.`, sub: `biggest single driver: ${mover.lab} (${f2(mover.d)} mb/d to the build)` });
+  const z = (U.build[uN] - U.build_norm[uN]) / U.build_sd[uN];
+  items.push({ w: Math.abs(z), mag: f2(z) + "σ", tag: "US weekly", hd: `US crude stocks ${U.build[uN] >= 0 ? "built" : "drew"} ${n2(Math.abs(U.build[uN] * 7))} mb last week against a normal ${U.build_norm[uN] >= 0 ? "build" : "draw"} of ${n2(Math.abs(U.build_norm[uN] * 7))}.`, sub: `week ending ${U.dates[uN]} · refinery inputs ${n2(U.refinery_inputs[uN])} vs normal ${n2(U.refinery_inputs_norm[uN])} mb/d` });
+  D.pairs.filter(p => Math.abs(p.z_60d) >= 1).forEach(p => items.push({ w: Math.abs(p.z_60d), mag: f2(p.z_60d) + "z", tag: "Pair", hd: `${name[p.long]} is ${p.z_60d > 0 ? "rich" : "cheap"} against ${name[p.short]}.`, sub: `${p.thesis} · 3m spread ${pct(p.ret_3m)} · corr ${n2(p.corr_now)}` }));
+  D.regime_alerts.slice().sort((a, b) => Math.abs(b.z_score) - Math.abs(a.z_score)).slice(0, 3).forEach(r => items.push({ w: Math.abs(r.z_score) / 2, mag: f2(r.z_score) + "z", tag: "Regime", hd: `${name[r.basket]} has ${r.direction} its sensitivity to ${r.driver}.`, sub: `beta ${n2(r.current_beta)} now vs ${n2(r.long_run_mean)} long-run` }));
+  items.forEach(i => { i.neg = /^[-\u2212]/.test(i.mag); });
+  items.sort((a, b) => b.w - a.w);
+  document.getElementById("c-body").innerHTML = `<h4>${new Date((D.meta.prices_through ? D.meta.prices_through + "T12:00:00" : D.meta.generated_at)).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })} · ${items.length} things, largest first</h4>` +
+    items.slice(0, 8).map(i => `<div class="item"><div class="mag ${i.neg ? "neg" : "pos"}">${i.mag}</div><div><div class="tag">${i.tag}</div><div class="hd">${i.hd}</div><div class="sub">${i.sub}</div></div></div>`).join("");
+  const movers = D.nodes.map(n => ({ n, r: ret(n, 1) })).filter(x => x.r != null).sort((a, b) => b.r - a.r);
+  document.getElementById("c-side").innerHTML = `<h4>Map</h4><div class="todo" style="height:150px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:22px;color:var(--text)">the existing map dock</div>
+    <h4 style="margin-top:18px">Week's movers</h4>${movers.slice(0, 4).concat(movers.slice(-4)).map(x => `<div class="kv"><span>${x.n.display_name}</span><span class="${cls(x.r)}">${pct(x.r)}</span></div>`).join("")}`;
+}
+</script>
+</main>
+</body>
+</html>

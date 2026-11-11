@@ -234,3 +234,43 @@ def test_guard_leaves_plausible_moves_alone() -> None:
                           cost_bps=60.0, min_names=20, value_col="close",
                           max_abs_period_return=3.0)
     assert res.summary["n_extreme_dropped"] == 0
+
+
+# ---------- subsample stability ----------
+
+def _period_frame(values: list[float]) -> pl.DataFrame:
+    from datetime import timedelta
+    d0 = date(2019, 1, 31)
+    return pl.DataFrame({"date": [d0 + timedelta(days=30 * i) for i in range(len(values))],
+                         "ls_gross": values})
+
+
+def test_subsample_flags_edge_confined_to_one_window():
+    from signal_engine.validation.backtest import subsample_report
+    rng = np.random.default_rng(3)
+    vals = list(0.03 + rng.normal(0, 0.01, 30)) + list(rng.normal(-0.002, 0.01, 60))
+    rep = subsample_report(_period_frame(vals))
+    assert rep["full"]["sharpe"] > 0.5
+    assert rep["worst_subsample_sharpe"] < 0.0
+    assert rep["stability"] is False
+
+
+def test_subsample_stable_signal_and_embargo_windows():
+    from signal_engine.validation.backtest import subsample_report
+    rng = np.random.default_rng(4)
+    rep = subsample_report(_period_frame(list(0.02 + rng.normal(0, 0.01, 90))), embargo=1)
+    assert rep["stability"] is True
+    thirds = [w for w in rep["windows"] if w["window"].startswith("third")]
+    # 90 periods, one embargoed period on each side of the two boundaries
+    assert [w["n"] for w in thirds] == [29, 28, 29]
+    assert thirds[0]["end"] < thirds[1]["start"] < thirds[1]["end"] < thirds[2]["start"]
+
+
+def test_subsample_noise_is_not_stable_by_construction():
+    from signal_engine.validation.backtest import subsample_report
+    sharpes = []
+    for seed in range(40):
+        rng = np.random.default_rng(seed)
+        rep = subsample_report(_period_frame(list(rng.normal(0, 0.02, 90))))
+        sharpes += [w["sharpe"] for w in rep["windows"]]
+    assert abs(float(np.mean(sharpes))) < 0.25

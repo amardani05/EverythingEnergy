@@ -307,3 +307,62 @@ def walk_forward_ls(
         "n_extreme_dropped": float(n_extreme_dropped),
     }
     return BacktestResult(period_returns=period, quantile_means=qdf, summary=summary)
+
+
+def subsample_report(
+    period_returns: pl.DataFrame,
+    *,
+    col: str = "ls_gross",
+    periods_per_year: float = 12.0,
+    embargo: int = 1,
+) -> dict[str, object]:
+    """Is the full-sample result one regime, or the whole sample?
+
+    Splits the rebalance grid into non-overlapping thirds plus a first/second
+    half, dropping `embargo` periods on each side of every internal boundary
+    so adjacent windows share no holding period. Reports each window's mean,
+    annualised Sharpe and hit rate, the worst window, and `stability`: True
+    only when every window's mean return has the same sign as the full sample.
+
+    Used as a diagnostic, not a filter: a signal whose sign flips between
+    windows has no stable edge to cost-model, whichever way the total points.
+    """
+    df = period_returns.sort("date")
+    dates = df["date"].to_list()
+    x = df[col].to_numpy().astype(float)
+    n = x.size
+
+    def stats(lo: int, hi: int, label: str) -> dict[str, object]:
+        seg = x[lo:hi]
+        sd = float(seg.std(ddof=1)) if seg.size > 1 else 0.0
+        return {
+            "window": label,
+            "start": str(dates[lo]) if seg.size else None,
+            "end": str(dates[hi - 1]) if seg.size else None,
+            "n": int(seg.size),
+            "mean": float(seg.mean()) if seg.size else 0.0,
+            "sharpe": float(seg.mean() / sd * np.sqrt(periods_per_year)) if sd > 0 else 0.0,
+            "hit_rate": float((seg > 0).mean()) if seg.size else 0.0,
+        }
+
+    def split(k: int, prefix: str) -> list[dict[str, object]]:
+        edges = [round(i * n / k) for i in range(k + 1)]
+        out = []
+        for i in range(k):
+            lo = edges[i] + (embargo if i > 0 else 0)
+            hi = edges[i + 1] - (embargo if i < k - 1 else 0)
+            out.append(stats(lo, max(lo, hi), f"{prefix}{i + 1}/{k}"))
+        return out
+
+    full = stats(0, n, "full")
+    windows = split(3, "third ") + split(2, "half ")
+    usable = [w for w in windows if int(w["n"]) >= 3]  # type: ignore[call-overload]
+    sign = np.sign(float(full["mean"]))  # type: ignore[arg-type]
+    return {
+        "col": col,
+        "full": full,
+        "windows": windows,
+        "worst_subsample_sharpe": min((float(w["sharpe"]) for w in usable), default=0.0),  # type: ignore[arg-type]
+        "stability": bool(usable) and sign != 0
+        and all(np.sign(float(w["mean"])) == sign for w in usable),  # type: ignore[arg-type]
+    }

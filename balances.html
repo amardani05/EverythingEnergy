@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balances - Everything Energy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0d12'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='18' font-weight='600' fill='%23d4af37'%3EE%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
+<style>
+:root {
+  --bg-deep: #0a0d12; --bg: #11151c; --bg-card: #161b25;
+  --border: #232a3a; --border-hi: #344056;
+  --text: #dde1e8; --text-mute: #98a0b0; --text-dim: #737b8c;
+  --accent: #d4af37; --pos: #3fb96f; --neg: #d05252;
+  --build: #5b9bd5; --draw: #d98a4e;
+  --serif: "EB Garamond", Georgia, serif;
+  --sans: "Inter", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", "SF Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg-deep); color: var(--text);
+  font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums lining-nums;
+}
+.top-bar {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  padding: 18px 32px; border-bottom: 1px solid var(--border); min-height: 72px;
+  position: sticky; top: 0; background: rgba(10,13,18,0.92); backdrop-filter: blur(6px); z-index: 10;
+}
+.brand { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 22px; color: var(--text); text-decoration: none; }
+.brand .gold { color: var(--accent); }
+.nav-link {
+  font-family: var(--sans); font-size: 12px; font-weight: 500; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-mute); text-decoration: none;
+  border-bottom: 1px solid transparent; padding-bottom: 2px;
+}
+.nav-link:hover { color: var(--text); }
+.nav-link.active { color: var(--text); border-bottom-color: var(--accent); }
+.asof-chip {
+  margin-left: auto; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+  color: var(--text-mute); padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: 3px; background: rgba(15,20,28,0.6); white-space: nowrap;
+}
+main { max-width: 1180px; margin: 0 auto; padding: 44px 32px 120px; }
+h1 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 36px; margin-bottom: 8px; }
+h2 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 24px; margin: 52px 0 8px; padding-top: 18px; border-top: 1px solid var(--border); }
+h3 { font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-mute); margin: 0 0 10px; }
+.subtitle { color: var(--text-mute); font-size: 14.5px; max-width: 800px; margin-bottom: 8px; }
+.subtitle b, .note b { font-weight: 500; color: var(--text); }
+.meta-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 24px 0 6px; }
+.meta-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 12px 16px; }
+.meta-card .lab { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+.meta-card .val { font-family: var(--mono); font-size: 21px; margin-top: 2px; }
+.meta-card .sub { font-family: var(--mono); font-size: 11px; color: var(--text-mute); }
+.controls { display: flex; flex-wrap: wrap; gap: 18px; align-items: end; margin: 18px 0 14px; }
+.ctl { display: flex; flex-direction: column; gap: 4px; }
+.ctl label { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+select {
+  background: var(--bg-card); color: var(--text); border: 1px solid var(--border-hi); border-radius: 3px;
+  font-family: var(--mono); font-size: 12.5px; padding: 6px 10px; outline: none; cursor: pointer;
+}
+select:focus { border-color: var(--accent); }
+.seg { display: inline-flex; border: 1px solid var(--border-hi); border-radius: 3px; overflow: hidden; }
+.seg button {
+  background: transparent; color: var(--text-mute); border: none; border-right: 1px solid var(--border-hi);
+  font-family: var(--mono); font-size: 12px; padding: 6px 12px; cursor: pointer;
+}
+.seg button:last-child { border-right: none; }
+.seg button.on { background: rgba(212,175,55,0.12); color: var(--accent); }
+.panel { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 18px 20px; margin: 12px 0; }
+.split { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.split .panel { margin: 0; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { font-family: var(--mono); fill: var(--text-mute); font-size: 10.5px; }
+svg .axis path, svg .axis line { stroke: var(--border-hi); }
+svg .grid line { stroke: var(--border); stroke-dasharray: 2 4; }
+svg .grid path { display: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--mono); font-size: 11px; color: var(--text-mute); margin-top: 10px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.legend i.line { height: 2px; vertical-align: 3px; }
+table { border-collapse: collapse; width: 100%; font-size: 12px; }
+th {
+  font-family: var(--sans); font-weight: 600; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-dim); text-align: right; padding: 5px 0 5px 10px; border-bottom: 1px solid var(--border-hi); white-space: nowrap;
+}
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+td { font-family: var(--mono); padding: 4px 0 4px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+td:first-child { font-family: var(--sans); font-weight: 400; color: var(--text); }
+tr.grp td { font-family: var(--sans); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); padding-top: 12px; border-bottom: none; }
+tr.tot td { border-top: 1px solid var(--border-hi); font-weight: 500; color: var(--text); }
+.b { color: var(--build); } .d { color: var(--draw); } .dim { color: var(--text-dim); } .gold { color: var(--accent); }
+.note {
+  border: 1px solid var(--border); border-left: 2px solid var(--accent);
+  background: rgba(212,175,55,0.05); padding: 12px 16px; margin: 14px 0;
+  border-radius: 3px; font-size: 13.5px; max-width: 86ch;
+}
+.tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 3px; border: 1px solid var(--border-hi); color: var(--text-mute); margin-left: 8px; vertical-align: 2px; }
+.tag.est { color: var(--accent); border-color: rgba(212,175,55,0.5); }
+.tag.fcst { color: var(--draw); border-color: rgba(217,138,78,0.5); }
+#tip {
+  position: fixed; pointer-events: none; z-index: 50; display: none;
+  background: #0d1118; border: 1px solid var(--border-hi); border-radius: 3px;
+  padding: 7px 10px; font-family: var(--mono); font-size: 11.5px; color: var(--text); line-height: 1.5; max-width: 280px;
+}
+.foot { margin-top: 60px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 12px; font-family: var(--mono); }
+.foot a { color: var(--text-mute); }
+.err { color: var(--neg); font-family: var(--mono); font-size: 13px; padding: 20px 0; }
+@media (max-width: 900px) { .split { grid-template-columns: 1fr; } main { padding: 28px 16px 80px; } .top-bar { padding: 14px 16px; gap: 14px; } }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="brand" href="dashboard.html">Everything <span class="gold">Energy</span></a>
+  <a class="nav-link" href="dashboard.html">Dashboard</a>
+  <a class="nav-link" href="flows.html">Flows</a>
+  <a class="nav-link active" href="balances.html">Balances</a>
+  <a class="nav-link" href="signals.html">Signals</a>
+  <a class="nav-link" href="methodology.html">Methodology</a>
+  <div class="asof-chip" id="asof">balance: loading&hellip;</div>
+</div>
+
+<main>
+  <h1>Oil Balances</h1>
+  <p class="subtitle">
+    A barebones supply and demand model. <b>Stock build = supply &minus; demand + what the data cannot explain.</b>
+    The bridges below show which producers and consumers moved the build, and the unexplained term
+    is measured rather than hidden: it is the model's error bar.
+  </p>
+  <div id="cards" class="meta-strip"></div>
+
+  <h2>Global liquids bridge</h2>
+  <p class="subtitle">Monthly, from the EIA Short-Term Energy Outlook. Pick a period and what to compare it against;
+    each bar is that bloc's contribution to the change in the implied build. Supply growth adds to the build, demand growth subtracts.</p>
+  <div class="controls">
+    <div class="ctl"><label for="g-period">Period</label><select id="g-period"></select></div>
+    <div class="ctl"><label>Window</label><div class="seg" id="g-win"><button data-v="1" class="on">Month</button><button data-v="3">3-mo avg</button></div></div>
+    <div class="ctl"><label>Compare against</label><div class="seg" id="g-cmp"><button data-v="yoy" class="on">Year ago</button><button data-v="prev">Prior period</button></div></div>
+  </div>
+  <div class="split">
+    <div class="panel"><h3 id="g-bridge-title">Bridge</h3><div id="g-bridge"></div>
+      <div class="legend"><span><i style="background:var(--build)"></i>adds to build</span><span><i style="background:var(--draw)"></i>adds to draw</span><span><i style="background:var(--accent)"></i>implied build (supply &minus; demand)</span></div>
+    </div>
+    <div class="panel"><h3>Balance, mb/d</h3><div id="g-table"></div></div>
+  </div>
+
+  <div class="panel">
+    <h3>Implied build vs what showed up in OECD tanks, mb/d <span class="dim" style="text-transform:none;letter-spacing:0">&middot; click a bar to bridge that month</span></h3>
+    <div id="g-hist"></div>
+    <div class="legend">
+      <span><i style="background:var(--build)"></i>implied build</span><span><i style="background:var(--draw)"></i>implied draw</span>
+      <span><i style="background:var(--text-dim);opacity:.45"></i>hatched = EIA estimate or forecast</span>
+      <span><i class="line" style="background:var(--text)"></i>observed OECD commercial stock change</span>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="panel"><h3>OECD commercial stocks, million barrels</h3><div id="g-proj"></div>
+      <div class="legend"><span><i class="line" style="background:var(--text)"></i>reported</span><span><i class="line" style="background:var(--accent)"></i>this model</span><span><i style="background:var(--accent);opacity:.2"></i>&plusmn;1&sigma; band</span><span><i class="line" style="background:var(--draw)"></i>EIA forecast</span></div>
+    </div>
+    <div class="panel"><h3>How the variance is estimated</h3><div id="g-model" style="font-size:13.5px;color:var(--text-mute)"></div></div>
+  </div>
+
+  <h2>US crude bridge</h2>
+  <p class="subtitle">Weekly, from the EIA Weekly Petroleum Status Report. Here demand is real refinery intake.
+    The bridge starts from the seasonal-normal stock change for that week (prior five years) and shows which line item
+    explains the surprise. The <b>adjustment</b> is crude EIA cannot account for: the model's residual.</p>
+  <div class="controls">
+    <div class="ctl"><label for="u-week">Week ending</label><select id="u-week"></select></div>
+    <div class="ctl"><label>Window</label><div class="seg" id="u-win"><button data-v="1" class="on">Week</button><button data-v="4">4-wk avg</button></div></div>
+  </div>
+  <div class="split">
+    <div class="panel"><h3 id="u-bridge-title">Bridge</h3><div id="u-bridge"></div>
+      <div class="legend"><span><i style="background:var(--build)"></i>more build than normal</span><span><i style="background:var(--draw)"></i>more draw than normal</span><span><i style="background:var(--accent)"></i>stock change incl. SPR</span></div>
+    </div>
+    <div class="panel"><h3>Line items, mb/d</h3><div id="u-table"></div></div>
+  </div>
+  <div class="panel">
+    <h3>Unaccounted-for crude (adjustment), mb/d, last 3 years</h3>
+    <div id="u-adj"></div>
+    <div class="legend"><span><i style="background:var(--text-dim)"></i>weekly</span><span><i class="line" style="background:var(--accent)"></i>13-week average</span><span><i style="background:var(--accent);opacity:.2"></i>&plusmn;1&sigma;</span></div>
+  </div>
+
+  <div class="note" id="caveats"></div>
+  <div class="foot" id="foot"></div>
+</main>
+<div id="tip"></div>
+
+<script>
+"use strict";
+const f2 = d3.format("+.2f"), n2 = d3.format(".2f"), n1 = d3.format(".1f"), n0 = d3.format(",.0f");
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const pLabel = p => MON[+p.slice(4, 6) - 1] + " " + p.slice(0, 4);
+const pDate = p => new Date(+p.slice(0, 4), +p.slice(4, 6) - 1, 15);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const tip = document.getElementById("tip");
+function showTip(ev, html) { tip.innerHTML = html; tip.style.display = "block";
+  const x = Math.min(ev.clientX + 14, window.innerWidth - tip.offsetWidth - 10);
+  tip.style.left = x + "px"; tip.style.top = (ev.clientY + 14) + "px"; }
+const hideTip = () => { tip.style.display = "none"; };
+const mean = a => { const v = a.filter(x => x != null); return v.length ? d3.mean(v) : null; };
+function seg(id, cb) {
+  const el = document.getElementById(id);
+  el.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+    el.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); cb(b.dataset.v); });
+}
+
+/* Waterfall: steps = [{label, value, kind:'total'|'delta', note}] where totals
+   are absolute levels and deltas are signed moves from the running level. */
+function waterfall(sel, steps, opts = {}) {
+  const W = 720, H = opts.height || 330, m = { t: 22, r: 12, b: 78, l: 44 };
+  const root = d3.select(sel); root.selectAll("*").remove();
+  const svg = root.append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", opts.aria || "bridge chart");
+  let run = 0; const bars = steps.map(s => {
+    if (s.kind === "total") { run = s.value; return { ...s, y0: 0, y1: s.value }; }
+    const b = { ...s, y0: run, y1: run + s.value }; run += s.value; return b; });
+  const ext = d3.extent(bars.flatMap(b => [b.y0, b.y1]).concat([0]));
+  const pad = (ext[1] - ext[0]) * 0.14 || 0.5;
+  const y = d3.scaleLinear().domain([ext[0] - pad, ext[1] + pad]).range([H - m.b, m.t]).nice(5);
+  const x = d3.scaleBand().domain(bars.map((_, i) => i)).range([m.l, W - m.r]).padding(0.24);
+  svg.append("g").attr("class", "grid").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(""));
+  svg.append("g").attr("class", "axis").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d3.format("+.1f")));
+  svg.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--text-dim"));
+  bars.forEach((b, i) => { if (i === bars.length - 1) return;
+    svg.append("line").attr("x1", x(i) + x.bandwidth()).attr("x2", x(i + 1)).attr("y1", y(b.y1)).attr("y2", y(b.y1))
+      .attr("stroke", css("--border-hi")).attr("stroke-dasharray", "2 2"); });
+  const col = b => b.kind === "total" ? css("--accent") : b.value >= 0 ? css("--build") : css("--draw");
+  svg.selectAll("rect.bar").data(bars).join("rect").attr("class", "bar")
+    .attr("x", (_, i) => x(i)).attr("width", x.bandwidth())
+    .attr("y", b => y(Math.max(b.y0, b.y1))).attr("height", b => Math.max(1.5, Math.abs(y(b.y0) - y(b.y1))))
+    .attr("fill", col).attr("opacity", b => b.kind === "total" ? 0.9 : 0.85).attr("rx", 1.5)
+    .on("mousemove", (ev, b) => showTip(ev, `<b>${b.label}</b><br>${b.kind === "total" ? n2(b.value) : f2(b.value)} mb/d${b.note ? "<br><span style='color:#98a0b0'>" + b.note + "</span>" : ""}`))
+    .on("mouseleave", hideTip);
+  svg.selectAll("text.v").data(bars).join("text").attr("class", "v").attr("text-anchor", "middle")
+    .attr("x", (_, i) => x(i) + x.bandwidth() / 2)
+    .attr("y", b => (b.kind === "total" ? b.value >= 0 : b.value >= 0) ? y(Math.max(b.y0, b.y1)) - 5 : y(Math.min(b.y0, b.y1)) + 13)
+    .style("fill", css("--text")).text(b => b.kind === "total" ? f2(b.value) : f2(b.value));
+  svg.selectAll("text.l").data(bars).join("text").attr("class", "l").attr("text-anchor", "end")
+    .attr("transform", (_, i) => `translate(${x(i) + x.bandwidth() / 2 + 4},${H - m.b + 14}) rotate(-38)`)
+    .style("fill", b => b.kind === "total" ? css("--accent") : css("--text-mute")).text(b => b.label);
+}
+
+fetch("oil_balance.json?t=" + Date.now()).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  .then(render).catch(e => { document.querySelector("main").insertAdjacentHTML("afterbegin",
+    `<div class="err">Could not load oil_balance.json (${e.message}). Run <code>.venv/bin/python scripts/oil_balance.py</code>.</div>`); });
+
+function render(D) {
+  const G = D.global, U = D.us_weekly, M = D.stock_model, P = D.projection;
+  document.getElementById("asof").textContent = `STEO ${D.meta.steo_released} · WPSR wk ${D.meta.us_week_ending}`;
+
+  /* ---------- headline cards ---------- */
+  const iStk = G.periods.indexOf(G.last_hist.oecd_stocks), iLast = G.periods.indexOf(G.last_hist.supply);
+  const ytd = G.periods.map((p, i) => i).filter(i => G.periods[i].slice(0, 4) === G.periods[iLast].slice(0, 4) && i <= iLast);
+  const uN = U.dates.length - 1, z = (U.build[uN] - U.build_norm[uN]) / (U.build_sd[uN] || NaN);
+  const card = (lab, val, sub, cls = "") => `<div class="meta-card"><div class="lab">${lab}</div><div class="val ${cls}">${val}</div><div class="sub">${sub}</div></div>`;
+  const bd = v => v >= 0 ? "b" : "d";
+  document.getElementById("cards").innerHTML =
+    card(`Implied global build · ${pLabel(G.periods[iLast])}`, f2(G.implied_build[iLast]) + " mb/d", `${G.periods[iLast].slice(0, 4)} YTD avg ${f2(mean(ytd.map(i => G.implied_build[i])))}`, bd(G.implied_build[iLast])) +
+    card(`OECD stocks · ${pLabel(G.periods[iStk])}`, n0(G.oecd_stocks[iStk]) + " mb", `${f2(G.oecd_stocks[iStk] - G.oecd_stocks[iStk - 12])} mb vs year ago`) +
+    card("Model error, 1σ", "±" + n2(M.sigma) + " mb/d", `≈ ±${n0(M.sigma * 30.4)} mb per month of OECD stocks`) +
+    card(`US crude build · wk ${U.dates[uN].slice(5)}`, f2(U.build[uN]) + " mb/d", `normal ${f2(U.build_norm[uN])} · ${isFinite(z) ? f2(z) + "σ" : "n/a"}`, bd(U.build[uN]));
+
+  /* ---------- global bridge ---------- */
+  const gState = { i: iLast, win: 1, cmp: "yoy" };
+  const selP = document.getElementById("g-period");
+  selP.innerHTML = G.periods.map((p, i) => i >= 14 ? `<option value="${i}">${pLabel(p)}${G.status[i] === "fcst" ? " · forecast" : G.status[i] === "est" ? " · est" : ""}</option>` : "").reverse().join("");
+  selP.value = iLast;
+  const idxSet = (i, win) => d3.range(win).map(k => i - k).filter(k => k >= 0);
+  function gDraw() {
+    const { i, win, cmp } = gState, now = idxSet(i, win), base = idxSet(i - (cmp === "yoy" ? 12 : win), win);
+    const avg = (arr, ix) => mean(ix.map(k => arr[k]));
+    const steps = [{ label: `Build, ${cmp === "yoy" ? "year ago" : "prior"}`, value: avg(G.implied_build, base), kind: "total" }];
+    const rows = [];
+    for (const [side, sign] of [["supply", 1], ["demand", -1]]) {
+      rows.push(`<tr class="grp"><td colspan="4">${side}</td></tr>`);
+      for (const k of Object.keys(G[side])) {
+        const a = avg(G[side][k], now), b = avg(G[side][k], base), d = a - b;
+        steps.push({ label: G.labels[side][k] + (side === "demand" ? " demand" : ""), value: sign * d, kind: "delta",
+          note: `${side} ${n2(b)} → ${n2(a)} (${f2(d)})` });
+        rows.push(`<tr><td>${G.labels[side][k]}</td><td>${n2(a)}</td><td class="dim">${n2(b)}</td><td class="${sign * d >= 0 ? "b" : "d"}">${f2(d)}</td></tr>`);
+      }
+      const ta = avg(G[side + "_total"], now), tb = avg(G[side + "_total"], base);
+      rows.push(`<tr class="tot"><td>Total ${side}</td><td>${n2(ta)}</td><td class="dim">${n2(tb)}</td><td class="${sign * (ta - tb) >= 0 ? "b" : "d"}">${f2(ta - tb)}</td></tr>`);
+    }
+    const bNow = avg(G.implied_build, now), bBase = avg(G.implied_build, base);
+    steps.push({ label: "Build, " + (win > 1 ? "3m to " : "") + pLabel(G.periods[i]), value: bNow, kind: "total" });
+    waterfall("#g-bridge", steps, { height: 470, aria: "Global implied build variance bridge" });
+    const st = G.status[i], tag = st === "hist" ? "" : `<span class="tag ${st}">${st === "est" ? "EIA estimate" : "EIA forecast"}</span>`;
+    document.getElementById("g-bridge-title").innerHTML = `${win > 1 ? "3 months to " : ""}${pLabel(G.periods[i])} vs ${cmp === "yoy" ? "a year earlier" : "the prior " + (win > 1 ? "3 months" : "month")}, mb/d ${tag}`;
+    const ob = avg(G.oecd_build, now), ux = avg(G.unexplained, now);
+    rows.push(`<tr class="grp"><td colspan="4">stock change</td></tr>`,
+      `<tr class="tot"><td>Implied build</td><td class="gold">${f2(bNow)}</td><td class="dim">${f2(bBase)}</td><td class="${bNow - bBase >= 0 ? "b" : "d"}">${f2(bNow - bBase)}</td></tr>`,
+      `<tr><td>Observed in OECD stocks</td><td>${ob == null ? "n/a" : f2(ob)}</td><td></td><td></td></tr>`,
+      `<tr><td>Unexplained (non-OECD, afloat, error)</td><td>${ux == null ? "n/a" : f2(ux)}</td><td></td><td></td></tr>`,
+      `<tr><td>Model: expected OECD build</td><td>${f2(M.alpha + M.beta * bNow)}</td><td class="dim" colspan="2">± ${n2(M.sigma / Math.sqrt(win))}</td></tr>`);
+    document.getElementById("g-table").innerHTML = `<table><thead><tr><th></th><th>Now</th><th>Base</th><th>Δ</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
+    selP.value = i; histMark();
+  }
+  selP.addEventListener("change", () => { gState.i = +selP.value; gDraw(); });
+  seg("g-win", v => { gState.win = +v; gDraw(); });
+  seg("g-cmp", v => { gState.cmp = v; gDraw(); });
+
+  /* ---------- history: implied vs observed ---------- */
+  let histMark = () => {};
+  (function () {
+    const i0 = Math.max(0, G.periods.indexOf("202001")), ix = d3.range(i0, G.periods.length);
+    const W = 1100, H = 300, m = { t: 14, r: 12, b: 28, l: 44 };
+    const svg = d3.select("#g-hist").append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "Implied global build versus observed OECD stock change by month");
+    svg.append("defs").html(`<pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#0a0d12"/><rect width="2.4" height="5" fill="#fff"/></pattern><mask id="hm"><rect width="${W}" height="${H}" fill="url(#hatch)"/></mask>`);
+    const x = d3.scaleBand().domain(ix).range([m.l, W - m.r]).padding(0.18);
+    const vals = ix.flatMap(i => [G.implied_build[i], G.oecd_build[i]]).filter(v => v != null);
+    const y = d3.scaleLinear().domain(d3.extent(vals)).nice().range([H - m.b, m.t]);
+    svg.append("g").attr("class", "grid").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(6).tickSize(-(W - m.l - m.r)).tickFormat(""));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(6).tickFormat(d3.format("+.0f")));
+    ix.filter(i => G.periods[i].endsWith("01")).forEach(i => svg.append("text").attr("x", x(i)).attr("y", H - 8).text(G.periods[i].slice(0, 4)));
+    svg.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--text-dim"));
+    const bars = svg.selectAll("rect.h").data(ix).join("rect").attr("class", "h").attr("x", i => x(i)).attr("width", x.bandwidth())
+      .attr("y", i => y(Math.max(0, G.implied_build[i]))).attr("height", i => Math.max(1, Math.abs(y(G.implied_build[i]) - y(0))))
+      .attr("fill", i => G.implied_build[i] >= 0 ? css("--build") : css("--draw"))
+      .attr("mask", i => G.status[i] === "hist" ? null : "url(#hm)").style("cursor", "pointer")
+      .on("mousemove", (ev, i) => showTip(ev, `<b>${pLabel(G.periods[i])}</b> · ${G.status[i]}<br>implied ${f2(G.implied_build[i])}<br>OECD observed ${G.oecd_build[i] == null ? "n/a" : f2(G.oecd_build[i])}<br>unexplained ${G.unexplained[i] == null ? "n/a" : f2(G.unexplained[i])}`))
+      .on("mouseleave", hideTip).on("click", (_, i) => { gState.i = i; gDraw(); });
+    const obs = ix.filter(i => G.oecd_build[i] != null && G.periods[i] <= G.last_hist.oecd_stocks);
+    svg.append("path").attr("fill", "none").attr("stroke", css("--text")).attr("stroke-width", 1.4)
+      .attr("d", d3.line().x(i => x(i) + x.bandwidth() / 2).y(i => y(G.oecd_build[i]))(obs));
+    const mark = svg.append("rect").attr("fill", "none").attr("stroke", css("--accent")).attr("stroke-width", 1.2).attr("y", m.t).attr("height", H - m.b - m.t);
+    histMark = () => { const i = gState.i; mark.attr("display", x(i) == null ? "none" : null).attr("x", (x(i) || 0) - 2).attr("width", x.bandwidth() + 4); };
+  })();
+  gDraw();
+
+  /* ---------- stocks projection ---------- */
+  (function () {
+    const i0 = Math.max(0, iStk - 30), hist = d3.range(i0, iStk + 1);
+    const W = 720, H = 300, m = { t: 14, r: 14, b: 26, l: 50 };
+    const svg = d3.select("#g-proj").append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "OECD commercial stocks, reported and projected");
+    const x = d3.scaleTime().domain([pDate(G.periods[i0]), pDate(P.periods[P.periods.length - 1] || G.periods[iStk])]).range([m.l, W - m.r]);
+    const all = hist.map(i => G.oecd_stocks[i]).concat(P.lo, P.hi, P.eia.filter(v => v != null));
+    const y = d3.scaleLinear().domain(d3.extent(all)).nice().range([H - m.b, m.t]);
+    svg.append("g").attr("class", "grid").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(""));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(",.0f")));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat("%b %y")));
+    const fp = [{ p: P.anchor, m: P.anchor_level, lo: P.anchor_level, hi: P.anchor_level, e: P.anchor_level }]
+      .concat(P.periods.map((p, k) => ({ p, m: P.model[k], lo: P.lo[k], hi: P.hi[k], e: P.eia[k] })));
+    svg.append("path").attr("fill", css("--accent")).attr("opacity", 0.16).attr("d", d3.area().x(d => x(pDate(d.p))).y0(d => y(d.lo)).y1(d => y(d.hi))(fp));
+    svg.append("path").attr("fill", "none").attr("stroke", css("--draw")).attr("stroke-width", 1.4).attr("stroke-dasharray", "4 3").attr("d", d3.line().defined(d => d.e != null).x(d => x(pDate(d.p))).y(d => y(d.e))(fp));
+    svg.append("path").attr("fill", "none").attr("stroke", css("--accent")).attr("stroke-width", 1.8).attr("d", d3.line().x(d => x(pDate(d.p))).y(d => y(d.m))(fp));
+    svg.append("path").attr("fill", "none").attr("stroke", css("--text")).attr("stroke-width", 1.8).attr("d", d3.line().x(i => x(pDate(G.periods[i]))).y(i => y(G.oecd_stocks[i]))(hist));
+    svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.b - m.t).attr("fill", "transparent")
+      .on("mousemove", ev => { const t = x.invert(d3.pointer(ev)[0]); const key = t.getFullYear() + String(t.getMonth() + 1).padStart(2, "0");
+        const f = fp.find(d => d.p === key), i = G.periods.indexOf(key);
+        if (f && f.p !== P.anchor) showTip(ev, `<b>${pLabel(key)}</b><br>model ${n0(f.m)} (${n0(f.lo)} to ${n0(f.hi)})<br>EIA ${f.e == null ? "n/a" : n0(f.e)}`);
+        else if (i >= 0 && G.oecd_stocks[i] != null) showTip(ev, `<b>${pLabel(key)}</b><br>reported ${n0(G.oecd_stocks[i])} mb`); })
+      .on("mouseleave", hideTip);
+    const last = fp[fp.length - 1];
+    document.getElementById("g-model").innerHTML =
+      `<p>Only OECD inventories are reported on time, so the model asks: when the balance implies a 1 mb/d global build, how much of it historically lands in OECD tanks?</p>
+       <p style="font-family:var(--mono);color:var(--text);margin:12px 0">OECD build = ${f2(M.alpha)} + ${n2(M.beta)} × implied build<br>residual σ = ${n2(M.sigma)} mb/d &nbsp;·&nbsp; R² = ${n2(M.r2)} &nbsp;·&nbsp; n = ${M.n} months</p>
+       <p>About <b style="color:var(--text)">${d3.format(".0%")(M.beta)}</b> of an implied build shows up; the rest goes to non-OECD storage, oil on water, or was never there. The σ is the variance estimate: a one-month call on OECD stocks is good to roughly ±${n0(M.sigma * 30.4)} mb.</p>
+       <p style="margin-top:10px">Rolled forward from ${pLabel(P.anchor)}, the model puts OECD stocks at <b style="color:var(--text)">${n0(last.m)} mb</b> by ${pLabel(last.p)} (${n0(last.lo)} to ${n0(last.hi)}), against EIA's ${last.e == null ? "n/a" : n0(last.e)}.</p>`;
+  })();
+
+  /* ---------- US weekly ---------- */
+  const uState = { i: uN, win: 1 };
+  const selW = document.getElementById("u-week");
+  selW.innerHTML = d3.range(uN, Math.max(uN - 156, 3), -1).map(i => `<option value="${i}">${U.dates[i]}</option>`).join("");
+  const ITEMS = [["production", "Production", 1], ["imports", "Imports", 1], ["exports", "Exports", -1], ["refinery_inputs", "Refinery inputs", -1], ["adjustment", "Adjustment (unaccounted)", 1]];
+  function uDraw() {
+    const { i, win } = uState, ix = idxSet(i, win), avg = k => mean(ix.map(j => U[k][j]));
+    const normB = avg("build_norm"), actB = avg("build");
+    const steps = [{ label: "Seasonal-normal build", value: normB, kind: "total" }], rows = [];
+    for (const [k, lab, sign] of ITEMS) {
+      const a = avg(k), nrm = avg(k + "_norm"), sd = avg(k + "_sd"), d = sign * (a - nrm);
+      steps.push({ label: lab, value: d, kind: "delta", note: `${n2(a)} vs normal ${n2(nrm)}` });
+      const zz = sd ? (a - nrm) / (sd / Math.sqrt(win)) : NaN;
+      rows.push(`<tr><td>${sign < 0 ? "− " : "+ "}${lab}</td><td>${n2(a)}</td><td class="dim">${n2(nrm)}</td><td class="${d >= 0 ? "b" : "d"}">${f2(d)}</td><td class="dim">${isFinite(zz) ? f2(zz) : ""}</td></tr>`);
+    }
+    steps.push({ label: "Reported build", value: actB, kind: "total" });
+    waterfall("#u-bridge", steps, { aria: "US crude stock change versus seasonal normal" });
+    document.getElementById("u-bridge-title").textContent = `${win > 1 ? "4 weeks to " : "Week ending "}${U.dates[i]} vs the five-year seasonal normal, mb/d`;
+    const zB = (actB - normB) / (avg("build_sd") / Math.sqrt(win));
+    rows.push(`<tr class="tot"><td>Stock change, total</td><td class="gold">${f2(actB)}</td><td class="dim">${f2(normB)}</td><td class="${actB - normB >= 0 ? "b" : "d"}">${f2(actB - normB)}</td><td class="dim">${isFinite(zB) ? f2(zB) : ""}</td></tr>`,
+      `<tr><td>&nbsp; commercial</td><td>${f2(avg("build_comm"))}</td><td class="dim">${f2(avg("build_comm_norm"))}</td><td></td><td></td></tr>`,
+      `<tr><td>&nbsp; SPR</td><td>${f2(avg("build_spr"))}</td><td class="dim">${f2(avg("build_spr_norm"))}</td><td></td><td></td></tr>`,
+      `<tr><td>Commercial stocks, mb</td><td>${n1(U.stocks_comm[i])}</td><td class="dim">${n1(U.stocks_comm_norm[i])}</td><td class="${U.stocks_comm[i] - U.stocks_comm_norm[i] >= 0 ? "b" : "d"}">${f2(U.stocks_comm[i] - U.stocks_comm_norm[i])}</td><td></td></tr>`);
+    document.getElementById("u-table").innerHTML = `<table><thead><tr><th></th><th>Actual</th><th>Normal</th><th>Effect</th><th>z</th></tr></thead><tbody>${rows.join("")}</tbody></table>
+      <p style="font-size:12px;color:var(--text-dim);margin-top:10px">Effect is the line item's contribution to build versus normal (exports and refinery inputs are sign-flipped). A week is ×7 for barrels.</p>`;
+  }
+  selW.addEventListener("change", () => { uState.i = +selW.value; uDraw(); });
+  seg("u-win", v => { uState.win = +v; uDraw(); });
+  uDraw();
+
+  (function () {
+    const ix = d3.range(Math.max(13, uN - 156), uN + 1), S = U.adjustment_stats;
+    const W = 1100, H = 240, m = { t: 12, r: 12, b: 26, l: 44 };
+    const svg = d3.select("#u-adj").append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "Weekly unaccounted-for crude");
+    const x = d3.scaleTime().domain([new Date(U.dates[ix[0]]), new Date(U.dates[uN])]).range([m.l, W - m.r]);
+    const y = d3.scaleLinear().domain(d3.extent(ix, i => U.adjustment[i])).nice().range([H - m.b, m.t]);
+    svg.append("g").attr("class", "grid").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(""));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d3.format("+.1f")));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(8).tickFormat(d3.timeFormat("%b %y")));
+    svg.append("rect").attr("x", m.l).attr("width", W - m.l - m.r).attr("y", y(S.mean + S.sigma)).attr("height", y(S.mean - S.sigma) - y(S.mean + S.sigma)).attr("fill", css("--accent")).attr("opacity", 0.1);
+    svg.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--text-dim"));
+    const bw = Math.max(1.5, (W - m.l - m.r) / ix.length - 1.5);
+    svg.selectAll("rect.a").data(ix).join("rect").attr("class", "a").attr("x", i => x(new Date(U.dates[i])) - bw / 2).attr("width", bw)
+      .attr("y", i => y(Math.max(0, U.adjustment[i]))).attr("height", i => Math.max(1, Math.abs(y(U.adjustment[i]) - y(0)))).attr("fill", css("--text-dim")).attr("opacity", 0.7)
+      .on("mousemove", (ev, i) => showTip(ev, `<b>${U.dates[i]}</b><br>adjustment ${f2(U.adjustment[i])} mb/d<br>modelled build ${f2(U.modelled_build[i])}<br>reported build ${f2(U.build[i])}`)).on("mouseleave", hideTip)
+      .style("cursor", "pointer").on("click", (_, i) => { uState.i = i; selW.value = i; uDraw(); });
+    svg.append("path").attr("fill", "none").attr("stroke", css("--accent")).attr("stroke-width", 1.6)
+      .attr("d", d3.line().x(i => x(new Date(U.dates[i]))).y(i => y(d3.mean(d3.range(i - 12, i + 1), j => U.adjustment[j])))(ix));
+    document.getElementById("caveats").innerHTML =
+      `<b>Read this before trusting a number.</b> World demand after ${pLabel(G.last_hist.demand)} is an EIA estimate, not a count, so every implied build since then inherits that estimate (hatched bars).
+       Forecast months are EIA's view, not an independent forecast. The stock model assumes monthly errors are independent; they are not, so the band is a floor.
+       In the US bridge the adjustment has averaged <b>${f2(S.mean)} mb/d</b> with σ <b>${n2(S.sigma)}</b> over ${S.window_weeks} weeks: a persistent positive bias (commonly attributed to production and blending volumes the weekly survey undercounts), which is why the modelled build alone under-predicts reported stocks.
+       Each STEO release is now archived, so forecast-versus-actual error on the build will accumulate from ${D.meta.steo_released}.`;
+  })();
+
+  document.getElementById("foot").innerHTML = `Sources: ${D.meta.sources.map(s => `<a href="${s.url}">${s.name}</a>`).join(" · ")} · generated ${D.meta.generated_at.replace("T", " ").slice(0, 16)} UTC`;
+}
+</script>
+</body>
+</html>

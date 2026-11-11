@@ -1,0 +1,414 @@
+{
+ "generated_at": "2026-11-10T20:53:58",
+ "grid": {
+  "start": "2019-01-31",
+  "end": "2026-11-09",
+  "n": 95
+ },
+ "signals": {
+  "composite": {
+   "summary": {
+    "n_periods": 93.0,
+    "ann_ret_net": -0.08576,
+    "ann_ret_gross": -0.05085,
+    "ann_vol": 0.137164,
+    "sharpe_net": -0.625239,
+    "sharpe_gross": -0.370803,
+    "nw_t_net": -1.688281,
+    "max_drawdown": -0.608852,
+    "avg_turnover": 0.242436,
+    "avg_cost_per_period": 0.002909,
+    "n_periods_skipped": 0.0,
+    "min_book": 15.0,
+    "median_n_long": 45.0,
+    "median_n_short": 44.0,
+    "min_n_long": 32.0,
+    "min_n_short": 31.0,
+    "median_n_ranked": 134.0,
+    "n_stale_dropped": 3.0,
+    "n_extreme_dropped": 1.0
+   },
+   "quantile_means": [
+    {
+     "quantile": 1,
+     "mean_period_ret": 0.017882,
+     "n_obs": 4107
+    },
+    {
+     "quantile": 2,
+     "mean_period_ret": 0.013208,
+     "n_obs": 4170
+    },
+    {
+     "quantile": 3,
+     "mean_period_ret": 0.014426,
+     "n_obs": 4138
+    }
+   ],
+   "subsample": {
+    "col": "ls_gross",
+    "full": {
+     "window": "full",
+     "start": "2019-01-31",
+     "end": "2026-09-30",
+     "n": 93,
+     "mean": -0.004237,
+     "sharpe": -0.370803,
+     "hit_rate": 0.505376
+    },
+    "windows": [
+     {
+      "window": "third 1/3",
+      "start": "2019-01-31",
+      "end": "2021-06-30",
+      "n": 30,
+      "mean": -0.013974,
+      "sharpe": -0.788636,
+      "hit_rate": 0.533333
+     },
+     {
+      "window": "third 2/3",
+      "start": "2021-09-30",
+      "end": "2024-01-31",
+      "n": 29,
+      "mean": -0.003189,
+      "sharpe": -0.545523,
+      "hit_rate": 0.413793
+     },
+     {
+      "window": "third 3/3",
+      "start": "2024-04-30",
+      "end": "2026-09-30",
+      "n": 30,
+      "mean": 0.002155,
+      "sharpe": 0.314886,
+      "hit_rate": 0.533333
+     },
+     {
+      "window": "half 1/2",
+      "start": "2019-01-31",
+      "end": "2022-09-30",
+      "n": 45,
+      "mean": -0.010996,
+      "sharpe": -0.746032,
+      "hit_rate": 0.466667
+     },
+     {
+      "window": "half 2/2",
+      "start": "2022-12-30",
+      "end": "2026-09-30",
+      "n": 46,
+      "mean": 0.002968,
+      "sharpe": 0.439991,
+      "hit_rate": 0.565217
+     }
+    ],
+    "worst_subsample_sharpe": -0.788636,
+    "stability": false
+   }
+  },
+  "score_momentum": {
+   "summary": {
+    "n_periods": 93.0,
+    "ann_ret_net": -0.094424,
+    "ann_ret_gross": -0.065989,
+    "ann_vol": 0.16889,
+    "sharpe_net": -0.559085,
+    "sharpe_gross": -0.390808,
+    "nw_t_net": -1.528395,
+    "max_drawdown": -0.689073,
+    "avg_turnover": 0.197463,
+    "avg_cost_per_period": 0.00237,
+    "n_periods_skipped": 0.0,
+    "min_book": 10.0,
+    "median_n_long": 62.0,
+    "median_n_short": 62.0,
+    "min_n_long": 56.0,
+    "min_n_short": 56.0,
+    "median_n_ranked": 186.0,
+    "n_stale_dropped": 1.0,
+    "n_extreme_dropped": 3.0
+   },
+   "quantile_means": [
+    {
+     "quantile": 1,
+     "mean_period_ret": 0.01943,
+     "n_obs": 5738
+    },
+    {
+     "quantile": 2,
+     "mean_period_ret": 0.014926,
+     "n_obs": 5797
+    },
+    {
+     "quantile": 3,
+     "mean_period_ret": 0.014097,
+     "n_obs": 5764
+    }
+   ],
+   "subsample": {
+    "col": "ls_gross",
+    "full": {
+     "window": "full",
+     "start": "2019-01-31",
+     "end": "2026-09-30",
+     "n": 93,
+     "mean": -0.005499,
+     "sharpe": -0.390808,
+     "hit_rate": 0.526882
+    },
+    "windows": [
+     {
+      "window": "third 1/3",
+      "start": "2019-01-31",
+      "end": "2021-06-30",
+      "n": 30,
+      "mean": -0.012478,
+      "sharpe": -0.552928,
+      "hit_rate": 0.6
+     },
+     {
+      "window": "third 2/3",
+      "start": "2021-09-30",
+      "end": "2024-01-31",
+      "n": 29,
+      "mean": -0.003995,
+      "sharpe": -0.805729,
+      "hit_rate": 0.413793
+     },
+     {
+      "window": "third 3/3",
+      "start": "2024-04-30",
+      "end": "2026-09-30",
+      "n": 30,
+      "mean": -0.002872,
+      "sharpe": -0.32374,
+      "hit_rate": 0.533333
+     },
+     {
+      "window": "half 1/2",
+      "start": "2019-01-31",
+      "end": "2022-09-30",
+      "n": 45,
+      "mean": -0.008816,
+      "sharpe": -0.473021,
+      "hit_rate": 0.533333
+     },
+     {
+      "window": "half 2/2",
+      "start": "2022-12-30",
+      "end": "2026-09-30",
+      "n": 46,
+      "mean": -0.001294,
+      "sharpe": -0.165849,
+      "hit_rate": 0.543478
+     }
+    ],
+    "worst_subsample_sharpe": -0.805729,
+    "stability": true
+   }
+  },
+  "score_value": {
+   "summary": {
+    "n_periods": 93.0,
+    "ann_ret_net": 0.014242,
+    "ann_ret_gross": 0.029193,
+    "ann_vol": 0.118538,
+    "sharpe_net": 0.120152,
+    "sharpe_gross": 0.246793,
+    "nw_t_net": 0.33124,
+    "max_drawdown": -0.242289,
+    "avg_turnover": 0.10382,
+    "avg_cost_per_period": 0.001246,
+    "n_periods_skipped": 0.0,
+    "min_book": 10.0,
+    "median_n_long": 34.0,
+    "median_n_short": 34.0,
+    "min_n_long": 21.0,
+    "min_n_short": 21.0,
+    "median_n_ranked": 103.0,
+    "n_stale_dropped": 4.0,
+    "n_extreme_dropped": 1.0
+   },
+   "quantile_means": [
+    {
+     "quantile": 1,
+     "mean_period_ret": 0.01368,
+     "n_obs": 3110
+    },
+    {
+     "quantile": 2,
+     "mean_period_ret": 0.012959,
+     "n_obs": 3177
+    },
+    {
+     "quantile": 3,
+     "mean_period_ret": 0.016117,
+     "n_obs": 3137
+    }
+   ],
+   "subsample": {
+    "col": "ls_gross",
+    "full": {
+     "window": "full",
+     "start": "2019-01-31",
+     "end": "2026-09-30",
+     "n": 93,
+     "mean": 0.002433,
+     "sharpe": 0.246793,
+     "hit_rate": 0.483871
+    },
+    "windows": [
+     {
+      "window": "third 1/3",
+      "start": "2019-01-31",
+      "end": "2021-06-30",
+      "n": 30,
+      "mean": 0.005594,
+      "sharpe": 0.387116,
+      "hit_rate": 0.566667
+     },
+     {
+      "window": "third 2/3",
+      "start": "2021-09-30",
+      "end": "2024-01-31",
+      "n": 29,
+      "mean": -0.003766,
+      "sharpe": -0.656022,
+      "hit_rate": 0.37931
+     },
+     {
+      "window": "third 3/3",
+      "start": "2024-04-30",
+      "end": "2026-09-30",
+      "n": 30,
+      "mean": 0.004584,
+      "sharpe": 0.595988,
+      "hit_rate": 0.466667
+     },
+     {
+      "window": "half 1/2",
+      "start": "2019-01-31",
+      "end": "2022-09-30",
+      "n": 45,
+      "mean": 0.003506,
+      "sharpe": 0.28297,
+      "hit_rate": 0.533333
+     },
+     {
+      "window": "half 2/2",
+      "start": "2022-12-30",
+      "end": "2026-09-30",
+      "n": 46,
+      "mean": 0.001724,
+      "sharpe": 0.249509,
+      "hit_rate": 0.434783
+     }
+    ],
+    "worst_subsample_sharpe": -0.656022,
+    "stability": false
+   }
+  },
+  "score_pead": {
+   "summary": {
+    "n_periods": 93.0,
+    "ann_ret_net": -0.040607,
+    "ann_ret_gross": 0.001578,
+    "ann_vol": 0.105992,
+    "sharpe_net": -0.383117,
+    "sharpe_gross": 0.014875,
+    "nw_t_net": -1.00382,
+    "max_drawdown": -0.455742,
+    "avg_turnover": 0.292955,
+    "avg_cost_per_period": 0.003515,
+    "n_periods_skipped": 0.0,
+    "min_book": 10.0,
+    "median_n_long": 30.0,
+    "median_n_short": 30.0,
+    "min_n_long": 19.0,
+    "min_n_short": 18.0,
+    "median_n_ranked": 91.0,
+    "n_stale_dropped": 3.0,
+    "n_extreme_dropped": 0.0
+   },
+   "quantile_means": [
+    {
+     "quantile": 1,
+     "mean_period_ret": 0.01516,
+     "n_obs": 2851
+    },
+    {
+     "quantile": 2,
+     "mean_period_ret": 0.015138,
+     "n_obs": 2904
+    },
+    {
+     "quantile": 3,
+     "mean_period_ret": 0.015573,
+     "n_obs": 2876
+    }
+   ],
+   "subsample": {
+    "col": "ls_gross",
+    "full": {
+     "window": "full",
+     "start": "2019-01-31",
+     "end": "2026-09-30",
+     "n": 93,
+     "mean": 0.000132,
+     "sharpe": 0.014875,
+     "hit_rate": 0.451613
+    },
+    "windows": [
+     {
+      "window": "third 1/3",
+      "start": "2019-01-31",
+      "end": "2021-06-30",
+      "n": 30,
+      "mean": 0.00323,
+      "sharpe": 0.293808,
+      "hit_rate": 0.433333
+     },
+     {
+      "window": "third 2/3",
+      "start": "2021-09-30",
+      "end": "2024-01-31",
+      "n": 29,
+      "mean": -0.004067,
+      "sharpe": -0.588324,
+      "hit_rate": 0.448276
+     },
+     {
+      "window": "third 3/3",
+      "start": "2024-04-30",
+      "end": "2026-09-30",
+      "n": 30,
+      "mean": 0.004984,
+      "sharpe": 0.630466,
+      "hit_rate": 0.533333
+     },
+     {
+      "window": "half 1/2",
+      "start": "2019-01-31",
+      "end": "2022-09-30",
+      "n": 45,
+      "mean": -0.003355,
+      "sharpe": -0.331824,
+      "hit_rate": 0.377778
+     },
+     {
+      "window": "half 2/2",
+      "start": "2022-12-30",
+      "end": "2026-09-30",
+      "n": 46,
+      "mean": 0.003136,
+      "sharpe": 0.419509,
+      "hit_rate": 0.521739
+     }
+    ],
+    "worst_subsample_sharpe": -0.588324,
+    "stability": false
+   }
+  }
+ }
+}
