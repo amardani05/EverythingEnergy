@@ -65,6 +65,40 @@ Click any node to open the side drawer. Tabs:
 
 The strip below the map shows top active signals (or, if no `|z| > 0.5` pairs, the top 8 strongest correlations as a fallback).
 
+### Terminal (`terminal.html`)
+
+A 2008-style workstation: white panels, small type, tabs across the top, numbers everywhere. Twelve default tabs (Overview, World Map, Supply Chain, Energy, Metals, Options, Volatility, Balances, Trade Flows, Markets, Data, Equities), each a grid of widgets.
+
+**Layout is yours.** Drag a widget by its title bar, resize from its bottom-right corner, maximize or remove it from its header, add any widget from the list on the left, add, rename or delete tabs, lock the layout, or reset a tab. Twenty rows always fill the screen. The arrangement is saved in the browser (`localStorage`), per machine.
+
+**Linked selection.** The Commodity and Country pickers in the bar under the tabs drive every widget in the visible tab: pick cobalt and the map, the sheet and the routes table all follow; click a country on the map and its sheet loads.
+
+| Widget | What it does |
+|---|---|
+| World Map | MapLibre map, dark or light, flat or globe. Shade countries by production, reserves, processing or consumption share. Trunk pipelines, refineries, LNG, mines, smelters and enrichment always shown; the dense US pipeline network and smaller sites appear as you zoom in. Sea-routed trade flows and chokepoints. Click a country for its sheet, a line or dot for details. |
+| Commodity Sheet | Producers with share, YoY and reserves; processing shares; trade links; end uses; HHI and top-3 concentration; an outage calculator (country X loses N% -> share of world supply gone). |
+| Country Sheet | Everything one country produces, processes, trades and consumes, with world share and rank, plus its mapped infrastructure. |
+| Supply Concentration | One row per commodity: top producer, top-3 share, HHI, top processor, reserve life, US import reliance. |
+| Trade Routes, Chokepoints | Largest physical routes by commodity, and what share of mapped trade passes each chokepoint. |
+| Quote Board, Movers, Chart | Energy and metals futures, vol indices, ETF proxies: last, 1d/1m/1y, 52-week range, realized vol; price chart with overlay and rolling vol. |
+| Vol Monitor | Implied vs realized for every option underlying: ATM IV at about 30 and 90 days, term slope, RV10/20/60, IV minus RV, implied move. |
+| Options Desk | Listed chains with implied vol solved from mid, Black-Scholes fair value at a vol you choose, edge, greeks, smile, term structure, surface. Click a bid or ask to send a leg to the builder. |
+| Strategy Builder | Multi-leg P&L at expiry, today, and any day/vol scenario; breakevens, max gain/loss, probability of profit; convexity (delta/gamma profiles, a Taylor split of P&L by sigma move, the daily move needed to cover theta); spot x vol grid; greeks by leg. 18 presets including calendars. |
+| Oil Balance | The balance model as tables. |
+| Data Workbench | Every dataset as a table: filter, `Where` expressions, formula columns (`production / reserves`, `Z("share")`, `MA("close", 20)`), group-by, charts, copy to spreadsheet, CSV. |
+
+Code: `terminal/wm.js` (shell, tables, charts), one file per widget family, `terminal/wm.css`. Layout engine is GridStack 10 from a CDN; country shapes are vendored in `terminal/world-50m.json`.
+
+Data files and the scripts that rebuild them:
+
+```bash
+.venv/bin/python scripts/market_snapshot.py     # market_data.json + options_data.json (Yahoo; nightly)
+.venv/bin/python scripts/build_commodities.py   # commodities.json (USGS, EIA international, WNA + curated)
+.venv/bin/python scripts/build_infra.py         # infra_pipelines.geojson + infra_facilities.geojson (EIA, USGS + curated)
+```
+
+Limits worth knowing: options are American-style ETF and equity proxies (USO for WTI, GLD for gold, and so on) priced with the European Black-Scholes approximation, because Yahoo carries no chains for the futures themselves; quotes are delayed snapshots. The pricing engine is `terminal/bs.js`, tested by `tests/test_bs.mjs`.
+
 ### Flows (`flows.html`)
 
 Atlas Plate II: a world map of the largest crude, products, LNG, pipeline gas, coal and uranium trade routes. Arcs are routed over a sea-lane graph and forced through the chokepoints each route depends on; click a chokepoint to see what share of mapped trade passes it. Data is the curated, sourced `flows_data.json` (mostly calendar 2025, each flow carrying its year, source and a confidence grade). It is a baseline of what normally moves, not a live tracker.

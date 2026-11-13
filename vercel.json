@@ -20,7 +20,7 @@
       ]
     },
     {
-      "source": "/(oil_balance|flows_data|signals_latest|backtests).json",
+      "source": "/(oil_balance|flows_data|signals_latest|backtests|market_data|options_data|commodities).json",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
       ]

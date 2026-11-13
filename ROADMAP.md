@@ -1,29 +1,26 @@
 # signal_engine - Improvement Roadmap
 
+*Newest first. Current direction and status are the first two sections; everything from "Original assessment" down is the historical record.*
+
 *Drafted 2026-07-16 against `main2` @ `02124ca`. Evidence cited as `file:line`.*
 
 ---
 
-## 0. Where things stand
+## Direction change (2026-11-12): a trading suite for energy and metals
 
-The repo holds two disjoint systems: the legacy **Energy Atlas** dashboard (works, manual, print-based, May-era) and the new **`signal_engine`** (the future: bitemporal DuckDB store, PIT-correct factors, 39 green tests). The engine's factor layer is genuinely solid - but it currently **dead-ends in both directions**: the fundamentals data it needs was never loaded, and everything downstream of raw factor values doesn't exist yet.
+*The owner's brief, which overrides the UI and scope assumptions above: an old-Windows, numbers-first terminal; metals as well as energy; supply and demand by country; pipelines and flows on a world map; options with Black-Scholes fair value, multi-leg P&L and convexity; and enough tooling to work the numbers in place instead of writing code elsewhere. Test case: "disarray in the DRC: how much do they make, where does it go, who refines it, what is it for".*
 
-| Layer | State | Evidence |
-|---|---|---|
-| PIT store (bitemporal DuckDB) | ✅ Designed & tested | `data/store.py:41-269`, `tests/test_store_pit.py` |
-| Prices | ⚠️ Loaded but stale + flawed | 1.53M rows, yfinance-only, max date **2026-06-23**; dividends silently dropped (`data/prices.py:80`) |
-| EDGAR fundamentals | ❌ **Empty** | `edgar_facts` = 0 rows. Ingest crashed at ~650/766 CIKs on 6/23; fix landed 6/25 (`02124ca`) but **never re-run**; 0 `companyfacts_*.json` on disk |
-| Universe (IJR) | ⚠️ One snapshot (2026-06-12) | `ijr_pit` mode unusable; launchd job never installed (no `data_store/logs/`) |
-| Macro (FRED/EIA), FINRA | ❌ Clients only / stub | No ingest script; `macro_series` = 0 rows; `supplements/finra.py:22` raises `NotImplementedError` |
-| Factors (V/Q/M/PEAD) | ✅ Implemented, PIT-correct, unit-tested | `factors/*.py` - but called **only from tests** |
-| Scoring / composite | ❌ Does not exist | `scoring/__init__.py` = 0 bytes; config spec at `config.yaml:37-44` is dead config |
-| Validation | ⚠️ IC primitive only | `validation/ic.py`; `validation.backtest` referenced at `ic.py:17` but missing |
-| Backtester | ❌ Does not exist | No portfolio construction, costs, turnover, or walk-forward anywhere |
-| Output / reporting | ❌ Does not exist | `output/__init__.py` = 0 bytes; `data_store/snapshots/` never created |
-| CLI / orchestration | ❌ None | No `[project.scripts]`, no Makefile, no runner - zero→signals is currently impossible |
-| Docs / CI | ❌ README covers only the legacy dashboard; no CI | `README.md` never mentions the engine; no `.github/` |
+**Shipped as `terminal.html`** (see README). First cut was a Win95 window desktop; on 2026-11-12 the owner asked for "2008, a bit more modern, plenty of information at every turn", tabs across the top and a layout they can rearrange, so the shell is now a tabbed workstation of movable widgets (GridStack) with a linked commodity/country selection. Widgets: World Map, Commodity and Country sheets with an outage calculator, Quote Board, Options Desk, Strategy Builder, Oil Balance, Data Workbench. Data: `commodities.json` (USGS MCS + EIA international + WNA, plus curated processing shares, trade links and end uses), `infra_*.geojson` (EIA US pipelines and plants, USGS mineral facilities, about 110 curated international pipelines and sites), `market_data.json` and `options_data.json` (Yahoo, nightly).
 
-**One-sentence diagnosis:** a well-built engine block with no fuel line (data), no transmission (scoring→backtest), and no steering wheel (CLI) - the roadmap is mostly *connecting* what exists, plus a handful of correctness fixes that are cheap now and expensive later.
+**Known weak spots, in the order they hurt:**
+1. **Options are ETF proxies with delayed quotes and a European model on American options.** Fine for structure and convexity work, wrong for anything execution-sensitive. Next: a binomial or Barone-Adesi-Whaley American price next to the BSM number; CME settlement files for real futures options (free, end of day) so crude, gas, copper and gold are priced on the future rather than on USO or GLD.
+2. **Metals have supply but little demand.** USGS gives production and reserves by country; consumption by country is only in the dataset for energy. Add apparent consumption for copper, aluminum, nickel and zinc (ICSG/ILZSG/INSG press-release tables, World Bureau of Metal Statistics where free) and exchange stocks (LME and SHFE daily warehouse reports, COMEX) as the metals equivalent of the oil balance.
+3. **Infrastructure vintages.** US pipelines and plants are EIA 2020/21 shapefiles; non-US mines and smelters are USGS 2003-2008. The curated layer covers the big names. Global Energy Monitor trackers (CC BY, gated download) would replace most of this.
+4. **Processing and trade shares are curated, with confidence flags.** UN Comtrade (free tier) can make the trade links reproducible by HS code.
+5. **No positions or P&L persistence.** The strategy builder forgets on reload. A saved book (local file via the dev server) with mark-to-market from the nightly snapshot is the step from calculator to blotter.
+6. **Workbench has no joins or saved views.** Add named views, a second table to join on country or symbol, and regression/correlation between two columns.
+
+**Next modules:** futures curve window (strip of contract months, calendar spreads, roll yield); crack, spark and metals-ratio spread board; event calendar (WPSR, STEO, OPEC, LME week) tied to the event-study backtest below; disruption overlay on the map (Hormuz closure: baseline vs current transit by chokepoint).
 
 ---
 
@@ -96,6 +93,29 @@ Reading: momentum loses in every window, so in this universe it behaves as a rev
 - **Bootstrap bands on everything shown.** The Lab's block bootstrap is client-side only. Port it so every published Sharpe and quantile spread carries an interval.
 - **Capacity and liquidity realism at the basket level.** ADV-weighted capacity per basket, so a signal that only works in the six-name SMR basket is labelled as such.
 - **A results registry on the site.** Trial ledger rendered on `signals.html`: every configuration ever run, with its date, git SHA and outcome. The August failure and today's diagnosis should be as visible as a success would be.
+
+---
+
+## Original assessment (2026-07-16): where things stood
+
+The repo holds two disjoint systems: the legacy **Energy Atlas** dashboard (works, manual, print-based, May-era) and the new **`signal_engine`** (the future: bitemporal DuckDB store, PIT-correct factors, 39 green tests). The engine's factor layer is genuinely solid - but it currently **dead-ends in both directions**: the fundamentals data it needs was never loaded, and everything downstream of raw factor values doesn't exist yet.
+
+| Layer | State | Evidence |
+|---|---|---|
+| PIT store (bitemporal DuckDB) | ✅ Designed & tested | `data/store.py:41-269`, `tests/test_store_pit.py` |
+| Prices | ⚠️ Loaded but stale + flawed | 1.53M rows, yfinance-only, max date **2026-06-23**; dividends silently dropped (`data/prices.py:80`) |
+| EDGAR fundamentals | ❌ **Empty** | `edgar_facts` = 0 rows. Ingest crashed at ~650/766 CIKs on 6/23; fix landed 6/25 (`02124ca`) but **never re-run**; 0 `companyfacts_*.json` on disk |
+| Universe (IJR) | ⚠️ One snapshot (2026-06-12) | `ijr_pit` mode unusable; launchd job never installed (no `data_store/logs/`) |
+| Macro (FRED/EIA), FINRA | ❌ Clients only / stub | No ingest script; `macro_series` = 0 rows; `supplements/finra.py:22` raises `NotImplementedError` |
+| Factors (V/Q/M/PEAD) | ✅ Implemented, PIT-correct, unit-tested | `factors/*.py` - but called **only from tests** |
+| Scoring / composite | ❌ Does not exist | `scoring/__init__.py` = 0 bytes; config spec at `config.yaml:37-44` is dead config |
+| Validation | ⚠️ IC primitive only | `validation/ic.py`; `validation.backtest` referenced at `ic.py:17` but missing |
+| Backtester | ❌ Does not exist | No portfolio construction, costs, turnover, or walk-forward anywhere |
+| Output / reporting | ❌ Does not exist | `output/__init__.py` = 0 bytes; `data_store/snapshots/` never created |
+| CLI / orchestration | ❌ None | No `[project.scripts]`, no Makefile, no runner - zero→signals is currently impossible |
+| Docs / CI | ❌ README covers only the legacy dashboard; no CI | `README.md` never mentions the engine; no `.github/` |
+
+**One-sentence diagnosis:** a well-built engine block with no fuel line (data), no transmission (scoring→backtest), and no steering wheel (CLI) - the roadmap is mostly *connecting* what exists, plus a handful of correctness fixes that are cheap now and expensive later.
 
 ---
 

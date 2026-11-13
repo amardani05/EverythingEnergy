@@ -142,16 +142,37 @@ def get_constituents(tax):
     return pd.DataFrame(rows)
 
 # -----------------------------------------------------------------
-def _cache_is_stale(df, max_age_days=4):
+def _cache_is_stale(df):
     """A cache that covers every ticker can still be months old. Without this
-    check the nightly job re-published May prices under a fresh timestamp."""
+    check the nightly job re-published May prices under a fresh timestamp.
+    Stale = the last price predates the most recent weekday (a market holiday
+    just costs one harmless refetch)."""
     if df.empty:
         return True
-    age = (pd.Timestamp.today().normalize() - pd.Timestamp(df.index.max()).normalize()).days
-    if age > max_age_days:
-        print(f"[cache] stale - last price {pd.Timestamp(df.index.max()).date()} is {age}d old, refetching")
+    expected = pd.Timestamp.today().normalize()
+    while expected.weekday() >= 5:
+        expected -= pd.Timedelta(days=1)
+    last = pd.Timestamp(df.index.max()).normalize()
+    if last < expected:
+        print(f"[cache] stale - last price {last.date()} predates {expected.date()}, refetching")
         return True
     return False
+
+
+def _keep_old_cache_if_degraded(new_df, path, tickers, min_cover=0.8):
+    """Never let a failed download replace a good cache. On 2026-11-11 a Yahoo
+    outage returned 0 of 205 tickers and the empty frame was written to disk.
+    Returns the frame to use; writes only when the fetch is healthy."""
+    cover = len(new_df.columns) / max(len(tickers), 1)
+    if len(new_df) == 0 or cover < min_cover:
+        if Path(path).exists():
+            old = pd.read_parquet(path)
+            if len(old):
+                print(f"[cache] fetch degraded ({len(new_df.columns)}/{len(tickers)} tickers) - keeping existing cache through {pd.Timestamp(old.index.max()).date()}")
+                return old
+        raise SystemExit(f"[cache] fetch failed ({len(new_df.columns)}/{len(tickers)} tickers) and no usable cache at {path}")
+    new_df.to_parquet(path)
+    return new_df
 
 def fetch_prices(tickers, years=LOOKBACK_YEARS, force=False):
     """Smart cache: only refetch if cache is missing >5% of needed tickers."""
@@ -178,7 +199,7 @@ def fetch_prices(tickers, years=LOOKBACK_YEARS, force=False):
         except Exception as e:
             print(f"  ! {t}: {e}")
     closes_df = pd.DataFrame(closes).dropna(axis=1, how='all')
-    closes_df.to_parquet(PRICE_CACHE)
+    closes_df = _keep_old_cache_if_degraded(closes_df, PRICE_CACHE, tickers)
     print(f"[yf] got {len(closes_df.columns)} of {len(tickers)} tickers")
     return closes_df
 

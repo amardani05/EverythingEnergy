@@ -3674,6 +3674,7 @@ function ViewNav({ view, setView }) {
           {label}
         </button>
       ))}
+      <a className="view-nav-btn" href="terminal.html" style={{color:"var(--accent)"}}>Terminal</a>
       <a className="view-nav-btn" href="flows.html">Flows</a>
       <a className="view-nav-btn" href="balances.html">Balances</a>
       <a className="view-nav-btn" href="signals.html">Signals</a>

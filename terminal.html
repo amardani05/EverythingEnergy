@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal - Everything Energy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='2' fill='%2324364d'/%3E%3Cpath d='M3 12V4h5v2H5v1h3v2H5v1h3v2z' fill='%23fff'/%3E%3Cpath d='M9 12V4h5v2h-3v1h3v2h-3v1h3v2z' fill='%23e0711c'/%3E%3C/svg%3E"/>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.css">
+<link rel="stylesheet" href="https://unpkg.com/gridstack@10.3.1/dist/gridstack.min.css">
+<link rel="stylesheet" href="terminal/wm.css">
+<style>[hidden] { display: none !important; }</style>
+</head>
+<body>
+<div id="hdr">
+  <div id="brand">Everything<i>Energy</i></div>
+  <div id="tabs"></div>
+  <div id="hdr-r"><span id="hdr-date"></span></div>
+</div>
+<div id="ctx">
+  <button id="side-tog" title="Show or hide the widget list">☰ Widgets</button>
+  <label>Commodity <select id="cx-commodity"></select></label>
+  <label>Country <select id="cx-country"></select></label>
+  <div id="ticker"></div>
+</div>
+<div id="main">
+  <div id="side"></div>
+  <div id="work"></div>
+</div>
+<div id="foot"><span id="foot-l">Loading data...</span><span id="foot-r"></span></div>
+<div id="tip" class="tip"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="https://unpkg.com/gridstack@10.3.1/dist/gridstack-all.js"></script>
+<script src="terminal/bs.js"></script>
+<script src="terminal/wm.js"></script>
+<script src="terminal/markets.js"></script>
+<script src="terminal/options.js"></script>
+<script src="terminal/sheets.js"></script>
+<script src="terminal/map.js"></script>
+<script src="terminal/boards.js"></script>
+<script src="terminal/grid.js"></script>
+<script>
+"use strict";
+/* Default tabs. Grid is 12 columns wide; x, y, w, h are in grid cells, and 20 rows fill the screen.
+   Anything the user moves, resizes, adds or removes replaces these in their browser. */
+const W = (app, x, y, w, h, arg) => ({ app, x, y, w, h, arg: arg ?? null });
+T.boot([
+  { id: "overview", name: "Overview", items: [W("map", 0, 0, 7, 12, { commodity: "crude_oil" }), W("quotes", 7, 0, 5, 12), W("movers", 0, 12, 3, 8), W("volmon", 3, 12, 5, 8), W("concentration", 8, 12, 4, 8)] },
+  { id: "map", name: "World Map", items: [W("map", 0, 0, 7, 20, { commodity: "copper" }), W("country", 7, 0, 5, 9, "COD"), W("commodity", 7, 9, 5, 11, "copper")] },
+  { id: "chain", name: "Supply Chain", items: [W("commodity", 0, 0, 7, 12, "cobalt"), W("country", 7, 0, 5, 12, "COD"), W("concentration", 0, 12, 7, 8), W("map", 7, 12, 5, 8, { commodity: "cobalt" })] },
+  { id: "energy", name: "Energy", items: [W("chart", 0, 0, 6, 10, "CL=F"), W("balance", 6, 0, 6, 10), W("routes", 0, 10, 5, 10, "crude"), W("chokepoints", 5, 10, 7, 10)] },
+  { id: "metals", name: "Metals", items: [W("commodity", 0, 0, 6, 11, "copper"), W("chart", 6, 0, 6, 11, "HG=F"), W("concentration", 0, 11, 7, 9), W("country", 7, 11, 5, 9, "CHL")] },
+  { id: "options", name: "Options", items: [W("chain", 0, 0, 7, 20, "USO"), W("strat", 7, 0, 5, 20)] },
+  { id: "vol", name: "Volatility", items: [W("volmon", 0, 0, 7, 9), W("chart", 7, 0, 5, 9, "^OVX"), W("chain", 0, 9, 12, 11, "GLD")] },
+  { id: "balances", name: "Balances", items: [W("balance", 0, 0, 8, 20), W("chart", 8, 0, 4, 10, "BZ=F"), W("chart", 8, 10, 4, 10, "CL=F")] },
+  { id: "flows", name: "Trade Flows", items: [W("map", 0, 0, 7, 13, { commodity: "natural_gas" }), W("routes", 7, 0, 5, 13, "lng"), W("chokepoints", 0, 13, 12, 7)] },
+  { id: "markets", name: "Markets", items: [W("quotes", 0, 0, 6, 12), W("chart", 6, 0, 6, 12, "GC=F"), W("movers", 0, 12, 4, 8), W("volmon", 4, 12, 8, 8)] },
+  { id: "data", name: "Data", items: [W("grid", 0, 0, 12, 20, { table: "Production by country", filter: "" })] },
+  { id: "equities", name: "Equities", items: [W("grid", 0, 0, 12, 20, { table: "Equity signals", filter: "" })] },
+]);
+
+/* context bar: commodity and country drive every linked widget in the visible tab */
+T.model().then((m) => { if (m.empty) return;
+  const groups = [...new Set(m.list.map((x) => x.group))], cs = document.getElementById("cx-commodity"), co = document.getElementById("cx-country");
+  cs.innerHTML = groups.map((g) => `<optgroup label="${T.esc(g)}">${m.list.filter((x) => x.group === g).map((x) => `<option value="${x.id}">${T.esc(x.name)}</option>`).join("")}</optgroup>`).join("");
+  co.innerHTML = m.countries.map((k) => `<option value="${k}">${T.esc(m.name(k))}</option>`).join("");
+  cs.value = T.ctx.commodity && m.com[T.ctx.commodity] ? T.ctx.commodity : "crude_oil"; co.value = T.ctx.country && m.C.countries[T.ctx.country] ? T.ctx.country : "COD";
+  cs.onchange = () => T.open("commodity", cs.value); co.onchange = () => T.open("country", co.value);
+});
+T.loadAll("market", "options", "commodities", "balance").then(([m, o, c, b]) => {
+  if (m) { const g = (s) => m.series.find((x) => x.symbol === s), tk = document.getElementById("ticker");
+    tk.innerHTML = ["CL=F", "BZ=F", "NG=F", "RB=F", "HG=F", "ALI=F", "GC=F", "SI=F", "PL=F", "^OVX", "^VIX", "DX-Y.NYB"].map(g).filter(Boolean)
+      .map((s) => `<span data-s="${T.esc(s.symbol)}" title="${T.esc(s.name)}"><b>${T.esc(s.symbol.replace("=F", "").replace("^", "").replace("-Y.NYB", "Y"))}</b>${T.F.auto(s.last)} <span class="${T.F.cls(s.chg_1d)}">${T.F.pct(s.chg_1d)}</span></span>`).join("");
+    tk.onclick = (e) => { const s = e.target.closest("[data-s]"); if (s) T.open("chart", s.dataset.s); }; }
+  document.getElementById("foot-l").textContent = [m && "Prices: close " + m.series[0].dates.slice(-1)[0] + " (Yahoo)", o && "Options: " + o.meta.as_of + " delayed", c && "Supply: USGS MCS, EIA, WNA, compiled " + c.meta.compiled, b && "Balance: STEO " + b.meta.steo_released].filter(Boolean).join("  ·  ") || "No data files found: run the scripts listed in the README.";
+  document.getElementById("foot-r").textContent = "Research tool. Delayed data. Not investment advice.";
+});
+document.getElementById("hdr-date").textContent = new Date().toLocaleDateString("en-US", { weekday: "long", month: "numeric", day: "numeric", year: "numeric" });
+</script>
+</body>
+</html>

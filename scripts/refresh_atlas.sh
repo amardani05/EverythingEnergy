@@ -32,10 +32,16 @@ echo "[refresh_atlas] oil supply/demand balance"
 $PY scripts/oil_balance.py \
   || echo "[refresh_atlas] oil balance failed (non-fatal for publish)"
 
-# oil_balance.json joins the auto-commit only once a human has committed it
+# The newer artifacts join the auto-commit only once a human has committed them
 # once; a pathspec for an untracked file would abort the whole publish.
+echo "[refresh_atlas] market + options snapshot for the terminal"
+$PY scripts/market_snapshot.py \
+  || echo "[refresh_atlas] market snapshot failed (non-fatal for publish)"
+
 ARTIFACTS=(dashboard_data.json signals_latest.json)
-git ls-files --error-unmatch oil_balance.json >/dev/null 2>&1 && ARTIFACTS+=(oil_balance.json)
+for f in oil_balance.json market_data.json options_data.json; do
+  git ls-files --error-unmatch "$f" >/dev/null 2>&1 && ARTIFACTS+=("$f")
+done
 
 if git diff --quiet -- "${ARTIFACTS[@]}"; then
   echo "[refresh_atlas] no data artifacts changed; nothing to publish"
