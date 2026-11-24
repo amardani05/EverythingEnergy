@@ -82,7 +82,7 @@ def main():
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), Handler) as httpd:
         print(f"\nEverything Energy · dev server")
-        print(f"  http://localhost:{PORT}/dashboard.html")
+        print(f"  http://localhost:{PORT}/  (PhysicalsAtlas)")
         print(f"  POST /api/refresh  →  re-run consolidate_data.py")
         print(f"  ctrl-C to stop")
         try:

@@ -118,7 +118,7 @@ const T = (() => {
   function download(name, text) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "text/csv" })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
 
   /* ================= workspace: tabs of widget grids ================= */
-  const KEY = "ee.terminal.layout.v3", ROWS = 20;
+  const ROWS = 20; let KEY = "ee.terminal.layout.v3";
   const cellH = () => Math.max(30, Math.floor((document.getElementById("work").clientHeight - 8) / ROWS));   // 20 rows fill the screen at any window size
   let DEFAULTS = [], state = null, panes = {}, saveT = 0, uid = 0;
   const ctx = {};
@@ -128,17 +128,22 @@ const T = (() => {
   const clone = (o) => JSON.parse(JSON.stringify(o));
   const tabOf = (id) => state.tabs.find((t) => t.id === id);
   const active = () => panes[state.active];
-  function save() { clearTimeout(saveT); saveT = setTimeout(() => { for (const t of state.tabs) { const p = panes[t.id]; if (!p) continue;
-      t.items = p.wins.map((w) => { const n = w.item.gridstackNode || {}; return { app: w.id, arg: w.arg ?? null, x: n.x ?? 0, y: n.y ?? 0, w: n.w ?? 4, h: n.h ?? 6 }; }).sort((a, b) => a.y - b.y || a.x - b.x); }
-    store.set(state); }, 250); }
+  /* Narrow screens stack widgets in one column. That stacking is never written back: w.geo keeps the 12-column place. */
+  const narrow = () => document.getElementById("work").clientWidth < 700;
+  function sync() { for (const t of state.tabs) { const p = panes[t.id]; if (!p) continue;
+      t.items = p.wins.map((w) => { const n = w.item.gridstackNode; if (!p.narrow && n) w.geo = { x: n.x ?? 0, y: n.y ?? 0, w: n.w ?? 4, h: n.h ?? 6 }; return { app: w.id, arg: w.arg ?? null, ...w.geo }; }).sort((a, b) => a.y - b.y || a.x - b.x); } }
+  function save() { clearTimeout(saveT); saveT = setTimeout(() => { sync(); store.set(state); }, 250); }
+  function refit() { const n = narrow(); if (!Object.values(panes).some((p) => p.narrow !== n)) return; sync(); Object.keys(panes).forEach(dropPane); show(state.active); }
 
   function addWidget(pane, it, auto) {
     const app = apps[it.app]; if (!app) return null;
     const item = $(`<div class="grid-stack-item" gs-min-w="2" gs-min-h="3"><div class="grid-stack-item-content wg"><div class="wh"><span class="tt"></span><button data-a="max" title="Maximize / restore">▢</button><button data-a="x" title="Remove widget">✕</button></div><div class="wb"></div></div></div>`);
     item.setAttribute("gs-w", it.w || app.w || 4); item.setAttribute("gs-h", it.h || app.h || 8); item.setAttribute("gs-id", "w" + (++uid));
-    if (auto) item.setAttribute("gs-auto-position", "true"); else { item.setAttribute("gs-x", it.x || 0); item.setAttribute("gs-y", it.y || 0); }
+    if (pane.narrow) { item.setAttribute("gs-x", 0); item.setAttribute("gs-y", pane.wins.length * 100); item.setAttribute("gs-w", 1); }
+    else if (auto) item.setAttribute("gs-auto-position", "true"); else { item.setAttribute("gs-x", it.x || 0); item.setAttribute("gs-y", it.y || 0); }
     const body = item.querySelector(".wb"), el = item.querySelector(".wg");
-    const w = { id: it.app, app, arg: it.arg ?? null, item, el, body, title: "", pane,
+    const bottom = auto ? pane.wins.reduce((m, o) => Math.max(m, o.geo.y + o.geo.h), 0) : 0;
+    const w = { geo: { x: auto ? 0 : it.x || 0, y: auto ? bottom : it.y || 0, w: it.w || app.w || 4, h: it.h || app.h || 8 }, id: it.app, app, arg: it.arg ?? null, item, el, body, title: "", pane,
       setTitle(t) { w.title = t; item.querySelector(".tt").textContent = t; },
       add(node) { const n = typeof node === "string" ? $(node) : node; body.appendChild(n); return n; },
       setArg(a) { w.arg = a; save(); },
@@ -161,8 +166,9 @@ const T = (() => {
   function buildPane(tab) {
     const el = $(`<div class="pane"><div class="grid-stack"></div></div>`); document.getElementById("work").appendChild(el);
     const gridEl = el.querySelector(".grid-stack");
-    const grid = GridStack.init({ column: 12, cellHeight: cellH(), margin: 3, float: false, animate: false, draggable: { handle: ".wh", cancel: "button" }, resizable: { handles: "se" }, alwaysShowResizeHandle: true, columnOpts: { breakpoints: [{ w: 700, c: 1 }] } }, gridEl);
-    const pane = panes[tab.id] = { el, gridEl, grid, wins: [], tab };
+    const nar = narrow();
+    const grid = GridStack.init({ column: nar ? 1 : 12, cellHeight: cellH(), margin: 3, float: false, animate: false, draggable: { handle: ".wh", cancel: "button" }, resizable: { handles: "se" }, alwaysShowResizeHandle: true }, gridEl);
+    const pane = panes[tab.id] = { el, gridEl, grid, wins: [], tab, narrow: nar };
     grid.batchUpdate(); for (const it of tab.items) addWidget(pane, it, false); grid.batchUpdate(false);
     grid.on("change added removed", save); grid.on("resizestop", (ev, item) => { const w = pane.wins.find((x) => x.item === item); if (w) w.resized(); });
     if (state.locked) { grid.enableMove(false); grid.enableResize(false); }
@@ -207,21 +213,22 @@ const T = (() => {
     side.innerHTML = groups.map((g) => `<h4>${esc(g)}</h4>` + Object.entries(apps).filter(([, a]) => (a.group || "Other") === g).map(([id, a]) => `<span class="it" data-add="${id}" title="Add to this tab">${esc(a.title)}</span>`).join("")).join("") +
       `<h4>Layout</h4><span class="it" data-act="lock">${state.locked ? "Unlock layout" : "Lock layout"}</span><span class="it" data-act="new">New tab</span><span class="it" data-act="rename">Rename tab</span><span class="it" data-act="delete">Delete tab</span><span class="it" data-act="reset">Reset this tab</span><span class="it" data-act="resetall">Reset everything</span>
        <div class="hint">Drag title bars to move, corners to resize. Saved in this browser.</div>
-       <h4>Classic pages</h4><a class="it" href="dashboard.html">Atlas dashboard</a><a class="it" href="flows.html">Flows plate</a><a class="it" href="balances.html">Balances page</a><a class="it" href="signals.html">Equity signals</a><a class="it" href="methodology.html">Methodology</a>`;
+       <h4>Classic pages</h4><a class="it" href="index.html">PhysicalsAtlas</a><a class="it" href="terminal.html">Terminal</a><a class="it" href="dashboard.html">Equity Atlas</a><a class="it" href="flows.html">Flows plate</a><a class="it" href="balances.html">Balances page</a><a class="it" href="signals.html">Equity signals</a><a class="it" href="methodology.html">Methodology</a>`;
     side.onclick = (e) => { const t = e.target.closest("[data-add],[data-act]"); if (!t) return;
       if (t.dataset.add) { const w = addWidget(active(), { app: t.dataset.add }, true); save(); if (w) { w.item.scrollIntoView({ block: "nearest" }); w.item.classList.add("flash"); setTimeout(() => w.item.classList.remove("flash"), 700); } return; }
       ({ lock: toggleLock, new: newTab, rename: () => renameTab(state.active), delete: deleteTab, reset: resetTab, resetall: resetAll })[t.dataset.act](); }; }
 
-  function boot(defaults) {
+  function boot(defaults, key) {
+    if (key) KEY = key;   // each page keeps its own saved layout
     DEFAULTS = defaults; const saved = store.get();
     const ok = saved && Array.isArray(saved.tabs) && saved.tabs.length && saved.tabs.every((t) => t.id && Array.isArray(t.items));
     state = ok ? saved : { active: defaults[0].id, locked: false, tabs: clone(defaults) };
     for (const t of state.tabs) t.items = t.items.filter((it) => apps[it.app]);
     for (const d of defaults) if (!state.tabs.some((t) => t.id === d.id) && !ok) state.tabs.push(clone(d));
     renderSide(); show(state.active);
-    document.getElementById("side-tog").onclick = () => { document.getElementById("side").classList.toggle("shut"); setTimeout(() => active().wins.forEach((w) => w.resized()), 30); };
+    document.getElementById("side-tog").onclick = () => { document.getElementById("side").classList.toggle("shut"); refit(); setTimeout(() => active().wins.forEach((w) => w.resized()), 30); };
     addEventListener("keydown", (e) => { if (e.key === "Escape") { const m = document.querySelector(".grid-stack-item.maxed"); if (m) { const w = active().wins.find((x) => x.item === m); if (w) maximize(w, false); } } });
-    addEventListener("resize", () => { for (const p of Object.values(panes)) p.grid.cellHeight(cellH()); const m = document.querySelector(".grid-stack-item.maxed"); if (m) { const w = active().wins.find((x) => x.item === m); if (w) maximize(w, true); } });
+    addEventListener("resize", () => { refit(); for (const p of Object.values(panes)) p.grid.cellHeight(cellH()); const m = document.querySelector(".grid-stack-item.maxed"); if (m) { const w = active().wins.find((x) => x.item === m); if (w) maximize(w, true); } });
   }
   return { wins: () => (active() ? active().wins : []), $, F, C, esc, app: (id, def) => { apps[id] = def; }, apps, open, setCtx, ctx, load, loadAll, table, canvas, plot, ticks, tip, csv, download, boot, FILES };
 })();

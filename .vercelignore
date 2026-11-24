@@ -15,3 +15,13 @@ ARCHITECTURE.md
 .git/
 .gitignore
 .claude/
+scripts/
+tests/
+signal_engine/
+signal_engine.egg-info/
+data_store/
+docs/
+__pycache__/
+*.md
+*.toml
+.env*

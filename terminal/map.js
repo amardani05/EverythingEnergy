@@ -68,7 +68,7 @@
     const L = { shade: true, bubbles: true, flows: true, chokes: true, labels: true, pipe_crude: true, pipe_gas: true, pipe_products: false, pipe_hgl: false,
       refinery: true, oil_terminal: true, lng_export: true, lng_import: false, gas_storage: false, mine: true, smelter: true, metal_refinery: true, coal_mine: false, enrichment: true, conversion: true };
     let Mo, FL, map, CF = null, ready = false, labels = [], n3iso = {}, globe = false, theme = "dark", selN3 = null, quiet = false, raf = 0;
-    const a0 = arg && typeof arg === "object" ? arg : {};
+    const a0 = arg && typeof arg === "object" ? { ...arg } : {};
     if (!window.maplibregl) { q("#mp-s").textContent = "MapLibre failed to load (offline?)."; return; }
     map = new maplibregl.Map({ container: q("#mp-map"), style: { version: 8, sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": THEME.dark.ocean } }] },
       bounds: WORLD_BOUNDS, fitBoundsOptions: { padding: 6 }, minZoom: 0.2, maxZoom: 9, attributionControl: false, dragRotate: false, pitchWithRotate: false, renderWorldCopies: false });
@@ -108,7 +108,7 @@
       map.addLayer({ id: "fac_major", type: "circle", source: "fac", paint: facPaint(2.6, 4.2, 7) });
       if (!m.empty) { const groups = [...new Set(m.list.map((x) => x.group))];
         q("#mp-c").innerHTML = groups.map((g) => `<optgroup label="${esc(g)}">${m.list.filter((x) => x.group === g).map((x) => `<option value="${x.id}">${esc(x.name)}</option>`).join("")}</optgroup>`).join("");
-        const want = a0.commodity || T.ctx.commodity; q("#mp-c").value = want && m.com[want] ? want : m.com.crude_oil ? "crude_oil" : m.list[0].id; }
+        const want = a0.commodity || T.ctx.commodity; q("#mp-c").value = want && m.com[want] ? want : m.com.crude_oil ? "crude_oil" : m.list[0].id; win.setArg({ commodity: q("#mp-c").value }); }
       layerPanel(); ready = true; refresh(); if (a0.country) focusCountry(a0.country, true);
       map.on("move", () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; place(); }); });
       map.on("mousemove", (ev) => { const hit = map.queryRenderedFeatures(ev.point, { layers: live(["fac_major", "fac_all", ...pipeIds(), "flows", "land"]) })[0]; map.getCanvas().style.cursor = hit ? "pointer" : "";
@@ -198,7 +198,8 @@
       else q("#mp-s").textContent = "commodities.json missing: map shows infrastructure only."; }
     function setCommodity(id, tell) { if (!Mo || !Mo.com[id]) return; q("#mp-c").value = id; win.setArg({ commodity: id }); if (tell) T.setCtx("commodity", id, win); refresh(); }
     win.onArg = (a) => { if (!ready || !a) return; if (a.commodity) setCommodity(a.commodity, true); if (a.country) focusCountry(a.country, true); };
-    win.onCtx = (k, v) => { if (!ready) return; if (k === "commodity" && q("#mp-c").value !== v) setCommodity(v, false); else if (k === "country") focusCountry(v, !quiet); };
+    win.onCtx = (k, v) => { if (!ready) { if (k === "commodity") a0.commodity = v; return; }   // picked while the map was still loading: apply on load
+      if (k === "commodity" && q("#mp-c").value !== v) setCommodity(v, false); else if (k === "country") focusCountry(v, !quiet); };
     win.el.addEventListener("change", (ev) => { if (ev.target.id === "mp-c") setCommodity(ev.target.value, true); else if (/^mp-(m|match)$/.test(ev.target.id)) refresh(); });
     q("#mp-lay").onclick = () => { const p = q("#mp-layers"); p.hidden = !p.hidden; q("#mp-lay").classList.toggle("down", !p.hidden); };
     q("#mp-theme").onclick = () => { theme = theme === "dark" ? "light" : "dark"; refresh(); };

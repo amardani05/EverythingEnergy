@@ -136,3 +136,9 @@ canvas { display: block; }
 @media (max-width: 1500px) { .tab { padding: 6px 8px; font-size: 10px; letter-spacing: 0.1px; } #brand { font-size: 15px; } #hdr { gap: 10px; } }
 @media (max-width: 1250px) { #hdr-r { display: none; } }
 @media (max-width: 900px) { #side { display: none; } }
+
+/* ---- PhysicalsAtlas front page ---- */
+a#brand:hover { text-decoration: none; }
+#nav { display: flex; gap: 12px; } #nav a { font-weight: bold; }
+@media (max-width: 1250px) { body.front #hdr-r { display: flex; } body.front #hdr { flex-wrap: wrap; } body.front #hdr-r { order: 2; margin-left: auto; } body.front #tabs { order: 3; flex: 1 0 100%; } body.front #nav { flex-wrap: wrap; gap: 2px 10px; } }
+@media (max-width: 700px) { body.front #hdr-r { white-space: normal; margin-left: 0; flex: 1 1 100%; } body.front #hdr-date { display: none; } body.front #ctx { flex-wrap: wrap; } body.front #ticker { flex: 1 0 100%; border: 0; padding: 0; overflow-x: auto; } body.front #foot span + span { display: none; } }
