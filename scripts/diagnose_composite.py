@@ -30,7 +30,8 @@ from backtest_composite import clean, energy_universe_tickers, month_end_grid
 from signal_engine.config import REPO_ROOT, Config
 from signal_engine.data.store import as_of_prices, connect
 from signal_engine.scoring import build_composite
-from signal_engine.validation.backtest import subsample_report, walk_forward_ls
+from signal_engine.validation.backtest import subsample_report
+from signal_engine.validation.ledger import run_trial
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s | %(message)s")
 log = logging.getLogger("diagnose")
@@ -69,7 +70,8 @@ def main() -> int:
     for sig in SIGNALS:
         sp = panel.filter(pl.col(sig).is_not_null()).select(["ticker", "date", pl.col(sig).alias("value")])
         # single families cover fewer names than the composite: lower the floor, keep terciles
-        res = walk_forward_ls(sp, prices, rebalance_dates=grid, n_quantiles=3, cost_bps=60.0,
+        res = run_trial(sp, prices, signal=sig, dataset="energy205_free",
+                        hypothesis="which family carries the inversion", rebalance_dates=grid, n_quantiles=3, cost_bps=60.0,
                               min_names=45 if sig == "composite" else 30)
         rep = subsample_report(res.period_returns, col="ls_gross", periods_per_year=12.0)
         out["signals"][sig] = {"summary": res.summary, "quantile_means": res.quantile_means.to_dicts(), "subsample": rep}

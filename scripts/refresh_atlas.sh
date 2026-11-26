@@ -17,7 +17,25 @@ set -e
 cd /Users/amardani/EverythingEnergy
 PY=.venv/bin/python
 
+# Data QA runs however this script ends: published, nothing to publish, or a failed
+# step. It never blocks publishing (one stale feed should not freeze the rest), but
+# it makes the job exit non-zero and raises a notification.
+finish() {
+  local rc=$?
+  trap - EXIT
+  echo "[refresh_atlas] doctor"
+  $PY scripts/doctor.py --notify --quiet || { [ $rc -eq 0 ] && rc=1; }
+  exit $rc
+}
+trap finish EXIT
+
 echo "[refresh_atlas] $(date '+%F %T') pipeline start"
+
+# First, so no later failure can cost a day: expired contracts cannot be refetched.
+echo "[refresh_atlas] futures curve archive"
+$PY scripts/curve_archive.py \
+  || echo "[refresh_atlas] curve archive incomplete (doctor will report)"
+
 $PY basket_check.py
 $PY driver_analysis_v5.py
 $PY phase3_analysis.py
@@ -38,8 +56,16 @@ echo "[refresh_atlas] market + options snapshot for the terminal"
 $PY scripts/market_snapshot.py \
   || echo "[refresh_atlas] market snapshot failed (non-fatal for publish)"
 
+echo "[refresh_atlas] SHFE metal stocks"
+$PY scripts/shfe_stocks.py \
+  || echo "[refresh_atlas] SHFE stocks failed (non-fatal for publish)"
+
+echo "[refresh_atlas] US metals"
+$PY scripts/us_metals.py \
+  || echo "[refresh_atlas] US metals incomplete (non-fatal for publish)"
+
 ARTIFACTS=(dashboard_data.json signals_latest.json)
-for f in oil_balance.json market_data.json options_data.json; do
+for f in oil_balance.json market_data.json options_data.json us_metals.json curves.json metals_stocks.json; do
   git ls-files --error-unmatch "$f" >/dev/null 2>&1 && ARTIFACTS+=("$f")
 done
 

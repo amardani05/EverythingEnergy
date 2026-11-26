@@ -35,7 +35,8 @@ from signal_engine.config import Config
 from signal_engine.data.store import as_of_corporate_actions, as_of_prices, connect
 from signal_engine.factors.momentum import compute_momentum
 from signal_engine.scoring import build_composite
-from signal_engine.validation.backtest import BacktestResult, walk_forward_ls
+from signal_engine.validation.backtest import BacktestResult
+from signal_engine.validation.ledger import run_trial
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s | %(message)s")
 log = logging.getLogger("backtest_composite")
@@ -117,8 +118,9 @@ def main() -> int:
     # Terciles, not quintiles: the ~205-name energy universe yields only
     # ~120-170 ranked names, so quintiles would leave ~25/book. Terciles keep
     # each side meaningful (~40-55 names) at the cost of a milder spread.
-    comp_res = walk_forward_ls(
-        comp_panel, panel, rebalance_dates=grid,
+    comp_res = run_trial(
+        comp_panel, panel, signal="composite", dataset="energy205_free",
+        hypothesis="composite ranks energy stocks", rebalance_dates=grid,
         n_quantiles=3, cost_bps=60.0, min_names=45,
     )
     log.info("[composite monthly] %s", comp_res)
@@ -128,7 +130,8 @@ def main() -> int:
     ))
 
     mom = compute_momentum(panel, dividends=divs).rename({"momentum": "value"})
-    mom_res = walk_forward_ls(mom, panel, rebalance_every=5, n_quantiles=3,
+    mom_res = run_trial(mom, panel, signal="momentum_12_1_tr", dataset="energy205_free",
+                              hypothesis="momentum ranks energy stocks weekly", rebalance_every=5, n_quantiles=3,
                               cost_bps=60.0, min_names=45)
     log.info("[momentum weekly] %s", mom_res)
     results.append(result_block(

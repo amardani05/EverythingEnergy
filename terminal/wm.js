@@ -28,7 +28,7 @@ const T = (() => {
   /* ---------- data ---------- */
   const FILES = { market: "market_data.json", options: "options_data.json", commodities: "commodities.json", flows: "flows_data.json",
     balance: "oil_balance.json", pipelines: "infra_pipelines.geojson", facilities: "infra_facilities.geojson",
-    atlas: "dashboard_data.json", signals: "signals_latest.json" };
+    atlas: "dashboard_data.json", signals: "signals_latest.json", usmetals: "us_metals.json", curves: "curves.json", shfe: "metals_stocks.json" };
   const cache = {};
   function load(name) {
     return cache[name] ||= fetch(FILES[name] + "?t=" + Date.now()).then((r) => { if (!r.ok) throw new Error(FILES[name] + ": HTTP " + r.status); return r.json(); })

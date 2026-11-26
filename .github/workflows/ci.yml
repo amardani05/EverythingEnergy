@@ -1,0 +1,27 @@
+name: ci
+on:
+  push:
+    branches: [main, main2]
+    # The nightly robot commit touches only data; it needs no test run.
+    paths-ignore: ["*.json"]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: constraints.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -c constraints.txt -e ".[dev,databento]"
+      - run: ruff check signal_engine scripts tests
+      - run: mypy
+      - run: pytest

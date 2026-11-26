@@ -53,7 +53,8 @@ def ijr_universe_from_db(db_path) -> list[str]:
 
 
 def write_prices(db_path, df: pl.DataFrame) -> int:
-    """Upsert prices, returning row count actually inserted (new rows only)."""
+    """Insert prices, returning new-row count. A blank or non-positive close is never
+    stored, and one stored earlier is repaired; good closes are never overwritten."""
     if df.height == 0:
         return 0
     with store.connect(db_path) as con:
@@ -64,7 +65,10 @@ def write_prices(db_path, df: pl.DataFrame) -> int:
               (ticker, date, open, high, low, close, volume, source, div_adjusted, split_adjusted)
             SELECT ticker, date, open, high, low, close, volume, source, div_adjusted, split_adjusted
             FROM incoming
-            ON CONFLICT DO NOTHING;
+            WHERE close > 0 AND NOT isnan(close)
+            ON CONFLICT DO UPDATE SET open = excluded.open, high = excluded.high, low = excluded.low,
+              close = excluded.close, volume = excluded.volume
+            WHERE prices.close IS NULL OR prices.close <= 0;
         """)
         after = con.execute("SELECT count(*) FROM prices").fetchone()[0]
         return int(after - before)

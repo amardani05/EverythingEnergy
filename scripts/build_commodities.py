@@ -1147,21 +1147,20 @@ def load_eia(series_needed: set[str]) -> dict:
     out: dict = {k: {} for k in series_needed}
     prefixes = tuple('{"series_id":"INTL.%s-' % code for code, _ in series_needed)
     pat = re.compile(r"^INTL\.(\d+-\d+)-([A-Z0-9_]+)-([A-Z]+)\.A$")
-    with zipfile.ZipFile(io.BytesIO(blob)) as zf:
-        with zf.open(zf.namelist()[0]) as fh:
-            for raw in fh:
-                line = raw.decode("utf-8", "replace")
-                if not line.startswith(prefixes):
-                    continue
-                obj = json.loads(line)
-                m = pat.match(obj.get("series_id", ""))
-                if not m or (m.group(1), m.group(3)) not in out:
-                    continue
-                series = {}
-                for year, val in obj.get("data", []):
-                    if isinstance(val, (int, float)) and not (isinstance(val, float) and math.isnan(val)):
-                        series[int(year)] = float(val)
-                out[(m.group(1), m.group(3))][m.group(2)] = series
+    with zipfile.ZipFile(io.BytesIO(blob)) as zf, zf.open(zf.namelist()[0]) as fh:
+        for raw in fh:
+            line = raw.decode("utf-8", "replace")
+            if not line.startswith(prefixes):
+                continue
+            obj = json.loads(line)
+            m = pat.match(obj.get("series_id", ""))
+            if not m or (m.group(1), m.group(3)) not in out:
+                continue
+            series = {}
+            for year, val in obj.get("data", []):
+                if isinstance(val, (int, float)) and not (isinstance(val, float) and math.isnan(val)):
+                    series[int(year)] = float(val)
+            out[(m.group(1), m.group(3))][m.group(2)] = series
     return out
 
 

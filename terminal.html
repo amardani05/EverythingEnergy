@@ -40,6 +40,11 @@
 <script src="terminal/map.js"></script>
 <script src="terminal/boards.js"></script>
 <script src="terminal/physicals.js"></script>
+<script src="terminal/metals.js"></script>
+<script src="terminal/curves.js"></script>
+<script src="terminal/products.js"></script>
+<script src="terminal/gas.js"></script>
+<script src="terminal/shfe.js"></script>
 <script src="terminal/grid.js"></script>
 <script>
 "use strict";
@@ -51,10 +56,11 @@ T.boot([
   { id: "map", name: "World Map", items: [W("map", 0, 0, 7, 20, { commodity: "copper" }), W("country", 7, 0, 5, 9, "COD"), W("commodity", 7, 9, 5, 11, "copper")] },
   { id: "chain", name: "Supply Chain", items: [W("commodity", 0, 0, 7, 12, "cobalt"), W("country", 7, 0, 5, 12, "COD"), W("concentration", 0, 12, 7, 8), W("map", 7, 12, 5, 8, { commodity: "cobalt" })] },
   { id: "energy", name: "Energy", items: [W("chart", 0, 0, 6, 10, "CL=F"), W("balance", 6, 0, 6, 10), W("routes", 0, 10, 5, 10, "crude"), W("chokepoints", 5, 10, 7, 10)] },
-  { id: "metals", name: "Metals", items: [W("commodity", 0, 0, 6, 11, "copper"), W("chart", 6, 0, 6, 11, "HG=F"), W("concentration", 0, 11, 7, 9), W("country", 7, 11, 5, 9, "CHL")] },
+  { id: "curves", name: "Curves", items: [W("curves", 0, 0, 7, 12, "CL"), W("curves", 7, 0, 5, 12, "NG"), W("curves", 0, 12, 7, 8, "HG"), W("chart", 7, 12, 5, 8, "CL=F")] },
+  { id: "metals", name: "Metals", items: [W("commodity", 0, 0, 6, 11, "copper"), W("chart", 6, 0, 6, 11, "HG=F"), W("usmetals", 0, 11, 7, 9, "copper"), W("shfe", 7, 11, 5, 9, "copper")] },
   { id: "options", name: "Options", items: [W("chain", 0, 0, 7, 20, "USO"), W("strat", 7, 0, 5, 20)] },
   { id: "vol", name: "Volatility", items: [W("volmon", 0, 0, 7, 9), W("chart", 7, 0, 5, 9, "^OVX"), W("chain", 0, 9, 12, 11, "GLD")] },
-  { id: "balances", name: "Balances", items: [W("balance", 0, 0, 8, 20), W("chart", 8, 0, 4, 10, "BZ=F"), W("chart", 8, 10, 4, 10, "CL=F")] },
+  { id: "balances", name: "Balances", items: [W("balance", 0, 0, 7, 11), W("products", 7, 0, 5, 11, "distillate"), W("gas", 0, 11, 7, 10, "l48"), W("curves", 7, 11, 5, 10, "NG")] },
   { id: "flows", name: "Trade Flows", items: [W("map", 0, 0, 7, 13, { commodity: "natural_gas" }), W("routes", 7, 0, 5, 13, "lng"), W("chokepoints", 0, 13, 12, 7)] },
   { id: "markets", name: "Markets", items: [W("quotes", 0, 0, 6, 12), W("chart", 6, 0, 6, 12, "GC=F"), W("movers", 0, 12, 4, 8), W("volmon", 4, 12, 8, 8)] },
   { id: "data", name: "Data", items: [W("grid", 0, 0, 12, 20, { table: "Production by country", filter: "" })] },

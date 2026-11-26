@@ -50,6 +50,7 @@ FUTURES = {
     "MTF=F": ("Newcastle coal", "energy", "$/t"),
     "HG=F": ("Copper", "base metals", "$/lb"),
     "ALI=F": ("Aluminum", "base metals", "$/t"),
+    "AUP=F": ("Aluminum Midwest premium", "base metals", "$/lb"),
     "GC=F": ("Gold", "precious metals", "$/oz"),
     "SI=F": ("Silver", "precious metals", "$/oz"),
     "PL=F": ("Platinum", "precious metals", "$/oz"),

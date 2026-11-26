@@ -26,7 +26,7 @@
       ]
     },
     {
-      "source": "/(oil_balance|flows_data|signals_latest|backtests|market_data|options_data|commodities).json",
+      "source": "/(oil_balance|flows_data|signals_latest|backtests|market_data|options_data|commodities|us_metals|curves|metals_stocks).json",
       "headers": [
         {
           "key": "Cache-Control",

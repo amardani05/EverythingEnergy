@@ -29,6 +29,7 @@ from pathlib import Path
 import requests
 
 from signal_engine.config import REPO_ROOT, Config
+from signal_engine.macro import gas
 from signal_engine.macro.oil_balance import (
     US_WEEKLY_SERIES,
     build_global_balance,
@@ -38,12 +39,14 @@ from signal_engine.macro.oil_balance import (
     parse_steo_bulk,
     project_oecd_stocks,
 )
+from signal_engine.macro.products import build_products, series_ids
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s | %(message)s")
 log = logging.getLogger("oil_balance")
 
 STEO_URL = "https://www.eia.gov/opendata/bulk/STEO.zip"
 WPSR_URL = "https://www.eia.gov/dnav/pet/hist_xls/{sid}w.xls"
+NG_URL = "https://www.eia.gov/dnav/ng/hist_xls/{sid}w.xls"
 UA = {"User-Agent": "signal-engine/0.1 (energy research dashboard)"}
 
 
@@ -139,6 +142,35 @@ def main() -> int:
         us["adjustment_stats"]["sigma"], us["adjustment_stats"]["window_weeks"],
     )
 
+    # --- US refined products (WPSR) ---
+    products = None
+    try:
+        praw = {
+            sid: read_dnav_xls(fetch(WPSR_URL.format(sid=sid), raw_dir / f"{sid}w.xls", offline=args.offline))
+            for sid in series_ids()
+        }
+        products = build_products(praw)
+        for k, v in products["summary"].items():
+            log.info("[products] %s %s: stocks %.1f mb (%+.1f vs 5y), cover %.1f d", k, v["date"],
+                     v["stocks"], v["stocks_vs_5y"] or 0, v["cover"] or 0)
+    except Exception as e:  # products must not take down the crude balance
+        log.warning("[products] skipped: %s", e)
+
+    # --- US natural gas (weekly storage + STEO monthly) ---
+    gas_out = None
+    try:
+        graw = {
+            sid: read_dnav_xls(fetch(NG_URL.format(sid=sid), raw_dir / f"{sid}w.xls", offline=args.offline))
+            for sid in gas.weekly_ids()
+        }
+        gb = parse_steo_bulk(raw_dir / "STEO.zip", wanted=gas.steo_ids())
+        gas_out = {"storage": gas.build_storage(graw), "monthly": gas.build_monthly(gb.series, gb.last_hist)}
+        s, e = gas_out["storage"]["summary"]["l48"], gas_out["storage"]["end_of_season"]
+        log.info("[gas] %s: L48 %.0f Bcf (%+.0f vs 5y, %+.0f vs 1y); %s projected %.0f (%+.0f vs 5y)",
+                 s["date"], s["stocks"], s["vs_5y"] or 0, s["vs_1y"] or 0, e["date"], e["projected"], e["vs_5y"] or 0)
+    except Exception as e:  # gas must not take down the oil balance
+        log.warning("[gas] skipped: %s", e)
+
     payload = {
         "meta": {
             "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -154,6 +186,8 @@ def main() -> int:
         "stock_model": model.as_dict(),
         "projection": projection,
         "us_weekly": us,
+        "products": products,
+        "gas": gas_out,
     }
     text = json.dumps(payload, separators=(",", ":"), allow_nan=False)
     args.out.write_text(text)

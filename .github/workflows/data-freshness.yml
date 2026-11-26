@@ -1,0 +1,19 @@
+name: data freshness
+# Catches what the local nightly job cannot: the Mac being off or the job not running.
+on:
+  schedule:
+    - cron: "0 13 * * 2-6"  # morning after each weekday refresh
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -c constraints.txt -e .
+      - run: python scripts/doctor.py --published

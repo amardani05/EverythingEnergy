@@ -1,194 +1,162 @@
 ticker,name,assigned_node,home_corr,top1_node,top1_corr,top2_node,top2_corr,is_home_top
-COP,ConocoPhillips,upstream_oil_eandp,0.8731354002461269,upstream_oil_eandp,0.8731354002461269,iocs_integrated,0.8604443664818833,True
-EOG,EOG Resources,upstream_oil_eandp,0.8711524778461711,upstream_oil_eandp,0.8711524778461711,iocs_integrated,0.8266539396845161,True
-FANG,Diamondback Energy,upstream_oil_eandp,0.8919285329193384,upstream_oil_eandp,0.8919285329193384,iocs_integrated,0.7888411348452884,True
-OXY,Occidental Petroleum,upstream_oil_eandp,0.8269437345642627,upstream_oil_eandp,0.8269437345642627,iocs_integrated,0.7666837511485127,True
-DVN,Devon Energy,upstream_oil_eandp,0.890373029087671,upstream_oil_eandp,0.890373029087671,iocs_integrated,0.7982753361871867,True
-OVV,Ovintiv,upstream_oil_eandp,0.89842680096753,upstream_oil_eandp,0.89842680096753,minerals_royalty,0.7967000174303956,True
-APA,APA Corporation,upstream_oil_eandp,0.8889117399105427,upstream_oil_eandp,0.8889117399105427,iocs_integrated,0.7797074947035671,True
-PR,Permian Resources,upstream_oil_eandp,0.8745168792044267,upstream_oil_eandp,0.8745168792044267,minerals_royalty,0.7581662637984512,True
-MTDR,Matador Resources,upstream_oil_eandp,0.9041753135812808,upstream_oil_eandp,0.9041753135812808,minerals_royalty,0.7778263253327119,True
-CHRD,Chord Energy,upstream_oil_eandp,0.8944292923560321,upstream_oil_eandp,0.8944292923560321,minerals_royalty,0.7659758810128451,True
-SM,SM Energy,upstream_oil_eandp,0.8859001201133134,upstream_oil_eandp,0.8859001201133134,minerals_royalty,0.7407688891043527,True
-MGY,Magnolia Oil & Gas,upstream_oil_eandp,0.9001854605688498,upstream_oil_eandp,0.9001854605688498,minerals_royalty,0.7817190614112862,True
-NOG,Northern Oil & Gas,upstream_oil_eandp,0.8839264305546737,upstream_oil_eandp,0.8839264305546737,minerals_royalty,0.7710957349903673,True
-CRGY,Crescent Energy,upstream_oil_eandp,0.823305827555348,upstream_oil_eandp,0.823305827555348,ofs_onshore,0.7017526113551666,True
-MUR,Murphy Oil,upstream_oil_eandp,0.8815980887302266,upstream_oil_eandp,0.8815980887302266,iocs_integrated,0.7675177414519172,True
-CRC,California Resources,upstream_oil_eandp,0.7554069363456387,upstream_oil_eandp,0.7554069363456387,minerals_royalty,0.6700966045375698,True
-TALO,Talos Energy,upstream_oil_eandp,0.8349269356107113,upstream_oil_eandp,0.8349269356107113,minerals_royalty,0.7283858822018745,True
-KOS,Kosmos Energy,upstream_oil_eandp,0.7365488281622657,upstream_oil_eandp,0.7365488281622657,ofs_onshore,0.6265938079189945,True
-HPK,HighPeak Energy,upstream_oil_eandp,0.6543167824261904,upstream_oil_eandp,0.6543167824261904,iocs_integrated,0.5800017328307491,True
-REPX,Riley Exploration Permian,upstream_oil_eandp,0.6181775894961583,upstream_oil_eandp,0.6181775894961583,ofs_onshore,0.5403332232017909,True
-VTS,Vitesse Energy,upstream_oil_eandp,0.6480855390946961,upstream_oil_eandp,0.6480855390946961,minerals_royalty,0.5728815896124452,True
-GRNT,Granite Ridge Resources,upstream_oil_eandp,0.4559240242272136,upstream_oil_eandp,0.4559240242272136,iocs_integrated,0.36359650621878653,True
-GFR,Greenfire Resources,upstream_oil_eandp,0.32539242307485344,upstream_oil_eandp,0.32539242307485344,midstream_gpt,0.28231238636617195,True
-EGY,VAALCO Energy,upstream_oil_eandp,0.7263012079246531,upstream_oil_eandp,0.7263012079246531,iocs_integrated,0.6551769329307854,True
-GPRK,GeoPark,upstream_oil_eandp,0.6166271266242165,upstream_oil_eandp,0.6166271266242165,ofs_onshore,0.5558940434796324,True
-WTI,W&T Offshore,upstream_oil_eandp,0.768461077012997,upstream_oil_eandp,0.768461077012997,minerals_royalty,0.6548499202467439,True
-SD,SandRidge Energy,upstream_oil_eandp,0.7757197930773954,upstream_oil_eandp,0.7757197930773954,minerals_royalty,0.7106266829102255,True
-EQT,EQT Corp,upstream_gas_eandp,,midstream_gpt,0.6290274311499926,minerals_royalty,0.5687744382392741,False
-EXE,Expand Energy,upstream_gas_eandp,,midstream_gpt,0.6291447344078358,minerals_royalty,0.612519013571314,False
-AR,Antero Resources,upstream_gas_eandp,,upstream_oil_eandp,0.6691771301779268,midstream_gpt,0.657042649809858,False
-RRC,Range Resources,upstream_gas_eandp,,upstream_oil_eandp,0.6522957991829714,midstream_gpt,0.6444539022617666,False
-CRK,Comstock Resources,upstream_gas_eandp,,upstream_oil_eandp,0.5898805866377355,midstream_gpt,0.5821492955252899,False
-CNX,CNX Resources,upstream_gas_eandp,,upstream_oil_eandp,0.5751129181965082,midstream_gpt,0.558661100238495,False
-BKV,BKV Corporation,upstream_gas_eandp,0.7027363008213255,upstream_gas_eandp,0.7027363008213255,midstream_gpt,0.5935612380953957,True
-GPOR,Gulfport Energy,upstream_gas_eandp,,upstream_oil_eandp,0.615618153191074,midstream_gpt,0.6028888997418986,False
-TXO,TXO Partners,upstream_gas_eandp,,upstream_oil_eandp,0.43693026977550825,iocs_integrated,0.41909985323313426,False
-TPL,Texas Pacific Land,minerals_royalty,0.5628354611467856,upstream_oil_eandp,0.6154296051774015,midstream_gpt,0.5833111930118892,False
-VNOM,Viper Energy,minerals_royalty,0.6986150448921817,upstream_oil_eandp,0.78616205338602,minerals_royalty,0.6986150448921817,False
-BSM,Black Stone Minerals,minerals_royalty,0.6733230258097637,minerals_royalty,0.6733230258097637,upstream_oil_eandp,0.6713133949508169,True
-NRP,Natural Resource Partners,minerals_royalty,0.34227300718464637,coal,0.3709092138599454,midstream_gpt,0.3614778684256773,False
-SBR,Sabine Royalty Trust,minerals_royalty,0.6435928040449523,minerals_royalty,0.6435928040449523,upstream_oil_eandp,0.6161912965169832,True
-PBT,Permian Basin Royalty Trust,minerals_royalty,0.5030015320369563,upstream_oil_eandp,0.5167709467769277,minerals_royalty,0.5030015320369563,False
-DMLP,Dorchester Minerals,minerals_royalty,0.5822856733561943,upstream_oil_eandp,0.6006693460737591,minerals_royalty,0.5822856733561943,False
-MNR,Mach Natural Resources,minerals_royalty,0.44744490147881155,upstream_oil_eandp,0.46639133469719884,minerals_royalty,0.44744490147881155,False
-NE,Noble Corp,upstream_offshore_drillers,0.7249343464003284,upstream_offshore_drillers,0.7249343464003284,ofs_equipment,0.719748783520234,True
-RIG,Transocean,upstream_offshore_drillers,0.6650545092948503,ofs_equipment,0.7429937832980182,ofs_onshore,0.7266713586917325,False
-VAL,Valaris,upstream_offshore_drillers,0.7403917209627029,upstream_offshore_drillers,0.7403917209627029,ofs_equipment,0.6979250611112202,True
-SDRL,Seadrill,upstream_offshore_drillers,0.6727150776562698,upstream_offshore_drillers,0.6727150776562698,ofs_offshore,0.6644784578881295,True
-SOC,Sable Offshore,upstream_offshore_drillers,0.20303459927463133,upstream_oil_eandp,0.2121163213061249,upstream_offshore_drillers,0.20303459927463133,False
-TDW,Tidewater,ofs_offshore,0.6810660264941931,ofs_offshore,0.6810660264941931,ofs_equipment,0.6678565356126196,True
-OII,Oceaneering International,ofs_offshore,0.7327877103692847,ofs_equipment,0.7907940154009124,ofs_onshore,0.7754958968256882,False
-VTOL,Bristow Group,ofs_offshore,0.6255322245399684,ofs_onshore,0.6652029058412623,ofs_equipment,0.6416203206665428,False
-INVX,Innovex International,ofs_offshore,0.698030754335635,ofs_equipment,0.7347525751589958,ofs_onshore,0.72093330780888,False
-FRO,Frontline,tanker_shipping,0.812732002899338,tanker_shipping,0.812732002899338,ofs_offshore,0.37350760225178997,True
-INSW,International Seaways,tanker_shipping,0.8603000354209257,tanker_shipping,0.8603000354209257,ofs_offshore,0.4164979297047816,True
-DHT,DHT Holdings,tanker_shipping,0.8215231344943456,tanker_shipping,0.8215231344943456,ofs_offshore,0.34046045286836285,True
-TNK,Teekay Tankers,tanker_shipping,0.8593596818568594,tanker_shipping,0.8593596818568594,ofs_offshore,0.38017720035454844,True
-NAT,Nordic American Tankers,tanker_shipping,0.7438545555493357,tanker_shipping,0.7438545555493357,ofs_offshore,0.3378978189254898,True
-TEN,Tsakos Energy Navigation,tanker_shipping,0.7903254909974674,tanker_shipping,0.7903254909974674,ofs_offshore,0.42126687103093313,True
-STNG,Scorpio Tankers,tanker_shipping,0.7862319437113047,tanker_shipping,0.7862319437113047,upstream_oil_eandp,0.4222919463616155,True
-ASC,Ardmore Shipping,tanker_shipping,0.7868698102840075,tanker_shipping,0.7868698102840075,upstream_oil_eandp,0.4079773568448788,True
-NVGS,Navigator Holdings,tanker_shipping,0.6628610999181672,tanker_shipping,0.6628610999181672,ofs_onshore,0.4703779871483599,True
-LPG,Dorian LPG,tanker_shipping,0.6758398810938009,tanker_shipping,0.6758398810938009,ofs_offshore,0.4529838537196582,True
-GLNG,Golar LNG,tanker_shipping,0.5281066320625631,ofs_onshore,0.551062931312375,midstream_gpt,0.5427106696998956,False
-FLNG,FLEX LNG,tanker_shipping,0.5592646603251723,tanker_shipping,0.5592646603251723,minerals_royalty,0.4045000343751011,True
-TK,Teekay Corporation,tanker_shipping,0.7973451447090721,tanker_shipping,0.7973451447090721,ofs_offshore,0.43065659305889414,True
-SFL,SFL Corporation,tanker_shipping,0.6873584315802922,tanker_shipping,0.6873584315802922,ofs_offshore,0.5006650827510808,True
-LNG,Cheniere Energy,lng_terminals,0.6020747172315623,midstream_gpt,0.6544909242284777,lng_terminals,0.6020747172315623,False
-CQP,Cheniere Energy Partners,lng_terminals,0.5270055495404179,midstream_pipelines,0.6263183315336189,midstream_gpt,0.6143914525508337,False
-VG,Venture Global,lng_terminals,0.556584875965205,lng_terminals,0.556584875965205,upstream_oil_eandp,0.5494990514379828,True
-NEXT,NextDecade,lng_terminals,0.5001448901491573,lng_terminals,0.5001448901491573,midstream_gpt,0.4575624677174228,True
-EE,Excelerate Energy,lng_terminals,0.4334679267834153,midstream_gpt,0.5253326200355403,ofs_onshore,0.465937314244227,False
-WMB,Williams Companies,midstream_gpt,0.8261196105783118,midstream_gpt,0.8261196105783118,midstream_pipelines,0.6647829702107618,True
-KMI,Kinder Morgan,midstream_gpt,0.8194380566114737,midstream_gpt,0.8194380566114737,midstream_pipelines,0.686288158071884,True
-OKE,ONEOK,midstream_gpt,0.8146253750981556,midstream_gpt,0.8146253750981556,midstream_pipelines,0.7255893036401749,True
-TRGP,Targa Resources,midstream_gpt,0.840943807531656,midstream_gpt,0.840943807531656,upstream_oil_eandp,0.739176557676163,True
-AM,Antero Midstream,midstream_gpt,0.8012464846037957,midstream_gpt,0.8012464846037957,midstream_pipelines,0.7135066440056768,True
-DTM,DT Midstream,midstream_gpt,0.7842697714320294,midstream_gpt,0.7842697714320294,midstream_pipelines,0.6522966374873183,True
-HESM,Hess Midstream,midstream_gpt,0.6891484422927079,midstream_gpt,0.6891484422927079,midstream_pipelines,0.6512406330919889,True
-KNTK,Kinetik Holdings,midstream_gpt,0.7006892272521318,midstream_gpt,0.7006892272521318,midstream_pipelines,0.6173179747404087,True
-AROC,Archrock,midstream_gpt,0.754120147096142,midstream_gpt,0.754120147096142,ofs_onshore,0.6952757684635948,True
-KGS,Kodiak Gas Services,midstream_gpt,0.6286794753836037,midstream_gpt,0.6286794753836037,ofs_onshore,0.5516153800912821,True
-USAC,USA Compression Partners,midstream_gpt,0.6051952003482333,midstream_pipelines,0.6189244494276818,midstream_gpt,0.6051952003482333,False
-KRP,Kimbell Royalty Partners,midstream_gpt,0.6130662528723128,upstream_oil_eandp,0.7326200611038403,minerals_royalty,0.7064978234671886,False
-EPD,Enterprise Products,midstream_pipelines,0.7411543698144162,midstream_pipelines,0.7411543698144162,midstream_gpt,0.7139458054131106,True
-ET,Energy Transfer,midstream_pipelines,0.7555871554165943,midstream_gpt,0.7673859900104023,midstream_pipelines,0.7555871554165943,False
-MPLX,MPLX,midstream_pipelines,0.7134964184377883,midstream_pipelines,0.7134964184377883,midstream_gpt,0.6956767639774964,True
-PAA,Plains All American,midstream_pipelines,0.7991122666219909,midstream_pipelines,0.7991122666219909,midstream_gpt,0.7253551206873065,True
-PAGP,Plains GP Holdings,midstream_pipelines,0.7956494098690787,midstream_pipelines,0.7956494098690787,midstream_gpt,0.7409418029603437,True
-WES,Western Midstream,midstream_pipelines,0.7084933049098088,midstream_pipelines,0.7084933049098088,midstream_gpt,0.6799208888431133,True
-SUN,Sunoco LP,midstream_pipelines,0.6047259857556124,midstream_pipelines,0.6047259857556124,midstream_gpt,0.5528750554408105,True
-SUNC,SunocoCorp LLC,midstream_pipelines,0.6029711635121026,midstream_pipelines,0.6029711635121026,midstream_gpt,0.47605801353811966,True
-DKL,Delek Logistics,midstream_pipelines,0.4675136205236836,midstream_pipelines,0.4675136205236836,midstream_gpt,0.43021369372241514,True
-GEL,Genesis Energy,midstream_pipelines,0.633955425323019,midstream_pipelines,0.633955425323019,midstream_gpt,0.5671688034196711,True
-NGL,NGL Energy Partners,midstream_pipelines,0.40521639575524665,midstream_pipelines,0.40521639575524665,midstream_gpt,0.3672921383356227,True
-GLP,Global Partners,midstream_pipelines,0.52732653673739,midstream_pipelines,0.52732653673739,midstream_gpt,0.5010765964446559,True
-VLO,Valero Energy,downstream_refiners,0.8785017494593875,downstream_refiners,0.8785017494593875,iocs_integrated,0.6778683097801488,True
-MPC,Marathon Petroleum,downstream_refiners,0.8550315339886616,downstream_refiners,0.8550315339886616,upstream_oil_eandp,0.6774986884078804,True
-PSX,Phillips 66,downstream_refiners,0.8333534404130657,downstream_refiners,0.8333534404130657,iocs_integrated,0.7195399247203781,True
-DINO,HF Sinclair,downstream_refiners,0.8523780112377325,downstream_refiners,0.8523780112377325,upstream_oil_eandp,0.6002733659632044,True
-PBF,PBF Energy,downstream_refiners,0.8420481700852515,downstream_refiners,0.8420481700852515,upstream_oil_eandp,0.5930500709557629,True
-PARR,Par Pacific,downstream_refiners,0.7700841534026968,downstream_refiners,0.7700841534026968,upstream_oil_eandp,0.5512355233616424,True
-CVI,CVR Energy,downstream_refiners,0.7928843787906579,downstream_refiners,0.7928843787906579,upstream_oil_eandp,0.5793351287616951,True
-DK,Delek US,downstream_refiners,0.8246209049112817,downstream_refiners,0.8246209049112817,upstream_oil_eandp,0.5917485063200137,True
-CLMT,Calumet,downstream_refiners,0.4188258769716637,downstream_refiners,0.4188258769716637,upstream_oil_eandp,0.3968198003252016,True
-WKC,World Kinect,downstream_refiners,0.484369753889865,ofs_onshore,0.48576287782872,downstream_refiners,0.484369753889865,False
-CAPL,CrossAmerica Partners,downstream_refiners,0.3349349164286355,midstream_pipelines,0.4736852836654342,midstream_gpt,0.4349446118421601,False
-WLK,Westlake Corp,petrochem,0.7888547514171298,petrochem,0.7888547514171298,ofs_equipment,0.4597302676430566,True
-LYB,LyondellBasell,petrochem,0.8203777534991049,petrochem,0.8203777534991049,upstream_oil_eandp,0.5805318053103498,True
-DOW,Dow Inc,petrochem,0.8476626598524984,petrochem,0.8476626598524984,upstream_oil_eandp,0.5381054385827596,True
-OLN,Olin,petrochem,0.7267680162236272,petrochem,0.7267680162236272,upstream_oil_eandp,0.4489020742646551,True
-SLB,Schlumberger,ofs_onshore,0.7684445003825459,ofs_equipment,0.814241807861989,ofs_onshore,0.7684445003825459,False
-HAL,Halliburton,ofs_onshore,0.8402262389683017,ofs_onshore,0.8402262389683017,ofs_equipment,0.8320841402568343,True
-BKR,Baker Hughes,ofs_onshore,0.7320370685744378,ofs_equipment,0.7600643960286342,ofs_onshore,0.7320370685744378,False
-LBRT,Liberty Energy,ofs_onshore,0.8011318242981064,ofs_onshore,0.8011318242981064,ofs_equipment,0.7067197851422639,True
-PTEN,Patterson-UTI,ofs_onshore,0.8371185419250178,ofs_onshore,0.8371185419250178,upstream_oil_eandp,0.7973023256740225,True
-HP,Helmerich & Payne,ofs_onshore,0.8003388925620462,ofs_onshore,0.8003388925620462,ofs_equipment,0.747628945260319,True
-AESI,Atlas Energy Solutions,ofs_onshore,0.6704340650619148,ofs_onshore,0.6704340650619148,ofs_equipment,0.5547843938843787,True
-WTTR,Select Water Solutions,ofs_onshore,0.7162106711155228,ofs_onshore,0.7162106711155228,ofs_equipment,0.6658273799706614,True
-NESR,National Energy Services Reunited,ofs_onshore,0.5247968664513089,ofs_onshore,0.5247968664513089,ofs_equipment,0.5246736277491506,True
-XPRO,Expro Group,ofs_onshore,0.6936553523459734,ofs_offshore,0.6962697147482921,ofs_equipment,0.6942560212754718,False
-SEI,Solaris Energy Infrastructure,ofs_onshore,0.5721298726522848,ofs_onshore,0.5721298726522848,ofs_equipment,0.5044992052407492,True
-NBR,Nabors Industries,ofs_onshore,0.8175537630449387,ofs_onshore,0.8175537630449387,ofs_equipment,0.7770003477024437,True
-ACDC,ProFrac Holding,ofs_onshore,0.6633862041222762,ofs_onshore,0.6633862041222762,ofs_equipment,0.5716557805883122,True
-RES,RPC Inc,ofs_onshore,0.7970969524605764,ofs_onshore,0.7970969524605764,ofs_equipment,0.7494157393548835,True
-PUMP,ProPetro,ofs_onshore,0.8008617501320309,ofs_onshore,0.8008617501320309,ofs_equipment,0.7067407518358945,True
-TTI,TETRA Technologies,ofs_onshore,0.6642355515110501,ofs_onshore,0.6642355515110501,ofs_equipment,0.6305971880956124,True
-CLB,Core Laboratories,ofs_onshore,0.7291461034075734,ofs_onshore,0.7291461034075734,ofs_equipment,0.7216382914843312,True
-NINE,Nine Energy Service,ofs_onshore,0.4175009735298478,ofs_onshore,0.4175009735298478,ofs_offshore,0.3655637471109441,True
-CLNE,Clean Energy Fuels,ofs_onshore,0.42753633438156546,upstream_oil_eandp,0.4371648016509845,downstream_biofuels,0.428903418875512,False
-NGS,Natural Gas Services Group,ofs_onshore,0.5146957928388343,ofs_onshore,0.5146957928388343,midstream_gpt,0.5048324483915165,True
-FLOC,Flowco Holdings,ofs_onshore,0.5669602914328998,ofs_onshore,0.5669602914328998,ofs_equipment,0.5543737852611029,True
-NOV,NOV Inc,ofs_equipment,0.8021761088767227,ofs_equipment,0.8021761088767227,ofs_onshore,0.7888677659427029,True
-FTI,TechnipFMC,ofs_equipment,0.7463283911385133,ofs_equipment,0.7463283911385133,ofs_onshore,0.7273204319628513,True
-WFRD,Weatherford International,ofs_equipment,0.7064155107543448,ofs_equipment,0.7064155107543448,ofs_onshore,0.7053327753888297,True
-WHD,Cactus Inc,ofs_equipment,0.7562330498397656,ofs_onshore,0.7884227265752078,ofs_equipment,0.7562330498397656,False
-FET,Forum Energy Technologies,ofs_equipment,0.6358916773685741,ofs_onshore,0.6472123881796922,ofs_equipment,0.6358916773685741,False
-OIS,Oil States International,ofs_equipment,0.7467172168271002,ofs_onshore,0.7534689063339108,ofs_equipment,0.7467172168271002,False
-CNR,Core Natural Resources,coal,0.7648392216132291,coal,0.7648392216132291,minerals_royalty,0.4918938303425636,True
-ARLP,Alliance Resource Partners,coal,0.5888581799092164,coal,0.5888581799092164,minerals_royalty,0.4971549291899896,True
-BTU,Peabody Energy,coal,0.745839793647137,coal,0.745839793647137,minerals_royalty,0.47073896217906075,True
-VST,Vistra,power_ipps_merchant,0.8225476127217168,power_ipps_merchant,0.8225476127217168,midstream_gpt,0.4377365061003802,True
-NRG,NRG Energy,power_ipps_merchant,0.7069106742411573,power_ipps_merchant,0.7069106742411573,midstream_gpt,0.42147940429849234,True
-TLN,Talen Energy,power_ipps_merchant,0.7665073094641409,power_ipps_merchant,0.7665073094641409,uranium_nuclear_fuel,0.4204373642711587,True
-CEG,Constellation Energy,power_ipps_merchant,0.7186442774472355,power_ipps_merchant,0.7186442774472355,uranium_nuclear_fuel,0.3918739591285149,True
-NEE,NextEra Energy,power_utilities_regulated_gas,0.6651689304415682,power_utilities_regulated_gas,0.6651689304415682,power_renewables,0.6087665497019102,True
-SO,Southern Company,power_utilities_regulated_gas,0.8394468705351961,power_utilities_regulated_gas,0.8394468705351961,power_utilities_regulated_ldc,0.6971213330678847,True
-DUK,Duke Energy,power_utilities_regulated_gas,0.8568966177662378,power_utilities_regulated_gas,0.8568966177662378,power_utilities_regulated_ldc,0.7055444796177566,True
-AEP,American Electric Power,power_utilities_regulated_gas,0.8330083286198892,power_utilities_regulated_gas,0.8330083286198892,power_utilities_regulated_ldc,0.6778388619560796,True
-SRE,Sempra,power_utilities_regulated_gas,0.7154306195791682,power_utilities_regulated_gas,0.7154306195791682,power_utilities_regulated_ldc,0.6274139844867818,True
-D,Dominion Energy,power_utilities_regulated_gas,0.7755680632142827,power_utilities_regulated_gas,0.7755680632142827,power_utilities_regulated_ldc,0.6318933326447289,True
-ETR,Entergy,power_utilities_regulated_gas,0.7881561882463665,power_utilities_regulated_gas,0.7881561882463665,power_utilities_regulated_ldc,0.6515597810911824,True
-XEL,Xcel Energy,power_utilities_regulated_gas,0.8172926333442091,power_utilities_regulated_gas,0.8172926333442091,power_utilities_regulated_ldc,0.6511662039500193,True
-EXC,Exelon,power_utilities_regulated_gas,0.7900688553352347,power_utilities_regulated_gas,0.7900688553352347,power_utilities_regulated_ldc,0.6641358464378608,True
-ED,Consolidated Edison,power_utilities_regulated_gas,0.8160505718031389,power_utilities_regulated_gas,0.8160505718031389,power_utilities_regulated_ldc,0.6846360294403664,True
-PEG,Public Service Enterprise Group,power_utilities_regulated_gas,0.772978218439053,power_utilities_regulated_gas,0.772978218439053,power_utilities_regulated_ldc,0.6426006231890604,True
-WEC,WEC Energy Group,power_utilities_regulated_gas,0.8769138571341195,power_utilities_regulated_gas,0.8769138571341195,power_utilities_regulated_ldc,0.7374715493792549,True
-PCG,PG&E Corporation,power_utilities_regulated_gas,0.5456160284563625,power_utilities_regulated_gas,0.5456160284563625,power_utilities_regulated_ldc,0.4596700272240572,True
-AEE,Ameren,power_utilities_regulated_gas,0.8891098575762203,power_utilities_regulated_gas,0.8891098575762203,power_utilities_regulated_ldc,0.7459874486814031,True
-DTE,DTE Energy,power_utilities_regulated_gas,0.8843382976913143,power_utilities_regulated_gas,0.8843382976913143,power_utilities_regulated_ldc,0.7355677254394705,True
-CNP,CenterPoint Energy,power_utilities_regulated_gas,0.807549663492508,power_utilities_regulated_gas,0.807549663492508,power_utilities_regulated_ldc,0.7006468764060128,True
-PPL,PPL Corporation,power_utilities_regulated_gas,0.8418501338472668,power_utilities_regulated_gas,0.8418501338472668,power_utilities_regulated_ldc,0.7103592848121953,True
-FE,FirstEnergy,power_utilities_regulated_gas,0.7888540507149917,power_utilities_regulated_gas,0.7888540507149917,power_utilities_regulated_ldc,0.6598081089991326,True
-EIX,Edison International,power_utilities_regulated_gas,0.6415062353124459,power_utilities_regulated_gas,0.6415062353124459,power_utilities_regulated_ldc,0.520801101764916,True
-ES,Eversource Energy,power_utilities_regulated_gas,0.7781483938824063,power_utilities_regulated_gas,0.7781483938824063,power_utilities_regulated_ldc,0.6484909679119495,True
-CMS,CMS Energy,power_utilities_regulated_gas,0.8840917030060537,power_utilities_regulated_gas,0.8840917030060537,power_utilities_regulated_ldc,0.7324168835424824,True
-NI,NiSource,power_utilities_regulated_gas,0.842828668396909,power_utilities_regulated_gas,0.842828668396909,power_utilities_regulated_ldc,0.7484969690018091,True
-LNT,Alliant Energy,power_utilities_regulated_gas,0.9059579122139971,power_utilities_regulated_gas,0.9059579122139971,power_utilities_regulated_ldc,0.7616287280650071,True
-EVRG,Evergy,power_utilities_regulated_gas,0.8667424787108565,power_utilities_regulated_gas,0.8667424787108565,power_utilities_regulated_ldc,0.7167980835876129,True
-PNW,Pinnacle West Capital,power_utilities_regulated_gas,0.8293677773213126,power_utilities_regulated_gas,0.8293677773213126,power_utilities_regulated_ldc,0.7051172579810245,True
-AES,AES Corp,power_utilities_regulated_gas,0.44982476008388494,power_renewables,0.5681027316322272,power_utilities_regulated_gas,0.44982476008388494,False
-OGE,OGE Energy,power_utilities_regulated_gas,0.8935568302219816,power_utilities_regulated_gas,0.8935568302219816,power_utilities_regulated_ldc,0.7777884043649034,True
-IDA,IDACORP,power_utilities_regulated_gas,0.8443915649349184,power_utilities_regulated_gas,0.8443915649349184,power_utilities_regulated_ldc,0.7301543022168758,True
-MDU,MDU Resources,power_utilities_regulated_gas,0.6107103823961009,power_utilities_regulated_ldc,0.6238661819407654,power_utilities_regulated_gas,0.6107103823961009,False
-NWE,NorthWestern Energy,power_utilities_regulated_gas,0.7260314084973619,power_utilities_regulated_gas,0.7260314084973619,power_utilities_regulated_ldc,0.7048077026411355,True
-POR,Portland General Electric,power_utilities_regulated_gas,0.8200316189236466,power_utilities_regulated_gas,0.8200316189236466,power_utilities_regulated_ldc,0.7285845122227481,True
-BKH,Black Hills Corporation,power_utilities_regulated_gas,0.7721434501724007,power_utilities_regulated_gas,0.7721434501724007,power_utilities_regulated_ldc,0.7478809411646649,True
-TXNM,TXNM Energy,power_utilities_regulated_gas,0.4510858181546143,power_utilities_regulated_gas,0.4510858181546143,power_utilities_regulated_ldc,0.4239457637210293,True
-OTTR,Otter Tail,power_utilities_regulated_gas,0.4917852738423196,power_utilities_regulated_ldc,0.518128763261277,power_utilities_regulated_gas,0.4917852738423196,False
-AVA,Avista,power_utilities_regulated_gas,0.7533708361994306,power_utilities_regulated_gas,0.7533708361994306,power_utilities_regulated_ldc,0.7209344978170561,True
-MGEE,MGE Energy,power_utilities_regulated_gas,0.7129393589628145,power_utilities_regulated_gas,0.7129393589628145,power_utilities_regulated_ldc,0.6792041507892159,True
-HE,Hawaiian Electric Industries,power_utilities_regulated_gas,0.3574291747181117,power_utilities_regulated_gas,0.3574291747181117,power_utilities_regulated_ldc,0.3495205864158354,True
-ATO,Atmos Energy,power_utilities_regulated_ldc,0.7701839483307433,power_utilities_regulated_gas,0.832912296694452,power_utilities_regulated_ldc,0.7701839483307433,False
-NJR,New Jersey Resources,power_utilities_regulated_ldc,0.8136055072822843,power_utilities_regulated_ldc,0.8136055072822843,power_utilities_regulated_gas,0.7466943451628879,True
-NFG,National Fuel Gas,power_utilities_regulated_ldc,0.6198219412290852,power_utilities_regulated_ldc,0.6198219412290852,midstream_gpt,0.602567459222097,True
-SR,Spire,power_utilities_regulated_ldc,0.8113468090395353,power_utilities_regulated_ldc,0.8113468090395353,power_utilities_regulated_gas,0.722687691385554,True
-OGS,ONE Gas,power_utilities_regulated_ldc,0.7751462379046408,power_utilities_regulated_ldc,0.7751462379046408,power_utilities_regulated_gas,0.7029179633309467,True
-SWX,Southwest Gas Holdings,power_utilities_regulated_ldc,0.6250482282792931,power_utilities_regulated_ldc,0.6250482282792931,power_utilities_regulated_gas,0.5718860733367132,True
-UGI,UGI Corporation,power_utilities_regulated_ldc,0.5732519031983887,power_utilities_regulated_ldc,0.5732519031983887,power_utilities_regulated_gas,0.5419881740400608,True
-CPK,Chesapeake Utilities,power_utilities_regulated_ldc,0.7323573946104506,power_utilities_regulated_ldc,0.7323573946104506,power_utilities_regulated_gas,0.6851446014677439,True
-CWEN,Clearway Energy,power_renewables,0.6270032654328386,power_renewables,0.6270032654328386,power_utilities_regulated_gas,0.5467183242416023,True
-ORA,Ormat Technologies,power_renewables,0.4913325653883506,power_renewables,0.4913325653883506,power_utilities_regulated_gas,0.4043665594050409,True
-XIFR,XPLR Infrastructure (ex-NEP),power_renewables,0.48690135801476725,power_renewables,0.48690135801476725,power_utilities_regulated_gas,0.40035272824282925,True
+COP,ConocoPhillips,upstream_oil_eandp,0.8662796340826149,upstream_oil_eandp,0.8662796340826149,minerals_royalty,0.7640959487475981,True
+EOG,EOG Resources,upstream_oil_eandp,0.865038550035401,upstream_oil_eandp,0.865038550035401,minerals_royalty,0.7788745826259881,True
+FANG,Diamondback Energy,upstream_oil_eandp,0.8889038664089378,upstream_oil_eandp,0.8889038664089378,minerals_royalty,0.7855469818008314,True
+OVV,Ovintiv,upstream_oil_eandp,0.896868205677343,upstream_oil_eandp,0.896868205677343,minerals_royalty,0.7944752127964883,True
+APA,APA Corporation,upstream_oil_eandp,0.8821226014122807,upstream_oil_eandp,0.8821226014122807,minerals_royalty,0.7563867303159315,True
+PR,Permian Resources,upstream_oil_eandp,0.8710082462250902,upstream_oil_eandp,0.8710082462250902,minerals_royalty,0.7597480181206054,True
+MTDR,Matador Resources,upstream_oil_eandp,0.9014848719182571,upstream_oil_eandp,0.9014848719182571,minerals_royalty,0.7805825684092115,True
+SM,SM Energy,upstream_oil_eandp,0.8822044345127978,upstream_oil_eandp,0.8822044345127978,minerals_royalty,0.7450725965913094,True
+MGY,Magnolia Oil & Gas,upstream_oil_eandp,0.8933705572967087,upstream_oil_eandp,0.8933705572967087,minerals_royalty,0.7837040363380378,True
+CRGY,Crescent Energy,upstream_oil_eandp,0.8226274095440658,upstream_oil_eandp,0.8226274095440658,minerals_royalty,0.7033101740310129,True
+MUR,Murphy Oil,upstream_oil_eandp,0.8754861276313999,upstream_oil_eandp,0.8754861276313999,minerals_royalty,0.7466315266589367,True
+CRC,California Resources,upstream_oil_eandp,0.7517728004279487,upstream_oil_eandp,0.7517728004279487,minerals_royalty,0.6632405439895546,True
+TALO,Talos Energy,upstream_oil_eandp,0.8272383727818406,upstream_oil_eandp,0.8272383727818406,minerals_royalty,0.7254812081833386,True
+KOS,Kosmos Energy,upstream_oil_eandp,0.7260411998775103,upstream_oil_eandp,0.7260411998775103,ofs_onshore,0.6188072485563956,True
+HPK,HighPeak Energy,upstream_oil_eandp,0.6562517399307695,upstream_oil_eandp,0.6562517399307695,minerals_royalty,0.5658040816022458,True
+REPX,Riley Exploration Permian,upstream_oil_eandp,0.6211028226445846,upstream_oil_eandp,0.6211028226445846,minerals_royalty,0.5458866393325899,True
+VTS,Vitesse Energy,upstream_oil_eandp,0.6443054775792711,upstream_oil_eandp,0.6443054775792711,minerals_royalty,0.5775743470795102,True
+GRNT,Granite Ridge Resources,upstream_oil_eandp,0.464642132920644,upstream_oil_eandp,0.464642132920644,ofs_onshore,0.36747393909370146,True
+GFR,Greenfire Resources,upstream_oil_eandp,0.32353838873217605,upstream_oil_eandp,0.32353838873217605,midstream_gpt,0.2833920878100098,True
+EGY,VAALCO Energy,upstream_oil_eandp,0.7161706209418184,upstream_oil_eandp,0.7161706209418184,minerals_royalty,0.6529728858035553,True
+EQT,EQT Corp,upstream_gas_eandp,,midstream_gpt,0.6241592546794501,minerals_royalty,0.5592251023377173,False
+EXE,Expand Energy,upstream_gas_eandp,,midstream_gpt,0.6231010746899506,minerals_royalty,0.60709894392084,False
+AR,Antero Resources,upstream_gas_eandp,,upstream_oil_eandp,0.661752993060728,midstream_gpt,0.6528832448739568,False
+RRC,Range Resources,upstream_gas_eandp,,upstream_oil_eandp,0.6439541458344891,midstream_gpt,0.6389744902843607,False
+CRK,Comstock Resources,upstream_gas_eandp,,upstream_oil_eandp,0.5830772337846756,midstream_gpt,0.5779497949395445,False
+CNX,CNX Resources,upstream_gas_eandp,,upstream_oil_eandp,0.5650233176439428,midstream_gpt,0.5491209063218503,False
+BKV,BKV Corporation,upstream_gas_eandp,0.6944803339937741,upstream_gas_eandp,0.6944803339937741,midstream_gpt,0.591937182425372,True
+TXO,TXO Partners,upstream_gas_eandp,,upstream_oil_eandp,0.439002607155144,minerals_royalty,0.39652306038372714,False
+TPL,Texas Pacific Land,minerals_royalty,0.5636847576218661,upstream_oil_eandp,0.6126827313123756,midstream_gpt,0.5796849522270241,False
+VNOM,Viper Energy,minerals_royalty,0.7154252867557974,upstream_oil_eandp,0.7844055418865856,minerals_royalty,0.7154252867557974,False
+BSM,Black Stone Minerals,minerals_royalty,0.6553633390802138,upstream_oil_eandp,0.6634595002151454,minerals_royalty,0.6553633390802138,False
+SBR,Sabine Royalty Trust,minerals_royalty,0.6300172868018571,minerals_royalty,0.6300172868018571,upstream_oil_eandp,0.6069270353364479,True
+PBT,Permian Basin Royalty Trust,minerals_royalty,0.5062525332292087,upstream_oil_eandp,0.5188772795379475,minerals_royalty,0.5062525332292087,False
+DMLP,Dorchester Minerals,minerals_royalty,0.5787630267788888,upstream_oil_eandp,0.5958181951175493,minerals_royalty,0.5787630267788888,False
+NE,Noble Corp,upstream_offshore_drillers,0.7262971861492481,upstream_offshore_drillers,0.7262971861492481,ofs_equipment,0.7232838684591747,True
+RIG,Transocean,upstream_offshore_drillers,0.6662796584426521,ofs_equipment,0.7415836785851808,ofs_onshore,0.7168616656627019,False
+VAL,Valaris,upstream_offshore_drillers,0.7416316386315259,upstream_offshore_drillers,0.7416316386315259,ofs_equipment,0.6979671048491173,True
+SDRL,Seadrill,upstream_offshore_drillers,0.6734925448969797,upstream_offshore_drillers,0.6734925448969797,ofs_offshore,0.6659479804871961,True
+SOC,Sable Offshore,upstream_offshore_drillers,0.2079113366014126,upstream_oil_eandp,0.2169165486649569,upstream_offshore_drillers,0.2079113366014126,False
+TDW,Tidewater,ofs_offshore,0.6811065434804014,ofs_offshore,0.6811065434804014,ofs_equipment,0.6710223024510705,True
+OII,Oceaneering International,ofs_offshore,0.7315614067089692,ofs_equipment,0.7897847238416822,ofs_onshore,0.7680722763249676,False
+VTOL,Bristow Group,ofs_offshore,0.6237497749473989,ofs_onshore,0.6584488216435667,ofs_equipment,0.6408530816471951,False
+INVX,Innovex International,ofs_offshore,0.7002774435396631,ofs_equipment,0.7370723581827253,ofs_onshore,0.719044531529442,False
+FRO,Frontline,tanker_shipping,0.8174807230541127,tanker_shipping,0.8174807230541127,ofs_offshore,0.3724231862164807,True
+INSW,International Seaways,tanker_shipping,0.8624399565937899,tanker_shipping,0.8624399565937899,ofs_offshore,0.4176658692507106,True
+DHT,DHT Holdings,tanker_shipping,0.8264837843840563,tanker_shipping,0.8264837843840563,ofs_offshore,0.34123175372275005,True
+TNK,Teekay Tankers,tanker_shipping,0.8622432870724223,tanker_shipping,0.8622432870724223,ofs_offshore,0.3835221627045682,True
+NAT,Nordic American Tankers,tanker_shipping,0.7505021774900459,tanker_shipping,0.7505021774900459,ofs_offshore,0.33703318812510624,True
+TEN,Tsakos Energy Navigation,tanker_shipping,0.7923489703896475,tanker_shipping,0.7923489703896475,ofs_offshore,0.4227661686555941,True
+STNG,Scorpio Tankers,tanker_shipping,0.787417135609771,tanker_shipping,0.787417135609771,upstream_oil_eandp,0.4193174596129604,True
+ASC,Ardmore Shipping,tanker_shipping,0.7825934635010425,tanker_shipping,0.7825934635010425,upstream_oil_eandp,0.40331207184971585,True
+NVGS,Navigator Holdings,tanker_shipping,0.6526377559279589,tanker_shipping,0.6526377559279589,ofs_onshore,0.46750768824172123,True
+GLNG,Golar LNG,tanker_shipping,0.5181375558993362,ofs_onshore,0.5519107121565835,midstream_gpt,0.5426275373570605,False
+FLNG,FLEX LNG,tanker_shipping,0.5640631191442012,tanker_shipping,0.5640631191442012,midstream_gpt,0.4058005192173271,True
+TK,Teekay Corporation,tanker_shipping,0.7972950222967523,tanker_shipping,0.7972950222967523,ofs_offshore,0.42952987407538973,True
+SFL,SFL Corporation,tanker_shipping,0.6814113229174777,tanker_shipping,0.6814113229174777,ofs_offshore,0.5030419830929905,True
+LNG,Cheniere Energy,lng_terminals,0.6036153846644908,midstream_gpt,0.6439994285828635,lng_terminals,0.6036153846644908,False
+CQP,Cheniere Energy Partners,lng_terminals,0.5290148810606141,midstream_pipelines,0.6198140040013087,midstream_gpt,0.6105484699105028,False
+VG,Venture Global,lng_terminals,0.5562577908642562,lng_terminals,0.5562577908642562,upstream_oil_eandp,0.552094661935651,True
+NEXT,NextDecade,lng_terminals,0.5021497096819558,lng_terminals,0.5021497096819558,midstream_gpt,0.45696582542946196,True
+EE,Excelerate Energy,lng_terminals,0.43440703919423396,midstream_gpt,0.5247783917531175,ofs_onshore,0.4729860911517314,False
+WMB,Williams Companies,midstream_gpt,0.803456628053117,midstream_gpt,0.803456628053117,midstream_pipelines,0.6470921085834906,True
+KMI,Kinder Morgan,midstream_gpt,0.7937789085969598,midstream_gpt,0.7937789085969598,midstream_pipelines,0.6687333591621387,True
+TRGP,Targa Resources,midstream_gpt,0.8184272446951241,midstream_gpt,0.8184272446951241,upstream_oil_eandp,0.7373288953578968,True
+AM,Antero Midstream,midstream_gpt,0.7833197590462215,midstream_gpt,0.7833197590462215,midstream_pipelines,0.6970117832618749,True
+HESM,Hess Midstream,midstream_gpt,0.6804440563845423,midstream_gpt,0.6804440563845423,midstream_pipelines,0.638434931707275,True
+KNTK,Kinetik Holdings,midstream_gpt,0.6911026417446858,midstream_gpt,0.6911026417446858,upstream_oil_eandp,0.606014264911961,True
+AROC,Archrock,midstream_gpt,0.7575568546240826,midstream_gpt,0.7575568546240826,ofs_onshore,0.6846279303641329,True
+KGS,Kodiak Gas Services,midstream_gpt,0.6426409943082845,midstream_gpt,0.6426409943082845,ofs_onshore,0.5550714538111575,True
+USAC,USA Compression Partners,midstream_gpt,0.6041323672607537,midstream_gpt,0.6041323672607537,midstream_pipelines,0.6036351656578677,True
+KRP,Kimbell Royalty Partners,midstream_gpt,0.6080845759170604,upstream_oil_eandp,0.7279859108501394,minerals_royalty,0.6950354231381962,False
+EPD,Enterprise Products,midstream_pipelines,0.7260626694990338,midstream_pipelines,0.7260626694990338,midstream_gpt,0.7100284425056499,True
+MPLX,MPLX,midstream_pipelines,0.6933535429694935,midstream_pipelines,0.6933535429694935,midstream_gpt,0.6817454609321141,True
+PAA,Plains All American,midstream_pipelines,0.7852588703459166,midstream_pipelines,0.7852588703459166,midstream_gpt,0.7183669259069212,True
+PAGP,Plains GP Holdings,midstream_pipelines,0.7807659148516908,midstream_pipelines,0.7807659148516908,midstream_gpt,0.7307754613371394,True
+WES,Western Midstream,midstream_pipelines,0.6896010452760367,midstream_pipelines,0.6896010452760367,midstream_gpt,0.6756110106282223,True
+SUNC,SunocoCorp LLC,midstream_pipelines,0.5030020149454368,midstream_pipelines,0.5030020149454368,midstream_gpt,0.47677301589817195,True
+DKL,Delek Logistics,midstream_pipelines,0.4623641475780517,midstream_pipelines,0.4623641475780517,midstream_gpt,0.42613813537985396,True
+GEL,Genesis Energy,midstream_pipelines,0.6252692888299823,midstream_pipelines,0.6252692888299823,midstream_gpt,0.5670368878834856,True
+NGL,NGL Energy Partners,midstream_pipelines,0.40176073444164745,midstream_pipelines,0.40176073444164745,midstream_gpt,0.36746514742053876,True
+GLP,Global Partners,midstream_pipelines,0.5063908541962449,midstream_pipelines,0.5063908541962449,midstream_gpt,0.5014996854805306,True
+VLO,Valero Energy,downstream_refiners,0.8668888561233051,downstream_refiners,0.8668888561233051,upstream_oil_eandp,0.6483464210592847,True
+MPC,Marathon Petroleum,downstream_refiners,0.8522687700750001,downstream_refiners,0.8522687700750001,upstream_oil_eandp,0.6730047698204035,True
+PSX,Phillips 66,downstream_refiners,0.8299569918982043,downstream_refiners,0.8299569918982043,upstream_oil_eandp,0.6978457919627624,True
+DINO,HF Sinclair,downstream_refiners,0.8452636520014665,downstream_refiners,0.8452636520014665,upstream_oil_eandp,0.5966005651969042,True
+PARR,Par Pacific,downstream_refiners,0.7577082717672449,downstream_refiners,0.7577082717672449,upstream_oil_eandp,0.5466065185905306,True
+CVI,CVR Energy,downstream_refiners,0.7764371480895698,downstream_refiners,0.7764371480895698,upstream_oil_eandp,0.5727154423174237,True
+DK,Delek US,downstream_refiners,0.8071368107379879,downstream_refiners,0.8071368107379879,upstream_oil_eandp,0.5853773007295617,True
+CLMT,Calumet,downstream_refiners,0.44167095925768707,downstream_refiners,0.44167095925768707,upstream_oil_eandp,0.4117733461089617,True
+WKC,World Kinect,downstream_refiners,0.4732677259811843,ofs_onshore,0.4739265785997339,downstream_refiners,0.4732677259811843,False
+CAPL,CrossAmerica Partners,downstream_refiners,0.3395853934301137,midstream_pipelines,0.46972538756155374,midstream_gpt,0.4340916074452399,False
+WLK,Westlake Corp,petrochem,0.7884133827736387,petrochem,0.7884133827736387,ofs_equipment,0.4601356448206454,True
+LYB,LyondellBasell,petrochem,0.821894974877286,petrochem,0.821894974877286,upstream_oil_eandp,0.5844591987895968,True
+DOW,Dow Inc,petrochem,0.8486842852950505,petrochem,0.8486842852950505,upstream_oil_eandp,0.5416816699399315,True
+OLN,Olin,petrochem,0.7278473429863039,petrochem,0.7278473429863039,upstream_oil_eandp,0.4495478707336503,True
+HAL,Halliburton,ofs_onshore,0.8152229100119749,ofs_equipment,0.8315171772213619,ofs_onshore,0.8152229100119749,False
+PTEN,Patterson-UTI,ofs_onshore,0.8141081466585252,ofs_onshore,0.8141081466585252,upstream_oil_eandp,0.796412947414556,True
+WTTR,Select Water Solutions,ofs_onshore,0.7095759085946154,ofs_onshore,0.7095759085946154,ofs_equipment,0.6658318412178423,True
+NESR,National Energy Services Reunited,ofs_onshore,0.529988674049514,ofs_equipment,0.532480276174591,ofs_onshore,0.529988674049514,False
+XPRO,Expro Group,ofs_onshore,0.6978088788780894,ofs_offshore,0.7054249882165142,ofs_equipment,0.7040875344606505,False
+SEI,Solaris Energy Infrastructure,ofs_onshore,0.5684512413214663,ofs_onshore,0.5684512413214663,midstream_gpt,0.5065507877410067,True
+NBR,Nabors Industries,ofs_onshore,0.8039246595977378,ofs_onshore,0.8039246595977378,ofs_equipment,0.778353390936229,True
+ACDC,ProFrac Holding,ofs_onshore,0.6470794587675448,ofs_onshore,0.6470794587675448,ofs_equipment,0.5707106386848803,True
+RES,RPC Inc,ofs_onshore,0.7846477164248804,ofs_onshore,0.7846477164248804,ofs_equipment,0.7482666848323237,True
+PUMP,ProPetro,ofs_onshore,0.7856021487371214,ofs_onshore,0.7856021487371214,ofs_equipment,0.706258185946219,True
+TTI,TETRA Technologies,ofs_onshore,0.661683909549167,ofs_onshore,0.661683909549167,ofs_equipment,0.6293108820144465,True
+CLB,Core Laboratories,ofs_onshore,0.7239626544858759,ofs_onshore,0.7239626544858759,ofs_equipment,0.7218831868727168,True
+NINE,Nine Energy Service,ofs_onshore,0.4622649450125539,ofs_onshore,0.4622649450125539,ofs_offshore,0.39775550781676977,True
+CLNE,Clean Energy Fuels,ofs_onshore,0.42808683620905197,upstream_oil_eandp,0.43355256239653356,downstream_biofuels,0.4302920314792908,False
+NGS,Natural Gas Services Group,ofs_onshore,0.5154035073407685,ofs_onshore,0.5154035073407685,midstream_gpt,0.5149056573335482,True
+FLOC,Flowco Holdings,ofs_onshore,0.5608830327028881,ofs_onshore,0.5608830327028881,ofs_equipment,0.5598350518715811,True
+NOV,NOV Inc,ofs_equipment,0.801551946175555,ofs_equipment,0.801551946175555,ofs_offshore,0.7734194231173745,True
+FTI,TechnipFMC,ofs_equipment,0.7461968430210612,ofs_equipment,0.7461968430210612,ofs_offshore,0.7207646532084501,True
+WFRD,Weatherford International,ofs_equipment,0.709454472179003,ofs_equipment,0.709454472179003,ofs_onshore,0.6992317905594939,True
+WHD,Cactus Inc,ofs_equipment,0.7554667149674947,ofs_onshore,0.7771620362966656,ofs_equipment,0.7554667149674947,False
+FET,Forum Energy Technologies,ofs_equipment,0.6385085524415339,ofs_onshore,0.6489292440548099,ofs_equipment,0.6385085524415339,False
+OIS,Oil States International,ofs_equipment,0.7468135048567048,ofs_onshore,0.7477427959222163,ofs_equipment,0.7468135048567048,False
+VST,Vistra,power_ipps_merchant,0.8238744411551272,power_ipps_merchant,0.8238744411551272,midstream_gpt,0.438414471817106,True
+NRG,NRG Energy,power_ipps_merchant,0.7099149790130673,power_ipps_merchant,0.7099149790130673,midstream_gpt,0.41618584701351513,True
+TLN,Talen Energy,power_ipps_merchant,0.7701953954047621,power_ipps_merchant,0.7701953954047621,uranium_nuclear_fuel,0.4274320093878588,True
+CEG,Constellation Energy,power_ipps_merchant,0.7202475027077532,power_ipps_merchant,0.7202475027077532,uranium_nuclear_fuel,0.39515382809964555,True
+NEE,NextEra Energy,power_utilities_regulated_gas,0.6708942477939623,power_utilities_regulated_gas,0.6708942477939623,power_renewables,0.6064645715876398,True
+SO,Southern Company,power_utilities_regulated_gas,0.8422806440686521,power_utilities_regulated_gas,0.8422806440686521,power_utilities_regulated_ldc,0.6383243091054898,True
+DUK,Duke Energy,power_utilities_regulated_gas,0.8588074859546713,power_utilities_regulated_gas,0.8588074859546713,power_utilities_regulated_ldc,0.6432301363330984,True
+AEP,American Electric Power,power_utilities_regulated_gas,0.8345418423761555,power_utilities_regulated_gas,0.8345418423761555,power_utilities_regulated_ldc,0.6293661461397643,True
+SRE,Sempra,power_utilities_regulated_gas,0.7112327897274591,power_utilities_regulated_gas,0.7112327897274591,power_utilities_regulated_ldc,0.6013415201354837,True
+D,Dominion Energy,power_utilities_regulated_gas,0.7770091766176557,power_utilities_regulated_gas,0.7770091766176557,power_utilities_regulated_ldc,0.5915239497350882,True
+ETR,Entergy,power_utilities_regulated_gas,0.7845445241828842,power_utilities_regulated_gas,0.7845445241828842,power_utilities_regulated_ldc,0.6122243759699972,True
+XEL,Xcel Energy,power_utilities_regulated_gas,0.8179180714044653,power_utilities_regulated_gas,0.8179180714044653,power_utilities_regulated_ldc,0.5981007888771089,True
+EXC,Exelon,power_utilities_regulated_gas,0.7915775980814667,power_utilities_regulated_gas,0.7915775980814667,power_utilities_regulated_ldc,0.6087639604762378,True
+ED,Consolidated Edison,power_utilities_regulated_gas,0.8168454927172717,power_utilities_regulated_gas,0.8168454927172717,power_utilities_regulated_ldc,0.6174428285483577,True
+PCG,PG&E Corporation,power_utilities_regulated_gas,0.5443540783376691,power_utilities_regulated_gas,0.5443540783376691,power_utilities_regulated_ldc,0.4335429924647287,True
+AEE,Ameren,power_utilities_regulated_gas,0.8863507536644653,power_utilities_regulated_gas,0.8863507536644653,power_utilities_regulated_ldc,0.6897965785787831,True
+DTE,DTE Energy,power_utilities_regulated_gas,0.8841972798032794,power_utilities_regulated_gas,0.8841972798032794,power_utilities_regulated_ldc,0.6865624286484154,True
+CNP,CenterPoint Energy,power_utilities_regulated_gas,0.8058232737613484,power_utilities_regulated_gas,0.8058232737613484,power_utilities_regulated_ldc,0.6512102008205671,True
+PPL,PPL Corporation,power_utilities_regulated_gas,0.8421807317427169,power_utilities_regulated_gas,0.8421807317427169,power_utilities_regulated_ldc,0.6706090279901848,True
+FE,FirstEnergy,power_utilities_regulated_gas,0.7901604215784808,power_utilities_regulated_gas,0.7901604215784808,power_utilities_regulated_ldc,0.6160827732630179,True
+EIX,Edison International,power_utilities_regulated_gas,0.6406026445969274,power_utilities_regulated_gas,0.6406026445969274,power_utilities_regulated_ldc,0.48485128792630194,True
+ES,Eversource Energy,power_utilities_regulated_gas,0.7796735536018494,power_utilities_regulated_gas,0.7796735536018494,power_utilities_regulated_ldc,0.6076187162456098,True
+CMS,CMS Energy,power_utilities_regulated_gas,0.8827099439535365,power_utilities_regulated_gas,0.8827099439535365,power_utilities_regulated_ldc,0.671095939313432,True
+NI,NiSource,power_utilities_regulated_gas,0.8363312962032341,power_utilities_regulated_gas,0.8363312962032341,power_utilities_regulated_ldc,0.7046168366617027,True
+LNT,Alliant Energy,power_utilities_regulated_gas,0.9055307426316535,power_utilities_regulated_gas,0.9055307426316535,power_utilities_regulated_ldc,0.7029913714317699,True
+EVRG,Evergy,power_utilities_regulated_gas,0.8657684172608472,power_utilities_regulated_gas,0.8657684172608472,power_utilities_regulated_ldc,0.669269091921476,True
+PNW,Pinnacle West Capital,power_utilities_regulated_gas,0.8269555000391949,power_utilities_regulated_gas,0.8269555000391949,power_utilities_regulated_ldc,0.6502997096459361,True
+AES,AES Corp,power_utilities_regulated_gas,0.4443001399896784,power_renewables,0.5627193880385242,power_utilities_regulated_gas,0.4443001399896784,False
+OGE,OGE Energy,power_utilities_regulated_gas,0.8874171616792892,power_utilities_regulated_gas,0.8874171616792892,power_utilities_regulated_ldc,0.733266901251596,True
+IDA,IDACORP,power_utilities_regulated_gas,0.8437967069315135,power_utilities_regulated_gas,0.8437967069315135,power_utilities_regulated_ldc,0.6749826776244456,True
+POR,Portland General Electric,power_utilities_regulated_gas,0.8162638206130979,power_utilities_regulated_gas,0.8162638206130979,power_utilities_regulated_ldc,0.6763181917195171,True
+TXNM,TXNM Energy,power_utilities_regulated_gas,0.44612702165984447,power_utilities_regulated_gas,0.44612702165984447,power_utilities_regulated_ldc,0.40664594829108824,True
+OTTR,Otter Tail,power_utilities_regulated_gas,0.4805126300303019,power_utilities_regulated_ldc,0.48629445884003236,power_utilities_regulated_gas,0.4805126300303019,False
+AVA,Avista,power_utilities_regulated_gas,0.7424413224773698,power_utilities_regulated_gas,0.7424413224773698,power_utilities_regulated_ldc,0.6660548747500246,True
+MGEE,MGE Energy,power_utilities_regulated_gas,0.7099835373637639,power_utilities_regulated_gas,0.7099835373637639,power_utilities_regulated_ldc,0.6303916669114367,True
+HE,Hawaiian Electric Industries,power_utilities_regulated_gas,0.3537026174449438,power_utilities_regulated_gas,0.3537026174449438,power_utilities_regulated_ldc,0.336224519420041,True
+NFG,National Fuel Gas,power_utilities_regulated_ldc,0.5924672534694483,power_utilities_regulated_ldc,0.5924672534694483,midstream_gpt,0.5880620226174097,True
+SR,Spire,power_utilities_regulated_ldc,0.7525153191515023,power_utilities_regulated_ldc,0.7525153191515023,power_utilities_regulated_gas,0.7111182641881083,True
+OGS,ONE Gas,power_utilities_regulated_ldc,0.695393101202646,power_utilities_regulated_ldc,0.695393101202646,power_utilities_regulated_gas,0.6912896704443147,True
+SWX,Southwest Gas Holdings,power_utilities_regulated_ldc,0.602467203293083,power_utilities_regulated_ldc,0.602467203293083,power_utilities_regulated_gas,0.5635334439809049,True
+UGI,UGI Corporation,power_utilities_regulated_ldc,0.5656273231543034,power_utilities_regulated_ldc,0.5656273231543034,power_utilities_regulated_gas,0.5307441657736528,True
+CWEN,Clearway Energy,power_renewables,0.6285025579618713,power_renewables,0.6285025579618713,power_utilities_regulated_gas,0.5416441922907613,True
+ORA,Ormat Technologies,power_renewables,0.49629470550283483,power_renewables,0.49629470550283483,power_utilities_regulated_gas,0.39960721997080684,True
+XIFR,XPLR Infrastructure (ex-NEP),power_renewables,0.489988656485846,power_renewables,0.489988656485846,power_utilities_regulated_gas,0.4013107488699655,True

@@ -46,6 +46,7 @@ class BacktestResult:
                                    # ls_net, n_long, n_short, n_ranked
     quantile_means: pl.DataFrame   # quantile, mean_period_ret, n_obs (monotonicity view)
     summary: dict[str, float]
+    name_returns: tuple[np.ndarray, ...] = ()  # per traded period, for the permutation test
 
     def __str__(self) -> str:
         s = self.summary
@@ -166,6 +167,7 @@ def walk_forward_ls(
     qrows: list[dict[str, float | int]] = []
     prev_long: set[str] = set()
     prev_short: set[str] = set()
+    name_returns: list[np.ndarray] = []
     n_skipped = 0
     n_stale_dropped = 0
     n_extreme_dropped = 0
@@ -253,6 +255,7 @@ def walk_forward_ls(
             "n_long": long_leg.height, "n_short": short_leg.height,
             "n_ranked": merged.height,
         })
+        name_returns.append(merged["_ret"].to_numpy())
         prev_long, prev_short = long_book, short_book
 
     if not rows:
@@ -306,7 +309,8 @@ def walk_forward_ls(
         "n_stale_dropped": float(n_stale_dropped),
         "n_extreme_dropped": float(n_extreme_dropped),
     }
-    return BacktestResult(period_returns=period, quantile_means=qdf, summary=summary)
+    return BacktestResult(period_returns=period, quantile_means=qdf, summary=summary,
+                          name_returns=tuple(name_returns))
 
 
 def subsample_report(

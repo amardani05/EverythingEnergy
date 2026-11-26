@@ -1,282 +1,75 @@
-# signal_engine - Improvement Roadmap
+# Roadmap
 
-*Newest first. Current direction and status are the first two sections; everything from "Original assessment" down is the historical record.*
+*Rewritten 2026-11-24. Full history, specs and acceptance tests: [docs/roadmap_archive.md](docs/roadmap_archive.md) (older references to Phases, Tiers and item numbers point there).*
 
-*Drafted 2026-07-16 against `main2` @ `02124ca`. Evidence cited as `file:line`.*
+**Goal:** an energy and metals workstation that shows the physical market, prices it, and tests whether physical state predicts related equities.
 
----
+## Where it stands
 
-## Direction change (2026-11-12): a trading suite for energy and metals
+- **Terminal:** shipped. Map, commodity and country sheets, quotes, options, strategies, oil balance, workbench.
+- **Data:** free sources, nightly. Options are ETF proxies; metals lack demand and stocks; some infrastructure is 2003-2021 vintage.
+- **Signals:** the generic factor composite is frozen. It failed on free data (gross Sharpe -0.36) and the survivorship-free rerun did not certify it. Value and PEAD are dropped as standalone signals; the flipped-momentum sleeve is cancelled. Every trial is in a ledger.
+- **Operations:** `doctor` runs after every nightly refresh; CI and a daily freshness check are written and start once pushed.
 
-*The owner's brief, which overrides the UI and scope assumptions above: an old-Windows, numbers-first terminal; metals as well as energy; supply and demand by country; pipelines and flows on a world map; options with Black-Scholes fair value, multi-leg P&L and convexity; and enough tooling to work the numbers in place instead of writing code elsewhere. Test case: "disarray in the DRC: how much do they make, where does it go, who refines it, what is it for".*
+## Key changes
 
-**Shipped as `terminal.html`** (see README). First cut was a Win95 window desktop; on 2026-11-12 the owner asked for "2008, a bit more modern, plenty of information at every turn", tabs across the top and a layout they can rearrange, so the shell is now a tabbed workstation of movable widgets (GridStack) with a linked commodity/country selection. Widgets: World Map, Commodity and Country sheets with an outage calculator, Quote Board, Options Desk, Strategy Builder, Oil Balance, Data Workbench. Data: `commodities.json` (USGS MCS + EIA international + WNA, plus curated processing shares, trade links and end uses), `infra_*.geojson` (EIA US pipelines and plants, USGS mineral facilities, about 110 curated international pipelines and sites), `market_data.json` and `options_data.json` (Yahoo, nightly).
+1. **Physical state is the product, not the factor book.** Test balances, curves, cracks and the taxonomy graph. No more factor tuning.
+2. **Separate research from live.** WRDS answers historical questions locally; free data runs the terminal. Paid data is optional and parked.
+3. **Gate new signals.** Log every trial, test on survivorship-free data, then go live only on gross edge that survives costs.
 
-**Known weak spots, in the order they hurt:**
-1. **Options are ETF proxies with delayed quotes and a European model on American options.** Fine for structure and convexity work, wrong for anything execution-sensitive. Next: a binomial or Barone-Adesi-Whaley American price next to the BSM number; CME settlement files for real futures options (free, end of day) so crude, gas, copper and gold are priced on the future rather than on USO or GLD.
-2. **Metals have supply but little demand.** USGS gives production and reserves by country; consumption by country is only in the dataset for energy. Add apparent consumption for copper, aluminum, nickel and zinc (ICSG/ILZSG/INSG press-release tables, World Bureau of Metal Statistics where free) and exchange stocks (LME and SHFE daily warehouse reports, COMEX) as the metals equivalent of the oil balance.
-3. **Infrastructure vintages.** US pipelines and plants are EIA 2020/21 shapefiles; non-US mines and smelters are USGS 2003-2008. The curated layer covers the big names. Global Energy Monitor trackers (CC BY, gated download) would replace most of this.
-4. **Processing and trade shares are curated, with confidence flags.** UN Comtrade (free tier) can make the trade links reproducible by HS code.
-5. **No positions or P&L persistence.** The strategy builder forgets on reload. A saved book (local file via the dev server) with mark-to-market from the nightly snapshot is the step from calculator to blotter.
-6. **Workbench has no joins or saved views.** Add named views, a second table to join on country or symbol, and regression/correlation between two columns.
+## Plan
 
-**Next modules:** futures curve window (strip of contract months, calendar spreads, roll yield); crack, spark and metals-ratio spread board; event calendar (WPSR, STEO, OPEC, LME week) tied to the event-study backtest below; disruption overlay on the map (Hormuz closure: baseline vs current transit by chokepoint).
-
----
-
-## Reassessment (2026-11-10)
-
-*Written against `main2` @ `85a6a43` plus the working tree. Supersedes the ordering below where they conflict; the phase detail underneath is kept as the record.*
-
-### What changed since August
-
-1. **The engine has been idle for eleven weeks and the gate is still shut.** Tier 0.1 failed on 2026-08-20 (composite gross Sharpe -0.36, quantiles inverted) and nothing was built after it. The one test the roadmap named as next, the subsample split, is now run: see "Composite diagnosis" below.
-2. **The Atlas was publishing six-month-old numbers under a green chip.** `basket_check.py` and `driver_analysis_v5.py` treated a cache that covered every ticker as fresh forever, so the nightly job re-ran the analysis on prices frozen at 2026-05-06 and stamped it with the run time. Fixed: caches older than 4 days refetch, `meta.prices_through` carries the last real price date, and the chip keys off that. Two more faults surfaced by the first real refresh: WTI/Brent/Henry Hub came from `pandas_datareader`, which is not installed (now a key-free FRED CSV fallback, plus a guard that refuses to overwrite a good driver cache with one missing core series), and `CRACK_321` was `2*RB + HO - 3*CL` with RB/HO in $/gal, i.e. minus three times WTI (now a real $/bbl 3-2-1 crack). Every crack-spread loading published before today was a WTI loading with the sign flipped.
-3. **The project has no view of the physical market.** Everything so far ranks or correlates equities. In a year when the oil balance swung by several mb/d, the site could not say whether the world was building or drawing. That is the gap the two new surfaces start to close: `balances.html` (global liquids + US crude bridges, `signal_engine/macro/oil_balance.py`) and `flows.html` (trade routes and chokepoint exposure).
-
-### Composite diagnosis (Tier 0.1 follow-up)
-
-`scripts/diagnose_composite.py` runs the composite and each family alone through the same tercile harness and splits each into embargoed thirds and halves (`validation.backtest.subsample_report`). Result: the inversion is **not** a 2020 artifact, and it is mostly one family (93 monthly periods, 2019-01 to 2026-09, gross, terciles; full table in `docs/composite_diagnosis.json`).
-
-| Signal | Full-sample Sharpe | Third 1 (2019-21) | Third 2 (2021-24) | Third 3 (2024-26) | Same sign throughout |
-|---|---|---|---|---|---|
-| Composite | -0.37 | -0.79 | -0.55 | +0.31 | no |
-| Momentum 12-1 | -0.39 | -0.55 | -0.81 | -0.32 | **yes, negative** |
-| EV/EBITDA value | +0.25 | +0.39 | -0.66 | +0.60 | no |
-| PEAD (SUE) | +0.01 | +0.29 | -0.59 | +0.63 | no |
-
-Reading: momentum loses in every window, so in this universe it behaves as a reversal signal and its positive weight is what inverts the composite. Value and PEAD are positive in the first and last thirds and both fail in 2021-09 to 2024-01, the post-2022 mean-reverting stretch; neither is stable enough to certify. Thirty-period windows are noisy (a Sharpe of 0.6 on 30 months is about one standard error from zero), so this localises the problem rather than proving a fix. Next, in order, and each one a logged trial: (a) composite without momentum, (b) momentum with the sign flipped as a short-horizon reversal sleeve at its natural weekly horizon, (c) the same split conditioned on WTI trend, since the middle third is also when crude round-tripped. Do not re-weight on these numbers without the trial ledger: three families times two signs times three windows is already eighteen looks at the data.
-
-### Where the roadmap was wrong
-
-- **It assumed the factor book was the product.** Three generic factors on ~200 survivorship-biased names in one sector was always a weak prior, and the harness has now said so. The differentiated assets are the taxonomy graph, the commodity linkage, and (new) the physical balances. The plan should be organised around those.
-- **It treated the Atlas as legacy to be frozen.** The Atlas is the part people look at, and freezing it is how a six-month staleness bug survived. It needs the same QA as the engine (see 5.9).
-- **Usability (Phase 3) was "parallel" and so never happened.** No CLI, no `doctor`, no CI. A `doctor` command would have caught the stale cache in May.
-
-### Revised order
-
-1. **Trust floor (days).** `se doctor` with per-artifact staleness (prices, drivers, STEO vintage, WPSR week, flows vintage) and a non-zero exit wired into the nightly job; CI running ruff + mypy + pytest; the Tier 0.4 trial ledger, because the diagnosis above is itself several more trials.
-2. **Markets layer (Phase 5, below).** Balances and curves for the commodities the taxonomy already names. This is new breadth, and it is also the feature set the equity signals have been missing.
-3. **Re-aim the engine at conditional signals.** Stop asking "does momentum + value + PEAD rank energy stocks unconditionally" (answered: no). Ask whether physical state predicts basket-relative returns: does a tightening balance favour upstream over refiners, does a crack-spread shock propagate along `feeds_into` with a lag. Tier 1 and Tier 2 machinery stays frozen until one of these shows gross edge.
-4. **Phase 3 and 4 items** as they are touched, not as a block.
-
----
-
-## Phase 5 - Markets layer: energy as a whole, not WTI and uranium
-
-*Goal: for every commodity the taxonomy names, a balance, a price structure and a link to the baskets that carry it. Each item lists its free data source; all enter through the same vintage-stamped `macro_series` table.*
-
-**Shipped 2026-11-10:** global liquids balance and US crude bridge (EIA STEO bulk + WPSR, key-free), variance bridges, an implied-to-observed stock model with a measured error bar, STEO vintage archiving, and the trade-flow map with chokepoint exposure.
-
-- **5.1 Forecast-error variance on the build.** The current sigma is the fit residual. The better one is EIA's own forecast error: backfill monthly STEO archives (`eia.gov/outlooks/steo/archives`, xlsx) into `macro_series` as vintages, then report the distribution of (forecast build at t-k) minus (latest estimate) by horizon k. That turns "EIA says +2 mb/d next year" into "+2 with a one-sigma of X at 12 months".
-- **5.2 Refinery-side crude balance outside the US.** JODI publishes refinery intake, direct use, production and trade by country as key-free CSV (probed 2026-11-10: about 40 reporters, ~43 mb/d of intake, several large refiners missing from the crude rows). Usable as a bloc-level check on demand, not as a world total. Add PADD-level WPSR detail (PADD 3 runs, Cushing stocks) first: same source as today, much more signal.
-- **5.3 Products.** Gasoline, distillate and jet stocks, implied demand and cracks from WPSR; this is what the refiners, retail and biofuels baskets actually trade on. Bridges identical in form to the crude one.
-- **5.4 Natural gas and LNG.** US storage vs five-year band (EIA weekly), production, LNG feedgas and power burn; EU storage fill (AGSI, free key). Henry Hub, TTF and JKM spreads feed the LNG, gas E&P and utility baskets.
-- **5.5 Power.** EIA-930 hourly load and generation mix by balancing authority; spark and dark spreads from gas, coal and regional power prices. The IPP and regulated-utility baskets (the largest in the universe) currently have no fundamental series at all.
-- **5.6 Coal and uranium.** Coal: EIA quarterly production and exports, China and India import data. Uranium: WNA reactor requirements vs mine supply (annual), plus the spot/term spread; small, slow, but the nuclear baskets are where the taxonomy is most distinctive.
-- **5.7 Curve structure.** Front spreads (M1-M2, M1-M12) for WTI, Brent, HH, RBOB and HO from yfinance futures. Backwardation is the market's own real-time read on the balance; plotting it against the modelled build is the first sanity check on 5.1, and curve shape is a classic conditioning variable for equity signals.
-- **5.8 Positioning and activity.** CFTC Commitments of Traders (managed-money net length, weekly, free), Baker Hughes rig counts, frac spread counts. Crowding and capex-cycle state for the OFS and E&P baskets.
-- **5.9 Flows upkeep.** `flows_data.json` is a hand-compiled 2025 baseline with 15 low-confidence routes (uranium and products mostly). Make it reproducible where a primary table exists (EIA `PET_IMPORTS` bulk for US crude by origin, GIIGNL for LNG), add a "what changed" layer for disruptions (the 2026 Hormuz closure is the obvious first one: baseline vs current transit), and stamp a review-by date so it cannot go stale silently.
-- **5.10 The commodity desk UI.** One page per market joining its balance, routes, curve and exposed baskets (mock: `docs/ui_concepts.html`, concept A). This is what makes the layer navigable.
-
-## Backtester: ideas beyond the Tier list
-
-*The Tier 0-2 plan above is about making one cross-sectional long-short number trustworthy. These widen what the harness can test. None is started.*
-
-- **Event-study mode.** Most energy information arrives as dated events: WPSR Wednesdays, STEO releases, OPEC meetings, hurricane landfalls, earnings. Add `event_study(events, prices, window)` returning mean abnormal basket return by day relative to the event with bootstrap bands. Far better powered than monthly cross-sections on 200 names, and it is the natural test for the balance model ("does a 2-sigma surprise build move refiners vs E&Ps over the next five days").
-- **Basket-level and pair-level backtests.** The unit of account in this project is the basket, and the Lab already backtests pairs in the browser with no cost model and no rigor. Run the 13 taxonomy pairs and the 23 baskets through `walk_forward_ls` (or a time-series variant) so the Lab's pair z-scores get the same NW/permutation treatment as the factors.
-- **Conditional (regime-sliced) performance.** Report every result split by state variables known at the time: curve shape (backwardation vs contango), balance sign (building vs drawing), vol regime. An edge that exists only in one state is still an edge if the state is observable. Requires 5.1 and 5.7 as inputs.
-- **Commodity-neutral attribution.** Regress each book on the eight drivers and report alpha net of WTI, gas, cracks and rates. The Tier 1 WTI-hedge item is the one-factor version; the driver matrix already exists in the Atlas pipeline.
-- **Time-series backtests for macro signals.** A balance or curve signal is one series, not a cross-section. Add a simple `timeseries_backtest(signal, asset_returns, lag)` with the same cost and NW conventions, so "long upstream vs refiners when the 3-month implied build is below zero" can be tested at all.
-- **Purged, embargoed cross-validation.** `subsample_report` is the two-fold version. Combinatorial purged CV (Lopez de Prado) gives a distribution of out-of-sample Sharpes instead of one path, and a probability of backtest overfitting, which is the right headline for a sample this short.
-- **Point-in-time macro.** `macro_series` is bitemporal and now has its first vintages. Any macro signal must read through `as_of_macro`, never the latest revision; add the same poisoned-vintage canary the fundamentals have.
-- **Bootstrap bands on everything shown.** The Lab's block bootstrap is client-side only. Port it so every published Sharpe and quantile spread carries an interval.
-- **Capacity and liquidity realism at the basket level.** ADV-weighted capacity per basket, so a signal that only works in the six-name SMR basket is labelled as such.
-- **A results registry on the site.** Trial ledger rendered on `signals.html`: every configuration ever run, with its date, git SHA and outcome. The August failure and today's diagnosis should be as visible as a success would be.
-
----
-
-## Original assessment (2026-07-16): where things stood
-
-The repo holds two disjoint systems: the legacy **Energy Atlas** dashboard (works, manual, print-based, May-era) and the new **`signal_engine`** (the future: bitemporal DuckDB store, PIT-correct factors, 39 green tests). The engine's factor layer is genuinely solid - but it currently **dead-ends in both directions**: the fundamentals data it needs was never loaded, and everything downstream of raw factor values doesn't exist yet.
-
-| Layer | State | Evidence |
+| | Build | Done when |
 |---|---|---|
-| PIT store (bitemporal DuckDB) | ✅ Designed & tested | `data/store.py:41-269`, `tests/test_store_pit.py` |
-| Prices | ⚠️ Loaded but stale + flawed | 1.53M rows, yfinance-only, max date **2026-06-23**; dividends silently dropped (`data/prices.py:80`) |
-| EDGAR fundamentals | ❌ **Empty** | `edgar_facts` = 0 rows. Ingest crashed at ~650/766 CIKs on 6/23; fix landed 6/25 (`02124ca`) but **never re-run**; 0 `companyfacts_*.json` on disk |
-| Universe (IJR) | ⚠️ One snapshot (2026-06-12) | `ijr_pit` mode unusable; launchd job never installed (no `data_store/logs/`) |
-| Macro (FRED/EIA), FINRA | ❌ Clients only / stub | No ingest script; `macro_series` = 0 rows; `supplements/finra.py:22` raises `NotImplementedError` |
-| Factors (V/Q/M/PEAD) | ✅ Implemented, PIT-correct, unit-tested | `factors/*.py` - but called **only from tests** |
-| Scoring / composite | ❌ Does not exist | `scoring/__init__.py` = 0 bytes; config spec at `config.yaml:37-44` is dead config |
-| Validation | ⚠️ IC primitive only | `validation/ic.py`; `validation.backtest` referenced at `ic.py:17` but missing |
-| Backtester | ❌ Does not exist | No portfolio construction, costs, turnover, or walk-forward anywhere |
-| Output / reporting | ❌ Does not exist | `output/__init__.py` = 0 bytes; `data_store/snapshots/` never created |
-| CLI / orchestration | ❌ None | No `[project.scripts]`, no Makefile, no runner - zero→signals is currently impossible |
-| Docs / CI | ❌ README covers only the legacy dashboard; no CI | `README.md` never mentions the engine; no `.github/` |
+| **1. Trust** | `doctor` (staleness per artifact, non-zero exit in the nightly job); CI | Stale data fails loudly; every push is tested |
+| **2. Curves** | Free per-contract curves for CL, NG, RB, HO, GC, SI, HG; calendar spreads, cracks, roll yield; archive every night | The terminal shows each curve and its history since archiving began |
+| **3. Physical depth** | Products, then gas/LNG, then metals demand and exchange stocks; reproducible trade links; STEO forecast error | Each main commodity has balance + curve + exposed baskets |
+| **4. Options** | American pricing (binomial or BAW); implied vol and skew history from OptionMetrics, research only | Equity and ETF options stop using a European model |
+| **5. Conditional signals** | Balance, curve and crack state to baskets; event studies; customer-link graph | One clears the gate, or a null is recorded |
 
-**One-sentence diagnosis:** a well-built engine block with no fuel line (data), no transmission (scoring→backtest), and no steering wheel (CLI) - the roadmap is mostly *connecting* what exists, plus a handful of correctness fixes that are cheap now and expensive later.
+Do 1 first. Then 2 and 3; 5 needs both. 4 can go any time. Nothing here needs paid data.
 
----
+*Done:* SHFE exchange stocks (step 3: six base metals, weekly archive from 2025-10-31, Exchange Stocks widget), US gas balance (step 3: storage by region vs 5-year range, end-of-season projection, STEO monthly balance with LNG and power burn, Gas Balance widget), US products balance (step 3: gasoline, distillate, jet vs 5-year range, Products Balance widget), curve archive and Curves widget (step 2), `doctor` + CI (first run pending push), trial ledger, WRDS access test, CRSP/Compustat panel, composite rerun, Databento loader (offline only).
 
-## Phase 0 - Restore the data spine ✅ DONE (2026-07-17)
+**Eventual additions:** saved positions and P&L; event calendar; disruption overlay (Hormuz first); power and spark spreads; COT positioning; workbench joins and regressions; Global Energy Monitor infrastructure.
 
-*Goal: every table populated, fresh, and refreshable by cron - because nothing downstream is testable against reality until this is done.*
+**Not doing:** paid real-time feeds, intraday, ML, an execution simulator, or more weighting of the failed composite.
 
-- **0.1 Fix, then re-run the EDGAR ingest end-to-end.** ✅ Done. Hardened `scripts/ingest_edgar.py`: fetch+cache+parse now all inside the per-CIK `try`; incremental flushes every 50 CIKs; new `--from-cache` re-parse path (`edgar.iter_cached_payloads`) rebuilds from raw JSON with no HTTP, stamping `snapshot_date` from the cache file's mtime. Live re-run landed **1,325,958 fact rows across 756 CIKs = 98.4% of the 768 submitted CIKs** (4 CIKs 404'd at SEC - genuinely delisted/renamed). Core inputs present for 733–752 CIKs. Acceptance met.
-- **0.2 Refresh prices - and stop dropping dividends while the pipes are open.** ✅ Done. `parse_yf_history` now returns `(prices, corporate_actions)`; new `corporate_actions` table (PK `ticker,date,kind,source`) in `store.py`. Full re-pull: prices current **through 2026-07-17** (769 tickers, 1.54M rows), **14,936 dividends across 517 tickers + 97 splits across 79 tickers**. Verified: XOM/CVX/KMI each 34 quarterly dividends since 2018. Total-return math unblocked.
-- **0.3 Install the automation that already exists.** ✅ Done. Created `data_store/logs/`, added `com.signalengine.prices.plist` (nightly 21:00) and `com.signalengine.edgar.plist` (weekly Sun 09:00) alongside the existing IJR plist, and `launchctl load`ed all three - `launchctl list | grep signalengine` now shows all three staged. *(IJR still needs the manual browser CSV drop; automating detection is Phase 3.8.)*
-- **0.4 Baseline IC scorecard on real data.** ✅ Done. New `scripts/baseline_ic.py` runs momentum (daily panel), value + quality (month-end grid from 2019), and PEAD (SUE broadcast 63d) through the IC harness and writes `docs/baselines.md`. See the report for numbers.
-- **0.5 (emergent) Fix all-None SUE `Null`-dtype crash.** ✅ Done. The baseline surfaced a real pre-existing bug: `compute_sue_series` inferred a `Null` dtype for `sue` when a company's same-quarter EPS never varied (`pstdev == 0` → every `sue = None`), crashing `pl.concat` across tickers inside `compute_sue` with `SchemaError: type Float64 is incompatible with expected type Null`. Fixed at the source (cast to a declared `_SUE_SERIES_SCHEMA` on every return path); 2 regression tests added (`test_pead.py`). The synthetic fixtures never hit it because they always produced varied EPS.
+## WRDS: what each dataset is for
 
-**Phase 0 residue carried forward:** the value/quality baseline takes ~15 min each because `compute_value`/`compute_quality` issue per-ticker DuckDB queries (≈602 tickers × 91 grid dates × several queries). Vectorizing the snapshot fetch is folded into Phase 1 (the scoring layer needs a batched as-of fundamentals read anyway). Pre-existing repo-wide `ruff` debt (B008 on frozen-dataclass defaults, a few F541/I001 in older tests) is left for Phase 3.6's CI cleanup - this work added none.
+*Read access tested 2026-11-24. Table listings overstate access; only a real SELECT counts.*
 
----
+| Dataset | Access | Use |
+|---|---|---|
+| CRSP annual (`crsp.dsf_v2`) + delistings | Yes, through 2025-12-31 (old `crsp.dsf` stops 2024) | Survivorship-free universe and returns |
+| Compustat NA + CRSP link | Yes, current through 2026-09/10 quarters | Historical fundamentals; EDGAR `filed` dates remain the point-in-time source |
+| IBES + CRSP link | Yes, summary through 2026-08 | Analyst-based earnings surprise |
+| Compustat customer segments, `seglink` | Yes, through 2026-09 | Firm-to-firm edges for the graph |
+| OptionMetrics US + CRSP link | Yes, through 2025-08-29 | Historical IV, skew, variance premium |
+| TAQ millisecond, 2017 | Yes (2009-16 listed, not tested) | Spread calibration; nothing for 2025 |
+| Datastream futures, Compustat Snapshot, FactSet Revere, FINRA short interest, Markit CDS, CRSP monthly/quarterly | **Denied** | Do not plan on these |
 
-## Phase 1 - Signal generation: wire the missing middle (≈1 week)
+No IvyDB Futures schema found, so WRDS covers no futures. CRSP ends 2025: label the 2026 yfinance extension separately.
 
-*Goal: `signals --as-of 2026-07-15` produces a ranked, sector-neutral composite cross-section - the config spec at `config.yaml:17-44` finally executes.*
+Pull order: CRSP, Compustat, IBES, customer links, OptionMetrics. Filter on the server to energy and mining, and cache vintage-stamped parquet locally.
 
-- **1.1 Build `scoring/`** (currently 0 bytes) exactly to the spec already written in config: winsorize [1%, 99%] → cross-sectional z **within sector** → sign conventions (flip accruals) → equal-weight composite over enabled signals. Wire `data/sectors.py` (`sic_to_sector` exists but nothing calls it) via `edgar_submissions.sic`. Emit both raw and sector-relative variants (`emit_sector_relative: true`).
-- **1.2 Make config real.** ✅ Done. `scoring/composite.py` reads `signals.selection` (enabled/weight/components), `scoring.winsorize_pct`, `emit_sector_relative`, and `universe.min_price_history_days`. Per baselines, config now enables **momentum + value(`ev_ebitda` only) + pead**; quality stays off pending neutralization evidence.
-- **1.3 Known factor-correctness fixes:** ✅ Done (first two; third folded in).
-  - **SUE Q4 derivation** - `quarterly_eps_series` now derives Q4 = FY − ΣQ1..Q3 from the 10-K's annual EPS, `filed` = the 10-K date, `derived=True` flag, partial years skipped. 3 PIT-shaped tests. Live effect: PEAD coverage in the composite rose 61 → 92 names.
-  - **Total-return momentum** - `compute_momentum(dividends=...)` builds a per-ticker TR index from unadjusted closes + cash dividends (new `store.as_of_corporate_actions` PIT accessor); identical to price momentum when no dividends. **Bonus live-data bug found & fixed:** `momentum_as_of`'s panel window treated 252 *trading* days as 252 *calendar* days, so on real 5-day weeks the 252-row shift never filled and every name silently got null momentum - masked in tests by contiguous-calendar fixtures. Window now scales by 7/5; weekday-only regression test added.
-  - `shares_outstanding` coalesce deferred: `latest_annual_snapshot` reads the dei chain; the us-gaap fallback merge moves to the Phase 2 vectorized fundamentals read.
-- **1.4 Statistical hygiene:** ✅ Done. `newey_west_t` (Bartlett kernel, lag = horizon) in `validation/ic.py`; `IcSummary` now carries `t_stat_nw` beside the iid t, and the baseline report prints both. Test asserts NW cuts inflated |t| by >2× on a 21-day-overlap series.
-- **1.5 Build `output/`:** ✅ Done. `output/snapshots.py`: parquet snapshot per run into `data_store/snapshots/`, diff vs the latest prior snapshot (top-decile entrants/exits, rank moves ≥ threshold) rendered to markdown.
-- **1.6 Leakage canary through scoring:** ✅ Done. `tests/test_scoring.py::test_composite_pit_canary` plants absurd fundamentals filed *after* as_of and asserts the entire composite frame is byte-identical - PIT holds through winsorize/z/composite, not just at the store.
-- **Acceptance:** ✅ Met. `scripts/signals.py [--as-of]` emits the ranked composite (381/600 ranked at 2026-07-17), writes snapshot + rendered diff, prints the family Spearman-correlation matrix (value↔momentum −0.12, momentum↔pead +0.23 - genuine diversification) and per-family coverage.
+**Rules.** Academic, non-commercial use only. This repo is public and pushes nightly, so WRDS data never enters git, the site or live JSON; raw files stay in gitignored `data_store/wrds/`. Publish no WRDS-derived output until the university confirms the license allows it. Query through the Postgres service or WRDS Cloud, never by scripting the website. Cite WRDS and delete data when affiliation ends. The live pipeline must work without it.
 
-**Phase 1 residue carried forward:** `compute_value`/`compute_quality` still query per-ticker (single-date composite ≈ 13s - fine for the daily runner; the walk-forward backtest needs the vectorized batched as-of read, now a Phase 2.1 prerequisite). Quality family stays disabled until sector-neutralized IC evidence says otherwise.
+## The $10/month: parked
 
----
+Free data covers live curves: Yahoo serves individual contract months (10 of 10 tested on 2026-11-24, one year of daily closes each). It lacks dependable expired-contract history, open interest and futures options.
 
-## Phase 2 - The backtester (≈2–3 weeks; the centerpiece)
+**When resumed:** Databento pay-as-you-go. `scripts/databento_futures.py` quotes by default and caps spend ($2 per request, $10 per month, $110 of the $125 credit). It is untested live, and sign-up likely starts the credit's six-month clock.
 
-*Goal: `validation/backtest.py` - the module `ic.py:17` promises - turns signal panels into net-of-cost walk-forward portfolio returns with a report you'd trust.*
+**Resume if** step 5 needs curve history from before the nightly archive, or step 4 needs futures options. Check prices, redistribution terms and publication lag first.
 
-**Progress (2026-07-21):** core harness ✅ (`walk_forward_ls`: quantile L/S, explicit or every-Nth rebalance calendar, turnover + cost drag, poisoned-signal canary in tests). Graph-propagation sleeve ✅ first iteration (`atlas/graph.py` + `scripts/graph_ic.py`; neigh_down suggestive at NW t 1.0, neigh_up null; residualized version pending). **Visibility layer ✅:** `signals.html` on the site renders `signals_latest.json` (ranked book, family scores, coverage, correlation, daily movers) plus `backtests.json`; both artifacts publish with the nightly job. **First composite backtest** (monthly, quintiles, 60bps, `scripts/backtest_composite.py`): net +1.25%/yr, Sharpe +0.11 (gross +0.44), max DD -31%, quantiles ordered Q5 > Q1. Honest read: the composite survives costs where momentum alone loses 11%/yr, but it is not yet a strategy; and the survivorship-biased universe flatters even this. Remaining: vectorized fundamentals read, hysteresis portfolios (config `enter_decile`/`exit_tertile`), residualized graph propagation, PIT membership.
+**Rejected:** EODHD ($19.99), Tiingo Power ($30), Massive Options Starter ($29), Databento Standard (reported $199). Massive Options Basic ($0) is the trial source (`scripts/massive_check.py`): end-of-day bars only, no open interest, quotes or IV. Buy Databento only if the trial and Yahoo leave a gap.
 
-*The 2.1-2.6 sketch below was superseded on 2026-07-22 by the plan that follows, produced by a four-lens expert panel (portfolio construction, costs/microstructure, statistical rigor, energy-universe fit) plus an adversarial critic. The critic's headline: nobody had proposed FIXING the degenerate price join they kept describing, and every plan added machinery around a signal never re-validated on the new 205-name energy universe.*
+**Keep free:** EIA, FRED, EDGAR, CFTC, FINRA, USGS, JODI, AGSI, Comtrade, Yahoo.
 
-### Phase 2 - concrete backtester plan
+## Next three actions
 
-A "trustworthy backtest" here means a net return stream that is (1) non-degenerate (every reported book return is backed by a real multi-name book, not a silent one-name join artifact), (2) actually the strategy you think you are testing (neutralization that neutralizes something), (3) counted (every config tried is on the record so significance is not silently assuming N=1), and (4) honest about its ceiling. That ceiling is low and fixed: a static 205-name curated energy list is survivorship-biased (dead names absent), all-GICS-Energy so "sector-neutral" collapses to within-energy ranking, and thin (~30 names/quintile) on free OHLCV. The correct posture is defensibility over sophistication: prove there is gross edge in this universe first, bound the bias, and refuse to certify a Sharpe the data cannot support. Everything below is buildable on yfinance + EDGAR.
+1. Metals demand (step 3): no timely free source. Comtrade China imports lag about two years; LME stocks are behind a bot wall. Weekly LNG feedgas likewise needs a paid source; monthly STEO stands in.
+2. Reproducible trade links and STEO forecast error (finish step 3), then step 5.
 
-#### Tier 0 - trust prerequisites (do first)
-
-**Status 2026-08-20.** Items 2 and 3 are DONE and verified; item 1 is unblocked but was
-blocked longer than expected by data corruption found while doing it.
-
-- **0.2 price join** ✅ bounded backward as-of lookup + per-leg `min_book` guard; a period is
-  skipped rather than reported when a leg collapses. `n_long`, `n_short`, `n_periods_skipped`,
-  `n_stale_dropped`, `n_extreme_dropped` in every summary. Also added a counted
-  corporate-action guard (`max_abs_period_return`, default 3.0) after CHRD's post-bankruptcy
-  relisting (+283x in five days) produced a -500% period and an impossible -228% drawdown.
-- **0.3 basket neutralization** ✅ basket -> super-basket -> global ladder with
-  `neutralization_level` per name. Verified discriminating: shocked basket takes 100% of the
-  top half under the old global-z path, 50% under the new one.
-- **Three data bugs found en route, all confirmed against raw EDGAR JSON and all fixed:**
-  EPS truncated to integers at rest by polars dtype inference (VST Q1 2.87 stored as 2.0);
-  standalone quarters discarded by a PK collision with the YTD row sharing period_end and
-  accession; SUE differencing on EDGAR's `fy` (the report's fiscal year) so every quarter was
-  compared against itself, yielding SUE = 0.0. Plus `first_reported`, so a quarter is dated by
-  its own announcement rather than the later 10-Q that restates it as a comparative.
-  `edgar_facts` rebuilt from cache: 1.33M -> 1.62M rows; PEAD coverage 0/202 -> 103/202. The
-  composite had been running on two families while the site claimed three.
-- **0.1 gross edge** ❌ **FAILS on corrected data. Tiers 1 and 2 are frozen.**
-  Composite (monthly, terciles, 60bps, 2019-2026, 90 periods): gross Sharpe **-0.36**, net -0.62,
-  NW t -1.63. Quantiles are INVERTED, not merely flat: Q1 (worst composite score) returns
-  +1.836%/period against Q3 (best) at +1.494%, so top-minus-bottom is **-0.34%/period**.
-  Momentum alone is likewise inverted (gross -0.09; Q1 +0.506% vs Q3 +0.453%).
-  This is not a book-integrity artifact: books ran 45L/44S with 0 periods skipped, 0 stale drops
-  and 1 artifact drop, and the poisoned-signal canary still returns Sharpe > 3, which rules out a
-  sign flip in the harness. Every quantile earns +1.3% to +1.8% per month, i.e. the sector itself
-  rose through the window and the long-short is short the best-performing bucket.
-  Per the plan's own gate, no cost model, borrow model, vol-targeting or deflated-Sharpe work
-  should be built on top of this. The open question is whether the inversion is a genuine
-  small-cap-energy reversal effect or an artifact of the 2020 crash-and-rebound dominating the
-  sample; the cheapest next test is the subsample split (Tier 1), used here as diagnosis rather
-  than polish. Every backtest number in this repo predating 2026-08-20 is void.
-- **0.4 trial ledger** - specified, not yet built (awaiting go-ahead).
-
-
-- **Re-confirm gross edge exists in the new universe** - Before any new machinery, re-run the existing composite (monthly quintile L/S) on the 205-name energy panel and check raw gross Q5 > Q1 monotonicity survives at all. Driver: `scripts/backtest_composite.py` -> `walk_forward_ls`, inspect `quantile_means`. *Acceptance: a printed gross quantile_means vector for the energy universe with a documented pass/fail on Q5 > Q1; if gross alpha is gone, Tiers 1-2 are frozen until a signal that ranks is found.*
-- **Repair the degenerate price join (not just report it)** - The inner joins to `entry_px`/`exit_px` (backtest.py ~124-129) silently drop names with a missing price on either date, so a "quintile mean" can collapse to a handful of names. Apply an explicit point-in-time-valid forward-fill / NaN policy on the price panel, then add a `min_book` guard (default `min_names // n_quantiles`): if a held book falls below it after the joins, skip the period rather than emit a degenerate mean. Emit `n_long`, `n_short`, `eff_n` (1/HHI) per period. *Acceptance: a fixture where half the top-quantile names lack an exit price causes that period to be skipped (not emitted as a 3-name mean); `summary.median_n_long >= min_book` across all emitted periods.*
-- **Basket-relative neutralization with hierarchical fallback** - The sector-neutral z in `composite.py` (over `sector`, MIN_SECTOR_N=8) does nothing because ~all names are GICS Energy, so an upstream-vs-utilities tilt masquerades as selection. Join `ticker_to_basket()` (atlas/clusters.py), add a coarse SUPER_BASKET dict (upstream / midstream / downstream+petrochem / oilfield-services / power+utilities / shipping+other), compute z hierarchically (basket -> super-basket -> global by the `_sector_n` pattern), and emit `neutralization_level` per name. *Acceptance: adding a constant +5.0 to one raw component for every name in a large basket moves that basket's mean composite z < 0.1 (vs > 0.5 under the old global-z path); `neutralization_level` populated for 100% of ranked names.*
-- **Trial ledger + in-pipeline permutation p-value** - Weekly, monthly, and multiple signals were each a trial; nothing counts them, so every Sharpe silently assumes N=1. Add `signal_engine/validation/ledger.py`: one deduped row per `walk_forward_ls` call to `output/trial_ledger.parquet` (config key + `sharpe_net`, `n_periods`, `ann_ret_net`). Add `permutation_pvalue(signals, prices, n_perm=500, seed, **bt_kwargs)` that shuffles the `value` column within each rebalance date and reruns the identical pipeline (same costs, same `min_book` skip), returning `p = (1 + sum(null >= obs)) / (n_perm + 1)`. This is the calibrated generalization of the poisoned-signal canary. *Acceptance: K distinct configs leave exactly K key-rows (rerun does not inflate count); the poisoned canary yields `perm_pvalue < 0.01`; a pure-noise signal yields `perm_pvalue` ~ Uniform(0,1) (mean in [0.4,0.6] over 200 seeds, exceeds 0.05 at least 90% of the time).*
-
-#### Tier 1 - realism & rigor
-
-- **Hysteresis buffer zone** - `config.yaml` `enter_decile`/`exit_tertile` are dead; every rebalance recomputes a hard quantile, so a name oscillating across the Q4/Q5 boundary is round-tripped repeatedly at `tov*2*60bps`. Wire `enter_pctl`/`exit_pctl` (default 0.10/0.33) into `walk_forward_ls` using the already-tracked `prev_long`/`prev_short`: a name stays long if `pctl <= exit_pctl` while held, enters only at `pctl <= enter_pctl`; symmetric short. Keep `qcut` only for the monotonicity diagnostic. *Acceptance: on the noise fixture `avg_turnover` is >= 40% lower than the no-buffer run, and the poisoned canary still yields `sharpe_net > 3` (the buffer must not blind the leak detector).*
-- **Corwin-Schultz per-name half-spread replaces flat 60bps** - Net results hinge on a single `cost_bps=60` guess that is too high for XOM and far too low for a $300M microcap. Add `signal_engine/validation/costs.py` with `corwin_schultz(high, low)` (Corwin & Schultz 2012), trailing-median denoised, estimated per name as of each rebalance date; widen the price select to full OHLCV. Keep `cost_bps` as a floor/override for degenerate high-low. Charge it through the existing turnover step. *Acceptance: on synthetic OHLC with a known injected spread the estimator recovers it within +/-20%; on the real universe it produces a cross-sectional p10/p50/p90 distribution (not a constant), and a majors-only subset (XOM, CVX, COP) yields median estimated half-spread < 15bps.*
-- **Breakeven-cost curve + cost-multiplier stress** - Every cost input is a free-data estimate, so cost fragility is the honest headline, not the point net Sharpe. Add `cost_sensitivity(inputs, multipliers=[0,0.5,1,1.5,2])` that rescales spread and re-aggregates net, plus a `breakeven_cost_multiplier` by linear interpolation. Fold both into `summary`. *Acceptance: at multiplier 0 net Sharpe equals gross Sharpe (identity), net Sharpe is monotonically non-increasing in the multiplier, and a signal whose gross alpha is fully eaten at 1x reports `breakeven_cost_multiplier <= 1.0`.*
-- **Deflated + Probabilistic Sharpe** - A net Sharpe of 0.11 over a few dozen monthly periods, with fat-tailed negatively-skewed L/S returns and many configs tried, is almost certainly noise; the harness should say so numerically. Add `deflated_sharpe(returns, n_trials, sharpe_var)` (Bailey & Lopez de Prado 2014) reading `N` and cross-trial Sharpe variance from the Tier 0 ledger; put `psr_gt0`, `deflated_sr`, `dsr_prob` in `summary` (all Sharpes per-period inside the formula). *Acceptance: on synthetic iid Normal zero-Sharpe returns PSR(0) ~ 0.5; with N=100 injected trials `dsr_prob` for that zero-edge stream stays well below 0.95; a regression test asserts the current composite's `dsr_prob < 0.90` (harness refuses to certify it).*
-- **Benchmark-relative alpha: WTI-hedged stream + XLE/XOP** - A dollar-neutral all-energy book can be pure net-WTI beta or long-sector beta, not selection. WTI is already in `prices`; regress `ls_gross` on the WTI holding-window return, report `beta_wti` and a hedged stream `ls_hedged`. Add XLE (and XOP) to the yfinance ingest and report `alpha_xle`/`beta_xle` plus `long_only_excess_vs_xle`. One benchmark regression each, not a factor zoo. *Acceptance: a synthetic signal whose L/S return = 1.5*wti_ret + noise recovers `beta_wti` in [1.3,1.7] and `sharpe_hedged` < 0.3 abs; a book built as 1.0*XLE returns yields `beta_xle` in [0.9,1.1] and `alpha_xle` within +/-2%/yr of zero.*
-- **Trade terciles, diagnose with quintiles** - The energy universe is 4x smaller than the S&P 600 it replaced, so quintile tails (~30/book at the floor) are noise and drove the U-shaped weekly artifact. Trade `n_quantiles=3` with a `min_book_names` guard (default 25), but keep computing quintile `quantile_means` purely as a diagnostic so the U-shape stays visible. Make callers pass `n_quantiles` explicitly. *Acceptance: on a 150-name synthetic panel, tercile long and short books each hold >= 25 names every period; the same panel at quintiles trips the `min_book_names` guard; quintile `quantile_means` still reported for diagnosis.*
-- **Subsample stability report** - A full-sample Sharpe hides the failure mode where all edge comes from one window (2020 oil crash, a single reversal). Add `subsample_report(period_returns, embargo=1)` splitting the rebalance grid into non-overlapping thirds plus a pre/post-midpoint split, embargoing one period at each boundary; surface `worst_subsample_sharpe` and a sign-agreement `stability` flag. *Acceptance: a signal engineered to predict only in the first third gives `worst_subsample_sharpe` near/below 0 while full-sample Sharpe is positive and `stability=False`; on iid noise all subsample Sharpes cluster near 0.*
-
-#### Tier 2 - alpha & extensions
-
-- **Long-only top-tercile vs XLE** - Shorting ~30 small/micro-cap energy names (offshore drillers, uranium, SMR developers) is often uneconomic on free-data borrow, so L/S net is the least realizable stream here. Add a `long_only` mode holding only the top book (hysteresis membership), one-sided turnover/costs, benchmark = equal-weight ranked universe (and XLE), reporting `ann_active_ret` and its Sharpe. This is the defensible headline. *Acceptance: `long_only` on the poisoned fixture gives both the long and active streams Sharpe > 2; with a null signal the active-return mean is within noise of zero; `long_only` avg cost per period is ~half the L/S value at matched turnover.*
-- **Ex-ante vol-targeting, gated on effective-N** - Raw equal-weight L/S carries whatever vol the cross-section delivers, so cross-config Sharpes are compared at mismatched risk. Add `target_ann_vol` (default off) levering by trailing realized per-period vol computed strictly on prior periods. Conflict guard: gate on `eff_n >= min_book` first and refuse to lever periods below it, so vol-targeting never manufactures leverage when breadth collapses. *Acceptance: with `target_ann_vol=0.10` on the composite, `ann_vol` lands within +/-15% of 0.10 and `sharpe_net` is unchanged within tolerance; a single-spike stream leaves the spike period un-downscaled and downscales the following one; no period with `eff_n < min_book` is levered up.*
-- **Short-book borrow fee + shortability gate** - The short book pays no borrow and assumes universal availability, exactly wrong for small-cap energy and worsened by survivorship. In `costs.py` proxy hard-to-borrow from ADV + market cap (optionally FINRA short-volume via the existing supplement), accrue a tiered annual borrow fee over the holding period, and drop names below an ADV/mktcap floor from the short book (renormalize). Charge `short_borrow_cost` as its own period column. *Acceptance: net L/S falls versus the no-borrow baseline by the accrued drag; a universe with all shorts flagged HTB produces an empty short book (long-only fallback) rather than a full one; per-period count of names dropped for non-shortability is reported.*
-- **Survivorship inflation bound** - Every row is stamped `survivorship_clean=False` but the magnitude is never quantified. Add `survivorship_bound(con, as_of)` in `composite.py`: from `edgar_submissions`, energy-SIC CIKs whose last filing predates `as_of` by > ~400 days and are absent from the current universe are the dropped/dead names; dropout rate `d`, worst-case `haircut_ann = d * (mean_universe_ret - q1_mean_ret)`. Emit `survivorship_dropout_rate` and `survivorship_haircut_ann`. *Acceptance: empty dropped set gives `haircut_ann == 0`; the haircut is monotone increasing in `d` (injected 0.1 vs 0.3); `ann_ret_net - haircut_ann` is reported alongside the raw number.*
-- **Per-basket net-exposure diagnostic** - With `power_utilities_regulated_gas` alone at 37 names, an unconstrained rank can make the L/S a utilities-vs-E&P pairs trade with a large rate-duration and commodity tilt. Join `ticker_to_basket()` to each leg per period, report time-averaged and max single-basket net exposure; add an optional `cap_basket_weight`. *Acceptance: `summary` carries `max_net_basket_expo` and `avg_net_basket_expo`; with `cap_basket_weight=0.25` no basket exceeds 25% of either leg in any period; with the cap off the (larger) uncapped diagnostic is still reported.*
-- **Graph-propagation sleeve backtest (parallel workstream)** - `compute_graph_momentum()` (atlas/graph.py) is IC-evaluated but never run through the backtester, so its portfolio value is unknown. Add `scripts/backtest_graph.py` building `value = neigh_up - neigh_down` and feeding `walk_forward_ls`. This is a new signal, not validation infrastructure, so it does not gate the trust work above. *Acceptance: the script runs end-to-end on the real DB and prints a `BacktestResult` with `quantile_means` and gross/net Sharpe; a leak fixture (signal = realized forward return) trips the Sharpe > 3 canary, proving it is wired through the same honest mechanics.*
-
-**Cut deliberately (do not build):** the fractional-membership ramp (a continuous reparametrization of a buffer not yet shipped), within-book inverse-vol / signal weighting (polishing a ~30-name book whose composition you cannot trust; the liquidity gate is the right fix for high-vol dominance), the full execution simulator (VWAP-proxy fills + volume-cap spill + per-name two-legged ledger + ADV-impact tiers) in favor of one Corwin-Schultz half-spread plus the cost-multiplier stress, and the Amihud gate as a separate item (fold liquidity awareness into the borrow/shortability gate if needed). One spread estimator and one stress curve, then stop.
-
-**What to build next, in order:**
-1. Re-confirm gross Q5 > Q1 on the energy universe, then repair the degenerate price join so no reported book return is secretly one name.
-2. Ship basket-relative neutralization so the composite is actually the strategy you are testing.
-3. Stand up the trial ledger + permutation p-value so every Sharpe from here on is counted and calibrated.
-
----
-
-## Phase 3 - Usability & automation (parallel with 1–2; ≈1 week of focused work)
-
-*Goal: one CLI, one README, CI, and a data layer that maintains itself.*
-
-- **3.1 Single CLI** via `[project.scripts]` (none exists - no `entry_points.txt` in egg-info): `se ingest [prices|edgar|ijr|macro|all]`, `se signals --as-of`, `se backtest`, `se report`, `se doctor`. Kill the "five hand-typed `.venv/bin/python scripts/...` invocations" workflow.
-- **3.2 `se doctor` - data QA in one command:** staleness per table (prices are 3.5 weeks old *right now* and nothing says so), per-concept EDGAR coverage, price sanity (zero/negative closes, gaps, zero-volume runs), IJR snapshot cadence gaps, skipped-ticker report persisted to a table instead of log lines (`data/prices.py:119-121`). Non-zero exit on failure so launchd/CI can alert.
-- **3.3 Incremental ingest.** Everything is full-history re-pull today (`ingest_prices.py:80`; full `companyfacts` per CIK). Add watermarks (`max(date)` / `max(filed)` per entity) and pull deltas. Cuts the nightly window from ~20 min to seconds and reduces yfinance ban exposure.
-- **3.4 Fix the price-revision trap.** `ON CONFLICT DO NOTHING` (`ingest_prices.py:66-67`) means a re-split/re-adjusted yfinance history can never correct stored rows. Either upsert-with-replace on re-pull windows, or add a proper knowledge_date to prices (consistent with the store's bitemporal philosophy). Decide explicitly; today's behavior is the worst default silently.
-- **3.5 Retry/backoff on all HTTP clients** (none today - failures are caught and skipped: `prices.py:113-118`, `ingest_edgar.py:85-87,116-118`): exponential backoff, honor 429/`Retry-After`, then persist the failure to the skip table.
-- **3.6 CI + pre-commit:** GitHub Actions running `ruff + mypy + pytest` (all three exist, all pass, nothing enforces them); extend mypy beyond `files=["signal_engine"]` to scripts and tests.
-- **3.7 README rewrite.** Current README is 100% the legacy dashboard and its quickstart is broken (`pip install yaml` - the package is `pyyaml`, `README.md:13`). Document the two-pipeline reality, the engine quickstart (including the manual IJR download step and the cold-start "~20 min + one browser download" expectation), and move legacy dashboard docs to their own section/file.
-- **3.8 De-risk the IJR manual loop.** Akamai blocks automation, so at minimum: `se doctor` flags snapshot gaps, launchd job complains loudly (notification) when no fresh CSV appeared in N days, and the drop-folder workflow is documented. Investigate alternate free S&P 600 membership sources for backfill/cross-check.
-- **3.9 Config/env hygiene:** `.env.example` advertises `EDGAR_CONTACT_EMAIL` but config.yaml hardcodes the email and nothing reads `.env` (`.env.example` header admits this); pick one mechanism. Portable launchd plists (no hardcoded `/Users/amardani`).
-
----
-
-## Phase 4 - Expansion & robustness (after the Phase 2 gate exists)
-
-*Rule: no new signal enters until it passes the Phase 2 harness. That's the point of building the harness first.*
-
-- **4.1 Macro/commodity-beta sleeve.** The missing `scripts/ingest_macro.py` (FRED/EIA clients exist, `macro_series` is empty), then the `commodity_beta` signal from `atlas/clusters.py` (the "step 4" residualization promised at `clusters.py:5`) - ranked as its own sleeve, not in the composite, per config.
-- **4.2 FINRA short interest** - replace the stub (`supplements/finra.py:22`), semi-monthly bitemporal ingest, squeeze/crowding signal candidate.
-- **4.3 Price-source redundancy.** Wire Stooq (or another source) as the cross-check `as_of_prices` was designed for (`store.py:228-234` has nothing to compare today); reconcile disagreements > tolerance into a QA table; verify split adjustments instead of trusting yfinance blindly.
-- **4.4 Security master.** Prices are keyed by ticker string with a current-only ticker↔CIK map (`edgar.py:191-202`) - renames orphan history. Move to CIK-anchored identity with a ticker-history table; map sector-label mismatches (`InfoTech` vs iShares' `Information Technology`).
-- **4.5 Survivorship: from flagged to fixed.** Accumulate IJR snapshots (0.3) until `ijr_pit` is usable going forward; investigate historical S&P 600 constituent backfill; add delisting handling (delisted names currently vanish silently - `prices.py:107-121`) with a terminal-return convention.
-- **4.6 Experiment tracking.** Every backtest run writes a manifest: config hash, git SHA, data watermarks, and the family-wise count of variants tried. This is the cheap version of "don't p-hack yourself" and makes results citable later.
-- **4.7 Fold the Energy Atlas in** (the pyproject description already promises this): pair/residual z-scores from the legacy pipeline become engine features; eventually the dashboard reads engine snapshots instead of its own parallel CSV pipeline. Until then: freeze the legacy code, don't refactor it.
-- **4.8 Graph-propagation alpha sleeve - the taxonomy's directed graph is an unexploited edge.** The Atlas flow graph (crude → refiners → distribution; gas → LNG → shipping; uranium → nuclear power) encodes economic links that cross-sectional factors are blind to. Candidate signals, in rising order of complexity: (a) *economic-links momentum* à la Cohen–Frazzini - a basket's return this month predicts its graph-neighbors' returns next month because investors underreact along supply chains; test as "neighbor momentum" = flow-weighted lag of adjacent-basket returns; (b) *shock propagation* - commodity-driver innovations (CL/NG/CRACK) hitting an upstream node predict downstream residuals with a lag; (c) *HMM regime conditioning* - a 2–3 state hidden Markov model on basket dispersion/correlation to gate factor weights (risk tool first, alpha second). **Gate:** every one of these enters through the Phase 2 harness on the same field as the factors - same IC/NW discipline, same costs, same canaries. The graph sleeve is the most differentiated idea in the repo precisely because it can't be bought off a shelf; that's also why it must clear the same bar.
-
----
-
-## Sequencing logic
-
-1. **Phase 0 before everything** - three of four factors have literally zero data; any signal work before the re-ingest is theater.
-2. **Scoring before backtester** - the backtester consumes the composite; building it against raw single factors means rebuilding its input contract a week later.
-3. **Correctness fixes (dividends, Q4-SUE, NW t-stats) before results accumulate** - every week they wait, more conclusions get anchored on biased numbers.
-4. **Backtester before new signals** - the harness is the filter; adding FINRA/macro signals first just grows the pile of unvalidated ideas.
-5. **Usability is parallel, not last** - the CLI/doctor/CI items are what make Phases 0–2 stick; do them as you touch each area.
-
-## Explicitly deferred (don't build yet)
-
-- Position sizing / liquidity floors (config says removed in v1; revisit only when a sizing layer needs spreads/ADV).
-- Intraday anything, options, ML models - the cross-sectional daily spine isn't proven yet.
-- Legacy dashboard refactor - freeze until 4.7.
-- Stooq paid bulk access - only if 4.3 shows yfinance is materially wrong.
+*US metals added 2026-11-25:* imports by origin (Comtrade), Midwest premium (AUP futures), COMEX stocks (manual file drop: CME blocks automated downloads). Review Comtrade terms before committing `us_metals.json`.
