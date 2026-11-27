@@ -228,7 +228,7 @@ const T = (() => {
       `<h4>Layout</h4><span class="it" data-act="lock">${state.locked ? "Unlock layout" : "Lock layout"}</span><span class="it" data-act="new">New tab</span><span class="it" data-act="rename">Rename tab</span><span class="it" data-act="delete">Delete tab</span><span class="it" data-act="reset">Reset this tab</span><span class="it" data-act="resetall">Reset everything</span>
        <div class="hint">Drag title bars to move, corners to resize. Saved in this browser.</div>
        <h4>Appearance</h4><label class="it" style="cursor:default">Theme <select class="theme-sel">${Object.entries(THEMES).map(([k, v]) => `<option value="${k}"${k === theme() ? " selected" : ""}>${v}</option>`).join("")}</select></label>
-       <h4>Pages</h4><a class="it" href="index.html">PhysicalsAtlas</a><a class="it" href="terminal.html">Terminal</a>`;
+       <h4>Pages</h4><a class="it" href="index.html">PhysicalsAtlas</a><a class="it" href="terminal.html">PhysicalsTerminal</a>`;
     side.querySelector(".theme-sel").onchange = (e) => setTheme(e.target.value);
     side.onclick = (e) => { const t = e.target.closest("[data-add],[data-act]"); if (!t) return;
       if (t.dataset.add) { const w = addWidget(active(), { app: t.dataset.add }, true); save(); if (w) { w.item.scrollIntoView({ block: "nearest" }); w.item.classList.add("flash"); setTimeout(() => w.item.classList.remove("flash"), 700); } return; }
