@@ -1,0 +1,10 @@
+{
+  "name": "everythingenergy",
+  "private": true,
+  "description": "Serverless functions for PhysicalsTerminal (AskAtlas). The site itself is static.",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.14.0",
+    "zod": "^4.1.0"
+  }
+}

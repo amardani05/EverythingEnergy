@@ -51,7 +51,8 @@ def imports(today: date) -> list[dict[str, Any]]:
         period = f"{idx // 12}{idx % 12 + 1:02d}"
         f = CACHE / f"{period}.json"
         if f.exists() and k > REFRESH + 2:
-            out.append(json.loads(f.read_text()))
+            rec = json.loads(f.read_text())
+            out.append({**rec, **{m: U.fill_total(rec[m]) for m in U.HS if m in rec}})
             continue
         if not names:
             names = {int(a["PartnerCode"]): a["PartnerDesc"] for a in get(AREAS)["results"]}

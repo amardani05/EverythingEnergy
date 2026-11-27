@@ -79,5 +79,10 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "api/ask.mjs": {
+      "maxDuration": 120
+    }
+  }
 }

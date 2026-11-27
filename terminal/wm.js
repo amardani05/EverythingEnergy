@@ -176,12 +176,12 @@ const T = (() => {
     try { w.pane.grid.movable(it, !to && !state.locked); w.pane.grid.resizable(it, !to && !state.locked); } catch (e) { /* older gridstack: header drag stays live */ }
     setTimeout(() => w.resized(), 30); }
   function emptyNote(pane) { let n = pane.el.querySelector(".empty"); if (pane.wins.length) { if (n) n.remove(); return; }
-    if (!n) pane.el.appendChild($(`<div class="empty"><b>This tab is empty.</b><br>Add widgets from the list on the left. Drag a widget by its title bar, resize from its bottom-right corner. The layout is saved automatically.</div>`)); }
+    if (!n) pane.el.appendChild($(`<div class="empty"><b>This tab is empty.</b><br>Add widgets from the list on the left. Drag a widget by its title bar, resize from any side or bottom corner. The layout is saved automatically.</div>`)); }
   function buildPane(tab) {
     const el = $(`<div class="pane"><div class="grid-stack"></div></div>`); document.getElementById("work").appendChild(el);
     const gridEl = el.querySelector(".grid-stack");
     const nar = narrow();
-    const grid = GridStack.init({ column: nar ? 1 : 12, cellHeight: cellH(), margin: 3, float: false, animate: false, draggable: { handle: ".wh", cancel: "button" }, resizable: { handles: "se" }, alwaysShowResizeHandle: true }, gridEl);
+    const grid = GridStack.init({ column: nar ? 1 : 12, cellHeight: cellH(), margin: 3, float: false, animate: false, draggable: { handle: ".wh", cancel: "button" }, resizable: { handles: "e,se,s,sw,w" }, alwaysShowResizeHandle: true }, gridEl);
     const pane = panes[tab.id] = { el, gridEl, grid, wins: [], tab, narrow: nar };
     grid.batchUpdate(); for (const it of tab.items) addWidget(pane, it, false); grid.batchUpdate(false);
     grid.on("change added removed", save); grid.on("resizestop", (ev, item) => { const w = pane.wins.find((x) => x.item === item); if (w) w.resized(); });
@@ -226,7 +226,7 @@ const T = (() => {
   function renderSide() { const side = document.getElementById("side"), groups = [...new Set(Object.values(apps).map((a) => a.group || "Other"))];
     side.innerHTML = groups.map((g) => `<h4>${esc(g)}</h4>` + Object.entries(apps).filter(([, a]) => (a.group || "Other") === g).map(([id, a]) => `<span class="it" data-add="${id}" title="Add to this tab">${esc(a.title)}</span>`).join("")).join("") +
       `<h4>Layout</h4><span class="it" data-act="lock">${state.locked ? "Unlock layout" : "Lock layout"}</span><span class="it" data-act="new">New tab</span><span class="it" data-act="rename">Rename tab</span><span class="it" data-act="delete">Delete tab</span><span class="it" data-act="reset">Reset this tab</span><span class="it" data-act="resetall">Reset everything</span>
-       <div class="hint">Drag title bars to move, corners to resize. Saved in this browser.</div>
+       <div class="hint">Drag title bars to move; drag any side or bottom corner to resize. Saved in this browser.</div>
        <h4>Appearance</h4><label class="it" style="cursor:default">Theme <select class="theme-sel">${Object.entries(THEMES).map(([k, v]) => `<option value="${k}"${k === theme() ? " selected" : ""}>${v}</option>`).join("")}</select></label>
        <h4>Pages</h4><a class="it" href="index.html">PhysicalsAtlas</a><a class="it" href="terminal.html">PhysicalsTerminal</a>`;
     side.querySelector(".theme-sel").onchange = (e) => setTheme(e.target.value);

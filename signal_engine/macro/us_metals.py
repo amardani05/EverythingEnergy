@@ -39,8 +39,18 @@ def parse_imports(payload: dict[str, Any], names: dict[int, str], period: str) -
         gap = abs(sum(o["usd"] for o in origins.values()) - usd)
         if usd and gap / usd > 0.01:
             raise ValueError(f"{period} {metal}: origins miss the world value by {gap / usd:.1%}")
-        out[metal] = {"t": t, "usd": usd, "est": bool(world[0]["isNetWgtEstimated"]), "origins": origins}
+        out[metal] = fill_total({"t": t, "usd": usd, "est": bool(world[0]["isNetWgtEstimated"]), "origins": origins})
     return out
+
+
+def fill_total(m: dict[str, Any]) -> dict[str, Any]:
+    """Comtrade sometimes reports the world value with no world weight (netWgt 0)
+    while every origin has one. Use the sum of origin weights then, flagged as
+    estimated, so shares stay below 100%."""
+    s = sum(o["t"] for o in m["origins"].values())
+    if s > 0 and m["t"] < s * 0.99:
+        return {**m, "t": s, "est": True}
+    return m
 
 
 def _num(v: Any) -> float | None:

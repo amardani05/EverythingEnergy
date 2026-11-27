@@ -47,6 +47,7 @@
 <script src="terminal/shfe.js"></script>
 <script src="terminal/grid.js"></script>
 <script src="terminal/methodology.js"></script>
+<script src="terminal/ask.js"></script>
 <script>
 "use strict";
 /* Default tabs. Grid is 12 columns wide; x, y, w, h are in grid cells, and 20 rows fill the screen.
@@ -67,6 +68,7 @@ T.boot([
   { id: "data", name: "Data", items: [W("grid", 0, 0, 12, 20, { table: "Production by country", filter: "" })] },
   { id: "equities", name: "Equities", items: [W("grid", 0, 0, 12, 20, { table: "Equity signals", filter: "" })] },
   { id: "method", name: "Methodology", pin: true, items: [W("methodology", 0, 0, 12, 20)] },
+  { id: "ask", name: "AskAtlas", pin: true, items: [W("ask", 0, 0, 7, 20), W("methodology", 7, 0, 5, 20)] },
 ]);
 
 /* context bar: commodity and country drive every linked widget in the visible tab */

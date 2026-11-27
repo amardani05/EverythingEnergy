@@ -88,3 +88,11 @@ def test_massive_needs_key(monkeypatch):
     monkeypatch.delenv("MASSIVE_API_KEY", raising=False)
     with pytest.raises(RuntimeError):
         Massive()
+
+
+def test_missing_world_weight_uses_origin_sum():
+    m = U.fill_total({"t": 0.0, "usd": 300.0, "est": False,
+                      "origins": {"Canada": {"t": 60.0, "usd": 200.0, "est": False}, "Chile": {"t": 40.0, "usd": 100.0, "est": False}}})
+    assert m["t"] == 100.0 and m["est"] is True
+    ok = {"t": 100.0, "usd": 300.0, "est": False, "origins": {"Canada": {"t": 100.0, "usd": 300.0, "est": False}}}
+    assert U.fill_total(ok) is ok

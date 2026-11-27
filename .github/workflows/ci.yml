@@ -22,6 +22,8 @@ jobs:
         with:
           node-version: "22"
       - run: pip install -c constraints.txt -e ".[dev,databento]"
+      - run: npm ci --no-audit --no-fund
+      - run: node --test tests/test_ask.mjs
       - run: ruff check signal_engine scripts tests
       - run: mypy
       - run: pytest

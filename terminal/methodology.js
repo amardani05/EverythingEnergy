@@ -65,7 +65,7 @@
       a report that does not reconcile is refused. Holiday weeks with no report are recorded and not retried.</p>
       <ul><li><b>Warrant share</b> = on warrant / deliverable. Sharp falls in warrants are the usual early sign of a squeeze.</li>
       <li>The archive starts 2025-10-31, so 5-year norms fill in over time.</li></ul>
-      <p><b>US metals</b>: imports by origin (Comtrade), COMEX warehouse stocks and the Midwest aluminium premium.</p>`],
+      <p><b>US metals</b>: imports by origin (Comtrade; when Comtrade gives a month no world weight, the total is the sum of countries and is marked estimated), COMEX warehouse stocks (no free automated source yet: CME blocks scripted downloads) and the aluminum Midwest premium (CME AUP futures).</p>`],
     ["physicals", "Physical atlas", `
       <p>Production by country for each commodity, latest published year, from USGS Mineral Commodity Summaries, EIA and the World Nuclear Association.
       Processing (refining, smelting) is tracked separately from mining where the source splits it, because concentration often sits downstream.</p>
@@ -93,6 +93,13 @@
       the whole universe. Families are averaged, and the composite is the weight-renormalised mean of the families each name has.</p>
       <p>Fundamentals enter on their SEC filed date and restatements never rewrite history. A leakage test plants a future-dated filing and checks that no output changes.
       Every trial run is recorded in a ledger so the number of things tried is known when judging a result.</p>`],
+    ["askatlas", "AskAtlas", `
+      <p>AskAtlas answers questions with Claude (Opus 5.5), which reads the same published data files as the widgets through three read-only tools: list the datasets,
+      describe one, and read a path inside it with filters. It cannot see anything that is not published, and it is told to cite the dataset, path and as-of date
+      and to say when the data does not cover a question.</p>
+      <ul><li>Access is limited to an allowlist of emails, each with a personal access code; the server stores only a hash of each code.</li>
+      <li>Answers can still be wrong. Check the figures against the widget named in the Sources line.</li>
+      <li>Questions and the data read are sent to Anthropic's API to produce the answer.</li></ul>`],
     ["limits", "Limitations", `
       <ul><li><b>Survivorship.</b> The equity universe is a fixed list applied to all history, so delisted names are missing and back-tested returns are biased up.</li>
       <li><b>Revisions.</b> EIA weekly data and STEO history are revised; the terminal shows the latest vintage, not what was known at the time.</li>

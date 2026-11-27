@@ -52,7 +52,7 @@
     ["mine", "Mines", "#f2c230"], ["smelter", "Smelters", "#f08a3c"], ["metal_refinery", "Metal refineries", "#f5b071"], ["coal_mine", "Coal mines", "#9aa3ad"], ["enrichment", "Enrichment", "#9ad94c"], ["conversion", "Conversion", "#6fb53a"]];
   const CUTS = [0.01, 0.03, 0.07, 0.15, 0.3, 0.5];
   const THEME = {
-    dark: { ocean: "#0e1622", land: "#1c2534", border: "#3b4860", trace: "#27344a", ramp: ["#4a5230", "#7a7228", "#ad8a28", "#d97f2a", "#e8562c", "#ff3b30"], sel: "#ffffff", bubble: "#ffd23c", route: { crude: "#f3c47c", products: "#f28f62", lng: "#cfeaf5", pipe_gas: "#b9e6a6", coal: "#d0d0d0", uranium: "#d9b3f2", metal: "#ffd23c" } },
+    dark: { ocean: "#0e1622", land: "#1c2534", border: "#3b4860", trace: "#27344a", ramp: ["#5c6a3a", "#8f8a2e", "#c29b2a", "#e8892c", "#f2602e", "#ff3b30"], sel: "#ffffff", bubble: "#ffd23c", route: { crude: "#f3c47c", products: "#f28f62", lng: "#cfeaf5", pipe_gas: "#b9e6a6", coal: "#d0d0d0", uranium: "#d9b3f2", metal: "#ffd23c" } },
     light: { ocean: "#d8e4ef", land: "#f4f2ec", border: "#aab4bf", trace: "#ebe6d6", ramp: ["#f1e3b4", "#ecd08a", "#e8b25f", "#e08a3f", "#d55f2b", "#b8271f"], sel: "#0f3f78", bubble: "#1f5fa8", route: { crude: "#9a5a00", products: "#b8432c", lng: "#1f7fa8", pipe_gas: "#3c8a3c", coal: "#555555", uranium: "#7b52ab", metal: "#1f5fa8" } } };
   const WORLD_BOUNDS = [[-168, -56], [178, 76]];
 
@@ -109,7 +109,7 @@
       if (!m.empty) { const groups = [...new Set(m.list.map((x) => x.group))];
         q("#mp-c").innerHTML = groups.map((g) => `<optgroup label="${esc(g)}">${m.list.filter((x) => x.group === g).map((x) => `<option value="${x.id}">${esc(x.name)}</option>`).join("")}</optgroup>`).join("");
         const want = a0.commodity || T.ctx.commodity; q("#mp-c").value = want && m.com[want] ? want : m.com.crude_oil ? "crude_oil" : m.list[0].id; win.setArg({ commodity: q("#mp-c").value }); }
-      layerPanel(); ready = true; refresh(); if (a0.country) focusCountry(a0.country, true);
+      layerPanel(); ready = true; modes(Mo.com[q("#mp-c").value]); if (q("#mp-m").selectedOptions[0]?.disabled) q("#mp-m").value = "production"; refresh(); if (a0.country) focusCountry(a0.country, true);
       map.on("move", () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; place(); }); });
       map.on("mousemove", (ev) => { const hit = map.queryRenderedFeatures(ev.point, { layers: live(["fac_major", "fac_all", ...pipeIds(), "flows", "land"]) })[0]; map.getCanvas().style.cursor = hit ? "pointer" : "";
         q("#mp-h").textContent = hit ? describe(hit) : ""; });
@@ -191,12 +191,15 @@
         text: `◆ ${k.name.replace(/^Strait of /, "").replace(/ Canal.*| Straits.*| \(.*/, "")}${k.oil_mbd ? " " + F.n(k.oil_mbd, 1) : ""}` }));
       setLabels(list);
       /* legend + status */
-      q("#mp-leg").innerHTML = L.shade && c ? `<b>${esc(c.name)}</b>, ${mode} share` + CUTS.map((t, i) => `<i style="background:${th.ramp[i]}"></i>${F.n(t * 100, 0)}%+`).join("") : "shading off";
+      q("#mp-leg").innerHTML = L.shade && c && !has(c, mode) ? `<b>${esc(c.name)}</b>: no ${mode === "refining" ? "processing" : mode} data in this dataset` : L.shade && c ? `<b>${esc(c.name)}</b>, ${mode === "refining" ? "processing" : mode} share` + CUTS.map((t, i) => `<i style="background:${th.ramp[i]}"></i>${F.n(t * 100, 0)}%+`).join("") : "shading off";
       q("#mp-theme").textContent = theme === "dark" ? "Light map" : "Dark map";
       if (c) { const top = c.producers.filter((p) => p.iso3 !== "OTH").slice(0, 4).map((p) => `${Mo.name(p.iso3)} ${F.share(p.share, 0)}`).join(", ");
         q("#mp-s").textContent = `${c.name} ${c.year}: ${F.big(c._tot)} ${c.unit}. ${top}. Top-3 ${F.share(c._top3, 0)}. Zoom in for the US pipeline network and smaller sites.`; win.setTitle("World Map - " + c.name); }
       else q("#mp-s").textContent = "commodities.json missing: map shows infrastructure only."; }
-    function setCommodity(id, tell) { if (!Mo || !Mo.com[id]) return; q("#mp-c").value = id; win.setArg({ commodity: id }); if (tell) T.setCtx("commodity", id, win); refresh(); }
+    /* a shading mode with no rows for this commodity is greyed out and, if chosen, says so instead of drawing a blank map */
+    const has = (c, m) => m === "production" ? true : m === "reserves" ? !!(c.world_reserves && c.producers.some((p) => p.reserves)) : m === "refining" ? !!(c.refining || []).length : !!(c.consumers || []).length;
+    function modes(c) { for (const o of q("#mp-m").options) { const ok = !c || has(c, o.value); o.disabled = !ok; o.textContent = o.textContent.replace(/ \(no data\)$/, "") + (ok ? "" : " (no data)"); } }
+    function setCommodity(id, tell) { if (!Mo || !Mo.com[id]) return; q("#mp-c").value = id; modes(Mo.com[id]); if (q("#mp-m").selectedOptions[0]?.disabled) q("#mp-m").value = "production"; win.setArg({ commodity: id }); if (tell) T.setCtx("commodity", id, win); refresh(); }
     win.onArg = (a) => { if (!ready || !a) return; if (a.commodity) setCommodity(a.commodity, true); if (a.country) focusCountry(a.country, true); };
     win.onCtx = (k, v) => { if (!ready) { if (k === "commodity") a0.commodity = v; return; }   // picked while the map was still loading: apply on load
       if (k === "commodity" && q("#mp-c").value !== v) setCommodity(v, false); else if (k === "country") focusCountry(v, !quiet); };

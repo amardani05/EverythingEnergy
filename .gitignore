@@ -21,3 +21,6 @@ data_store/
 # editor
 .vscode/
 .idea/
+
+# node (AskAtlas function deps)
+node_modules/
