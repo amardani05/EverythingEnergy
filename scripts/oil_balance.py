@@ -2,7 +2,7 @@
 """Oil supply/demand balance - fetch, model, publish.
 
 Pulls two key-free EIA feeds, runs `signal_engine.macro.oil_balance`, and
-writes the web artifact `oil_balance.json` that `balances.html` renders:
+writes the web artifact `oil_balance.json` that the terminal Oil, Products and Gas Balance widgets render:
 
   * STEO bulk file  -> global liquids balance (monthly, with EIA's forecast)
   * WPSR xls series -> US crude balance (weekly, real refinery inputs)

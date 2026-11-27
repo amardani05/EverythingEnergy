@@ -10,7 +10,7 @@
   T.app("curves", { title: "Futures Curves", group: "Markets", w: 7, h: 12, open(win, arg) {
     win.add(`<div class="toolbar"><label>Market <select class="fc-r"></select></label><span class="fc-legs" hidden><label>Buy <select class="fc-a"></select></label><label>Sell <select class="fc-b"></select></label></span></div>`);
     win.add(`<div class="tabs"><button data-t="c" class="on">Curve</button><button data-t="t">Table</button><button data-t="s">Spread history</button><button data-t="k">Cracks</button></div>`);
-    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:#fff;min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
+    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper);min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
     const q = (s) => win.el.querySelector(s); let D, R, root, tab = "c", leg = {};
     const kv = (o) => { lcd.innerHTML = `<div class="kvs">${o.map(([k, v]) => `<div><span>${esc(k)}</span><b>${v}</b></div>`).join("")}</div>`; };
     const clear = () => { if (pane._ro) { pane._ro.disconnect(); pane._ro = null; } pane.onmousemove = pane.onmouseleave = null; T.tip({}, null); pane.innerHTML = ""; };

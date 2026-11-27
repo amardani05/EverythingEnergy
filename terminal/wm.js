@@ -24,6 +24,19 @@ const T = (() => {
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   /* chart palette: blue, orange, teal, red, purple, grey */
   const C = ["#1f6fb5", "#e0711c", "#12998a", "#c8312b", "#7b52ab", "#6b7785", "#8a6d00", "#c2478f"];
+  /* themes: a data-theme attribute on <html> swaps the CSS tokens; the chart palette and
+     plot chrome are read from those tokens so canvases follow, and every canvas repaints */
+  const THEMES = { "classic-light": "Classic light", "classic-dark": "Classic dark", "modern-light": "Modern light", "modern-dark": "Modern dark" };
+  const css = (k) => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+  const painters = new Set();
+  function readPalette() { ["--c1", "--c2", "--c3", "--c4", "--c5", "--c6"].forEach((k, i) => { const v = css(k); if (v) C[i] = v; }); }
+  function setTheme(t) { if (!THEMES[t]) t = "classic-light"; document.documentElement.dataset.theme = t;
+    try { localStorage.setItem("ee.theme", t); } catch (e) { /* private mode */ }
+    readPalette(); for (const f of painters) { if (!f.host.isConnected) { painters.delete(f); continue; } f(); }
+    document.querySelectorAll(".theme-sel").forEach((x) => { x.value = t; });
+    dispatchEvent(new CustomEvent("themechange", { detail: t })); }
+  const theme = () => document.documentElement.dataset.theme || "classic-light";
+  try { document.documentElement.dataset.theme = THEMES[localStorage.getItem("ee.theme")] ? localStorage.getItem("ee.theme") : "classic-light"; } catch (e) { document.documentElement.dataset.theme = "classic-light"; }
 
   /* ---------- data ---------- */
   const FILES = { market: "market_data.json", options: "options_data.json", commodities: "commodities.json", flows: "flows_data.json",
@@ -67,6 +80,7 @@ const T = (() => {
     const paint = () => { const w = host.clientWidth, h = host.clientHeight; if (w < 20 || h < 20) return; const dpr = window.devicePixelRatio || 1;
       cv.width = w * dpr; cv.height = h * dpr; cv.style.width = w + "px"; cv.style.height = h + "px";
       const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h); draw(g, w, h); };
+    paint.host = host; painters.add(paint);
     host._ro = new ResizeObserver(paint); host._ro.observe(host); paint();
     return { cv, paint };
   }
@@ -75,7 +89,7 @@ const T = (() => {
   const FONT = "10.5px Tahoma, 'Segoe UI', Arial, sans-serif";
   /* series: [{pts:[[x,y]...], color, w, dash, fill, dots, name}] ; o: {xfmt, yfmt, vlines:[{x,color,label,row}], zero, pad, xdom, ydom, legend} */
   function plot(g, w, h, series, o = {}) {
-    const bg = "#ffffff", ax = "#d3dae3", tx = "#4a5563";
+    const bg = css("--plot-bg") || "#ffffff", ax = css("--plot-ax") || "#d3dae3", tx = css("--plot-tx") || "#4a5563";
     const p = { l: 48, r: 10, t: o.legend ? 20 : 8, b: 20, ...(o.pad || {}) };
     g.fillStyle = bg; g.fillRect(0, 0, w, h);
     const all = series.flatMap((s) => s.pts).filter((q) => isFinite(q[0]) && isFinite(q[1]));
@@ -93,7 +107,7 @@ const T = (() => {
     g.setLineDash([]);
     for (const t of o.xticks || ticks(x0, x1, Math.max(2, Math.floor(w / 95)))) { g.strokeStyle = ax; g.beginPath(); g.moveTo(Math.round(X(t)) + .5, h - p.b); g.lineTo(Math.round(X(t)) + .5, h - p.b + 4); g.stroke();
       g.textAlign = "center"; g.fillText((o.xfmt || F.auto)(t), X(t), h - 5); }
-    if (y0 < 0 && y1 > 0) { g.strokeStyle = "#7d8896"; g.beginPath(); g.moveTo(p.l, Math.round(Y(0)) + .5); g.lineTo(w - p.r, Math.round(Y(0)) + .5); g.stroke(); }
+    if (y0 < 0 && y1 > 0) { g.strokeStyle = css("--plot-zero") || "#7d8896"; g.beginPath(); g.moveTo(p.l, Math.round(Y(0)) + .5); g.lineTo(w - p.r, Math.round(Y(0)) + .5); g.stroke(); }
     g.save(); g.beginPath(); g.rect(p.l, p.t, w - p.l - p.r, h - p.t - p.b); g.clip();
     for (const s of series) { const pts = s.pts.filter((q) => isFinite(q[0]) && isFinite(q[1])); if (!pts.length) continue;
       g.strokeStyle = s.color || C[0]; g.lineWidth = s.w || 1.4; g.setLineDash(s.dash || []); g.lineJoin = "round";
@@ -106,7 +120,7 @@ const T = (() => {
     g.restore();
     if (o.legend) { let lx = p.l + 2; g.textAlign = "left"; for (const s of series) { if (!s.name) continue; g.strokeStyle = s.color; g.lineWidth = 2; g.setLineDash(s.dash || []); g.beginPath(); g.moveTo(lx, 10.5); g.lineTo(lx + 14, 10.5); g.stroke(); g.setLineDash([]);
       g.fillStyle = tx; g.fillText(s.name, lx + 18, 14); lx += 30 + g.measureText(s.name).width; } }
-    g.strokeStyle = "#b9c3ce"; g.lineWidth = 1; g.strokeRect(p.l + .5, p.t + .5, w - p.l - p.r, h - p.t - p.b);
+    g.strokeStyle = css("--plot-frame") || "#b9c3ce"; g.lineWidth = 1; g.strokeRect(p.l + .5, p.t + .5, w - p.l - p.r, h - p.t - p.b);
     return { X, Y, x0, x1, y0, y1, p, ix: (px) => x0 + (px - p.l) / (w - p.l - p.r) * (x1 - x0) };
   }
 
@@ -213,7 +227,9 @@ const T = (() => {
     side.innerHTML = groups.map((g) => `<h4>${esc(g)}</h4>` + Object.entries(apps).filter(([, a]) => (a.group || "Other") === g).map(([id, a]) => `<span class="it" data-add="${id}" title="Add to this tab">${esc(a.title)}</span>`).join("")).join("") +
       `<h4>Layout</h4><span class="it" data-act="lock">${state.locked ? "Unlock layout" : "Lock layout"}</span><span class="it" data-act="new">New tab</span><span class="it" data-act="rename">Rename tab</span><span class="it" data-act="delete">Delete tab</span><span class="it" data-act="reset">Reset this tab</span><span class="it" data-act="resetall">Reset everything</span>
        <div class="hint">Drag title bars to move, corners to resize. Saved in this browser.</div>
-       <h4>Classic pages</h4><a class="it" href="index.html">PhysicalsAtlas</a><a class="it" href="terminal.html">Terminal</a><a class="it" href="dashboard.html">Equity Atlas</a><a class="it" href="flows.html">Flows plate</a><a class="it" href="balances.html">Balances page</a><a class="it" href="signals.html">Equity signals</a><a class="it" href="methodology.html">Methodology</a>`;
+       <h4>Appearance</h4><label class="it" style="cursor:default">Theme <select class="theme-sel">${Object.entries(THEMES).map(([k, v]) => `<option value="${k}"${k === theme() ? " selected" : ""}>${v}</option>`).join("")}</select></label>
+       <h4>Pages</h4><a class="it" href="index.html">PhysicalsAtlas</a><a class="it" href="terminal.html">Terminal</a>`;
+    side.querySelector(".theme-sel").onchange = (e) => setTheme(e.target.value);
     side.onclick = (e) => { const t = e.target.closest("[data-add],[data-act]"); if (!t) return;
       if (t.dataset.add) { const w = addWidget(active(), { app: t.dataset.add }, true); save(); if (w) { w.item.scrollIntoView({ block: "nearest" }); w.item.classList.add("flash"); setTimeout(() => w.item.classList.remove("flash"), 700); } return; }
       ({ lock: toggleLock, new: newTab, rename: () => renameTab(state.active), delete: deleteTab, reset: resetTab, resetall: resetAll })[t.dataset.act](); }; }
@@ -225,10 +241,19 @@ const T = (() => {
     state = ok ? saved : { active: defaults[0].id, locked: false, tabs: clone(defaults) };
     for (const t of state.tabs) t.items = t.items.filter((it) => apps[it.app]);
     for (const d of defaults) if (!state.tabs.some((t) => t.id === d.id) && !ok) state.tabs.push(clone(d));
-    renderSide(); show(state.active);
+    /* pinned default tabs (methodology) and a tab named in the URL hash are restored even into a saved layout */
+    const want = location.hash.slice(1);
+    for (const d of defaults) if ((d.pin || d.id === want) && !state.tabs.some((t) => t.id === d.id)) state.tabs.push(clone(d));
+    if (want && state.tabs.some((t) => t.id === want)) state.active = want;
+    readPalette(); renderSide(); show(state.active);
+    const hr = document.getElementById("hdr-r"); if (hr && !hr.querySelector(".theme-sel")) { const l = document.createElement("label"); l.title = "Colour theme";
+      l.innerHTML = `<select class="theme-sel" aria-label="Theme">${Object.entries(THEMES).map(([k, v]) => `<option value="${k}"${k === theme() ? " selected" : ""}>${v}</option>`).join("")}</select>`;
+      hr.prepend(l); l.firstChild.onchange = (e) => setTheme(e.target.value); }
     document.getElementById("side-tog").onclick = () => { document.getElementById("side").classList.toggle("shut"); refit(); setTimeout(() => active().wins.forEach((w) => w.resized()), 30); };
+    addEventListener("hashchange", () => { const h = location.hash.slice(1), d = defaults.find((x) => x.id === h);
+      if (d && !state.tabs.some((t) => t.id === h)) { state.tabs.push(clone(d)); save(); } if (state.tabs.some((t) => t.id === h)) show(h); });
     addEventListener("keydown", (e) => { if (e.key === "Escape") { const m = document.querySelector(".grid-stack-item.maxed"); if (m) { const w = active().wins.find((x) => x.item === m); if (w) maximize(w, false); } } });
     addEventListener("resize", () => { refit(); for (const p of Object.values(panes)) p.grid.cellHeight(cellH()); const m = document.querySelector(".grid-stack-item.maxed"); if (m) { const w = active().wins.find((x) => x.item === m); if (w) maximize(w, true); } });
   }
-  return { wins: () => (active() ? active().wins : []), $, F, C, esc, app: (id, def) => { apps[id] = def; }, apps, open, setCtx, ctx, load, loadAll, table, canvas, plot, ticks, tip, csv, download, boot, FILES };
+  return { wins: () => (active() ? active().wins : []), $, F, C, esc, app: (id, def) => { apps[id] = def; }, apps, setTheme, theme, THEMES, css, open, setCtx, ctx, load, loadAll, table, canvas, plot, ticks, tip, csv, download, boot, FILES };
 })();

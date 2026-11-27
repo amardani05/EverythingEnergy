@@ -9,7 +9,7 @@
     win.add(`<div class="toolbar"><label>Region <select class="gb-r"></select></label>
       <label>Since <select class="gb-y"><option value="2">2 years</option><option value="4" selected>4 years</option><option value="9">all</option></select></label></div>`);
     win.add(`<div class="tabs"><button data-t="o" class="on">Overview</button><button data-t="s">Storage</button><button data-t="w">Weekly change</button><button data-t="m">Monthly balance</button><button data-t="l">LNG and power</button></div>`);
-    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:#fff;min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
+    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper);min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
     const q = (s) => win.el.querySelector(s); let G, reg = "l48", tab = "o";
     const kv = (o) => { lcd.innerHTML = `<div class="kvs">${o.map(([k, v]) => `<div><span>${esc(k)}</span><b>${v}</b></div>`).join("")}</div>`; };
     const clear = () => { T.tip({}, null); pane.innerHTML = ""; };

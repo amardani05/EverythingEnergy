@@ -8,7 +8,7 @@
   T.app("shfe", { title: "Exchange Stocks", group: "Supply chain", w: 7, h: 10, open(win, arg) {
     win.add(`<div class="toolbar"><label>Metal <select class="sx-m"></select></label></div>`);
     win.add(`<div class="tabs"><button data-t="o" class="on">Overview</button><button data-t="s">Stocks</button><button data-t="w">Weekly change</button></div>`);
-    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:#fff;min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
+    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper);min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
     const q = (s) => win.el.querySelector(s); let D, metal = "copper", tab = "o";
     const kv = (o) => { lcd.innerHTML = `<div class="kvs">${o.map(([k, v]) => `<div><span>${esc(k)}</span><b>${v}</b></div>`).join("")}</div>`; };
     const note = () => `SHFE weekly, tonnes. Archive starts ${D.meta.first} (${D.meta.weeks} weeks); 5-year norms appear as it grows. No report in Lunar New Year week.`;

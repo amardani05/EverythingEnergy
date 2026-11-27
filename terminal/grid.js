@@ -54,8 +54,8 @@ Row order for LAG/PCT/CUM/MA/SD is the table's order; filter to one series first
       <span style="flex:1"></span><button id="wb-help">?</button><button id="wb-copy">Copy</button><button id="wb-csv">CSV</button></div>`);
     win.add(`<div class="toolbar"><label>Chart: X <select id="wb-x"></select></label><label>Y <select id="wb-y"></select></label><label>Series <select id="wb-s"><option value="">(none)</option></select></label>
       <select id="wb-k"><option value="auto">auto</option><option value="line">line</option><option value="bar">bar</option><option value="scatter">scatter</option></select><button id="wb-ch">Chart</button><button id="wb-hide" hidden>Hide chart</button></div>`);
-    const chart = win.add(`<div class="in" style="height:220px;flex:none;background:#fff;display:none"></div>`);
-    const pane = win.add(`<div class="fill in" style="flex:1;background:#fff"></div>`);
+    const chart = win.add(`<div class="in" style="height:220px;flex:none;background:var(--paper);display:none"></div>`);
+    const pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper)"></div>`);
     win.add(`<div class="status"><div class="thin" id="wb-st"></div><div class="thin" id="wb-agg" style="min-width:300px"></div></div>`);
     const q = (s) => win.el.querySelector(s); let CAT, base = [], view = [], cols = [], computed = {}, charted = false;
     T.catalog().then((c) => { CAT = c; const names = Object.keys(c); if (!names.length) { pane.innerHTML = `<div class="pad">No datasets loaded.</div>`; return; }
@@ -88,7 +88,7 @@ Row order for LAG/PCT/CUM/MA/SD is the table's order; filter to one series first
           const nums = Object.keys(rows[0] || {}).filter((k) => k !== gb && rows.some((r) => isNum(r[k])));
           rows = [...groups].map(([k, rs]) => { const o = { [gb]: k, n: rs.length }; for (const c of nums) { const v = rs.map((r) => r[c]).filter(isNum); if (!v.length) { o[c] = null; continue; }
             o[c] = agg === "sum" ? v.reduce((a, b) => a + b, 0) : agg === "mean" ? v.reduce((a, b) => a + b, 0) / v.length : agg === "max" ? Math.max(...v) : agg === "min" ? Math.min(...v) : v.length; } return o; }); }
-      } catch (e) { st.textContent = "Formula error: " + e.message; st.style.color = "#c00000"; return; }
+      } catch (e) { st.textContent = "Formula error: " + e.message; st.style.color = "var(--down)"; return; }
       st.style.color = ""; view = rows; cols = Object.keys(rows[0] || base[0] || {});
       const CAP = 800, shown = rows.slice(0, CAP);
       T.table(pane, cols.map((k) => ({ k, t: k, l: !rows.some((r) => isNum(r[k])), f: fmtCell(k), c: (v) => (isNum(v) && /yoy|chg_|^ret$|build|net|gap|adjust|edge|unexpl/.test(k) ? F.cls(v) : "") })), shown, { onRow: rowClick });
@@ -107,9 +107,9 @@ Row order for LAG/PCT/CUM/MA/SD is the table's order; filter to one series first
       const PAL = T.C;
       T.canvas(chart, (g, w, h) => {
         if (kind === "bar") { const rows = view.filter((r) => isNum(r[yk])).slice().sort((a, b) => b[yk] - a[yk]).slice(0, 30), mx = Math.max(...rows.map((r) => Math.abs(r[yk])), 1e-12);
-          g.fillStyle = "#fff"; g.fillRect(0, 0, w, h); g.font = "10.5px Tahoma, Arial, sans-serif"; const lw = Math.min(190, w * 0.3), bh = Math.max(6, Math.min(16, (h - 8) / rows.length));
-          rows.forEach((r, i) => { const y = 4 + i * bh, len = Math.abs(r[yk]) / mx * (w - lw - 80); g.fillStyle = "#4a5563"; g.textAlign = "right"; g.fillText(String(r[xk] ?? "").slice(0, 28) + (sk ? " " + String(r[sk]).slice(0, 10) : ""), lw - 4, y + bh - 3);
-            g.fillStyle = r[yk] >= 0 ? T.C[0] : T.C[3]; g.fillRect(lw, y + 1, Math.max(1, len), bh - 2); g.fillStyle = "#1c232c"; g.textAlign = "left"; g.fillText(fmtCell(yk)(r[yk]), lw + len + 4, y + bh - 3); }); return; }
+          g.fillStyle = T.css("--plot-bg"); g.fillRect(0, 0, w, h); g.font = "10.5px Tahoma, Arial, sans-serif"; const lw = Math.min(190, w * 0.3), bh = Math.max(6, Math.min(16, (h - 8) / rows.length));
+          rows.forEach((r, i) => { const y = 4 + i * bh, len = Math.abs(r[yk]) / mx * (w - lw - 80); g.fillStyle = T.css("--plot-tx"); g.textAlign = "right"; g.fillText(String(r[xk] ?? "").slice(0, 28) + (sk ? " " + String(r[sk]).slice(0, 10) : ""), lw - 4, y + bh - 3);
+            g.fillStyle = r[yk] >= 0 ? T.C[0] : T.C[3]; g.fillRect(lw, y + 1, Math.max(1, len), bh - 2); g.fillStyle = T.css("--ink"); g.textAlign = "left"; g.fillText(fmtCell(yk)(r[yk]), lw + len + 4, y + bh - 3); }); return; }
         const X = (v) => (isDate ? Date.parse(v) : xNum ? v : null), groups = new Map();
         view.forEach((r, i) => { const k = sk ? String(r[sk]) : yk; (groups.get(k) || groups.set(k, []).get(k)).push([X(r[xk]) ?? i, r[yk]]); });
         const ser = [...groups].slice(0, 8).map(([k, pts], i) => ({ pts: pts.sort((a, b) => a[0] - b[0]), color: PAL[i], name: k, dots: kind === "scatter" ? "only" : false }));

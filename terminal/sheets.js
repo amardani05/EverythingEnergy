@@ -32,7 +32,7 @@
       <span id="cs-oi" style="font-family:var(--num)"></span><span style="flex:1"></span><button id="cs-map">Map ▸</button><button id="cs-wb">Data ▸</button></div>`);
     const lcd = win.add(`<div class="lcd"></div>`);
     win.add(`<div class="split stack fill" style="flex:1"><div class="fill in" style="flex:1.25" id="cs-l"></div>
-      <div class="col" style="flex:1;margin-left:3px"><div class="tabs" id="cs-tabs"></div><div class="fill in" id="cs-r" style="background:#fff"></div></div></div>`);
+      <div class="col" style="flex:1;margin-left:3px"><div class="tabs" id="cs-tabs"></div><div class="fill in" id="cs-r" style="background:var(--paper)"></div></div></div>`);
     win.add(`<div class="status"><div class="thin" id="cs-s"></div></div>`);
     const q = (s) => win.el.querySelector(s); let Mo, c, tab = "refining";
     T.model().then((m) => { if (m.empty) { lcd.textContent = "commodities.json missing. Run scripts/build_commodities.py"; return; } Mo = m;
@@ -78,7 +78,7 @@
     win.add(`<div class="toolbar"><label>Country <select id="co-c"></select></label><label>Outage <input type="number" id="co-p" value="50" min="0" max="100" step="10" style="width:50px"> % of output offline</label>
       <span style="flex:1"></span><button id="co-map">Map ▸</button><button id="co-wb">Data ▸</button></div>`);
     const lcd = win.add(`<div class="lcd"></div>`);
-    win.add(`<div class="tabs" id="co-tabs"></div>`); const pane = win.add(`<div class="fill in" style="flex:1;background:#fff"></div>`);
+    win.add(`<div class="tabs" id="co-tabs"></div>`); const pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper)"></div>`);
     win.add(`<div class="status"><div class="thin" id="co-s"></div></div>`);
     const q = (s) => win.el.querySelector(s); let Mo, iso, tab = "prod";
     T.model().then((m) => { if (m.empty) { lcd.textContent = "commodities.json missing. Run scripts/build_commodities.py"; return; } Mo = m;

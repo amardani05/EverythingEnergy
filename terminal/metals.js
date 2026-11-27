@@ -5,7 +5,7 @@
   T.app("usmetals", { title: "US Metals", group: "Markets", w: 6, h: 10, open(win, arg) {
     win.add(`<div class="toolbar"><label>Metal <select class="um-m"><option value="copper">Copper (refined)</option><option value="aluminum">Aluminum (unwrought)</option></select></label></div>`);
     win.add(`<div class="tabs"><button data-t="i" class="on">Imports by origin</button><button data-t="h">Import history</button><button data-t="s">COMEX stocks</button><button data-t="p">Midwest premium</button></div>`);
-    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:#fff;min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
+    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper);min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
     const sel = win.el.querySelector(".um-m"); let D, tab = "i";
     const kv = (o) => { lcd.innerHTML = `<div class="kvs">${o.map(([k, v]) => `<div><span>${esc(k)}</span><b>${v}</b></div>`).join("")}</div>`; };
     const mon = (v) => new Date(v).toLocaleDateString("en-US", { month: "short", year: "2-digit", timeZone: "UTC" });

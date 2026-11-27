@@ -37,7 +37,7 @@
       <button id="oc-s">Strategy ▸</button></div>`);
     const lcd = win.add(`<div class="lcd"></div>`);
     const sp = win.add(`<div class="split stack fill" style="flex:1"><div class="col" style="flex:1.7"><div class="fill in" id="oc-t"></div></div>
-      <div class="col" style="flex:1;margin-left:3px"><div class="tabs"><button data-t="smile" class="on">Smile</button><button data-t="term">Term</button><button data-t="surf">Surface</button></div><div class="fill in" id="oc-c" style="background:#fff"></div></div></div>`);
+      <div class="col" style="flex:1;margin-left:3px"><div class="tabs"><button data-t="smile" class="on">Smile</button><button data-t="term">Term</button><button data-t="surf">Surface</button></div><div class="fill in" id="oc-c" style="background:var(--paper)"></div></div></div>`);
     const st = win.add(`<div class="status"><div class="thin">Click an ASK to buy, a BID to sell: the leg goes to the Strategy window.</div><div class="thin" id="oc-asof"></div></div>`);
     const q = (s) => win.el.querySelector(s);
     let D, u, e, tab = "smile";
@@ -85,7 +85,7 @@
       if (tab === "smile") T.canvas(host, (g, w, h) => { const pts = (f) => e.rows.filter((x) => x[f] != null).map((x) => [x.k, x[f] * 100]);
         T.plot(g, w, h, [{ pts: pts("piv").filter((p) => p[0] <= e.fwd * 1.02), color: T.C[3], dots: true, name: "put IV" }, { pts: pts("civ").filter((p) => p[0] >= e.fwd * 0.98), color: T.C[0], dots: true, name: "call IV" },
           { pts: [[e.rows[0].k, u.rv["20"] * 100], [e.rows[e.rows.length - 1].k, u.rv["20"] * 100]], color: T.C[1], dash: [4, 3], name: "RV20" }],
-          { legend: true, vlines: [{ x: u.spot, color: "#333", label: "spot" }], yfmt: (v) => F.n(v, 0) }); });
+          { legend: true, vlines: [{ x: u.spot, color: T.css("--ink"), label: "spot" }], yfmt: (v) => F.n(v, 0) }); });
       else if (tab === "term") T.canvas(host, (g, w, h) => { const ex = u.expiries.filter((x) => x.atm);
         T.plot(g, w, h, [{ pts: ex.map((x) => [x.dte, x.atm * 100]), color: T.C[0], dots: true, name: "ATM IV" },
           ...[["10", T.C[3]], ["20", T.C[1]], ["60", T.C[2]], ["120", T.C[4]]].filter(([k]) => u.rv[k]).map(([k, c]) => ({ pts: [[0, u.rv[k] * 100], [ex[ex.length - 1].dte, u.rv[k] * 100]], color: c, dash: [4, 3], name: "RV" + k }))],
@@ -93,9 +93,9 @@
       else { const ms = [0.8, 0.9, 0.95, 1, 1.05, 1.1, 1.2];
         const at = (x, m) => { const k = u.spot * m, rs = x.rows.filter((r) => r.iv != null), lo = rs.filter((r) => r.k <= k).pop(), hi = rs.find((r) => r.k > k);
           return lo && hi ? lo.iv + (hi.iv - lo.iv) * (k - lo.k) / (hi.k - lo.k) : null; };
-        host.style.background = "#fff";
+        host.style.background = "var(--paper)";
         T.table(host, [{ k: "date", t: "Expiry", l: 1 }, { k: "dte", t: "d", f: (v) => v }, ...ms.map((m) => ({ k: (x) => at(x, m), t: (m * 100) + "%", f: (v) => v == null ? "" : F.n(v * 100, 1) }))], u.expiries, { nosort: true }); return; }
-      host.style.background = "#fff";
+      host.style.background = "var(--paper)";
     }
     win.el.addEventListener("change", (ev) => { if (ev.target.id === "oc-u") pickU(); else if (/^oc-/.test(ev.target.id)) { if (ev.target.id === "oc-vx") q("#oc-v").value = "x"; draw(); } });
     win.el.querySelector(".tabs").onclick = (ev) => { const b = ev.target.closest("button"); if (!b) return; tab = b.dataset.t; win.el.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("on", x === b)); chart(); };
@@ -125,7 +125,7 @@
       <label>Range ± <input type="number" id="sb-r" value="25" step="5" style="width:48px"> %</label></div>`);
     const lcd = win.add(`<div class="lcd"></div>`);
     win.add(`<div class="tabs"><button data-t="pnl" class="on">P&amp;L curve</button><button data-t="cvx">Convexity</button><button data-t="grid">Scenario grid</button><button data-t="grk">Greeks by leg</button></div>`);
-    const pane = win.add(`<div class="fill in" style="flex:1;background:#fff"></div>`);
+    const pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper)"></div>`);
     const stat = win.add(`<div class="status"><div class="thin" id="sb-st"></div><div class="thin">x100 multiplier · European BSM</div></div>`);
     const q = (s) => win.el.querySelector(s);
     let D, tab = "pnl";
@@ -187,10 +187,10 @@
         <div><span>implied daily σ</span><b>${F.n(atm / Math.sqrt(252) * 100, 2)}%</b></div><div><span>realized daily σ</span><b>${u.rv["20"] ? F.n(u.rv["20"] / Math.sqrt(252) * 100, 2) + "%" : "n/a"}</b></div></div>`;
       q("#sb-st").textContent = `spot ${F.n(u.spot)} · horizon = first expiry (${hz}d) · scenario line: T+${c.days}d, vol ${F.sgn(c.volAdd * 100, 0)} pts · position cost incl. underlying ${F.n(cost, 0)}`;
       const lo = u.spot * (1 - c.rng), hi = u.spot * (1 + c.rng);
-      if (tab === "pnl") { pane.style.background = "#fff"; T.canvas(pane, (gx, w, h) => { const sx = T.plot(gx, w, h, [
+      if (tab === "pnl") { pane.style.background = "var(--paper)"; T.canvas(pane, (gx, w, h) => { const sx = T.plot(gx, w, h, [
           { pts: BS.curve(legs, exp, lo, hi), color: T.C[0], w: 1.8, name: `expiry (${hz}d)`, fill: true }, { pts: BS.curve(legs, now, lo, hi), color: T.C[2], name: "today" },
           { pts: BS.curve(legs, sc, lo, hi), color: T.C[1], dash: [5, 3], name: `T+${c.days}d, vol ${F.sgn(c.volAdd * 100, 0)}` }],
-          { legend: true, zero: true, yfmt: (v) => F.n(v, 0), vlines: [{ x: u.spot, color: "#333", label: "spot" }, { x: u.spot - sd, color: "#8c96a3", label: "-1σ", row: 1 }, { x: u.spot + sd, color: "#8c96a3", label: "+1σ", row: 1 },
+          { legend: true, zero: true, yfmt: (v) => F.n(v, 0), vlines: [{ x: u.spot, color: T.css("--ink"), label: "spot" }, { x: u.spot - sd, color: T.css("--faint"), label: "-1σ", row: 1 }, { x: u.spot + sd, color: T.css("--faint"), label: "+1σ", row: 1 },
             ...be.filter((x) => x > lo && x < hi).map((x) => ({ x, color: T.C[3], label: F.n(x), row: 2 }))] });
         pane.onmousemove = (ev) => { if (!sx) return; const S = sx.ix(ev.offsetX); if (S < lo || S > hi) return T.tip(ev, null);
           T.tip(ev, `spot ${F.n(S)} (${F.pct(S / u.spot - 1)})\nexpiry ${F.sgn(BS.pnl(legs, S, exp), 0)}\ntoday  ${F.sgn(BS.pnl(legs, S, now), 0)}\nscen   ${F.sgn(BS.pnl(legs, S, sc), 0)}`); }; pane.onmouseleave = () => T.tip({}, null); }); }
@@ -200,15 +200,15 @@
     }
     /* Convexity: delta and gamma profiles, and a Taylor split of the P&L for
        sigma-sized moves so you can see how much is delta, gamma, and the rest. */
-    function convexity(c, sc, lo, hi, atm) { const { u } = c, legs = book.legs; pane.style.background = "#fff"; pane.onmousemove = null;
-      pane.innerHTML = `<div class="split" style="height:100%"><div style="flex:1.1;background:#fff" id="cx-a"></div><div class="fill" style="flex:1" id="cx-b"></div></div>`;
+    function convexity(c, sc, lo, hi, atm) { const { u } = c, legs = book.legs; pane.style.background = "var(--paper)"; pane.onmousemove = null;
+      pane.innerHTML = `<div class="split" style="height:100%"><div style="flex:1.1;background:var(--paper)" id="cx-a"></div><div class="fill" style="flex:1" id="cx-b"></div></div>`;
       const xs = []; for (let i = 0; i <= 120; i++) xs.push(lo + (hi - lo) * i / 120);
       const gk = xs.map((S) => BS.bookGreeks(legs, S, sc));
       const gmax = Math.max(...gk.map((x) => Math.abs(x.gamma))) || 1, dmax = Math.max(...gk.map((x) => Math.abs(x.delta))) || 1;
       T.canvas(pane.querySelector("#cx-a"), (g, w, h) => T.plot(g, w, h, [{ pts: xs.map((S, i) => [S, gk[i].delta]), color: T.C[0], name: "delta" },
         { pts: xs.map((S, i) => [S, gk[i].gamma * dmax / gmax]), color: T.C[1], name: `gamma (x${F.auto(dmax / gmax)})` },
         { pts: xs.map((S, i) => [S, gk[i].vega / 100 * dmax / (Math.max(...gk.map((x) => Math.abs(x.vega / 100))) || 1)]), color: T.C[4], dash: [4, 3], name: "vega (scaled)" }],
-        { legend: true, zero: true, yfmt: (v) => F.n(v, 0), vlines: [{ x: u.spot, color: "#333", label: "spot" }] }));
+        { legend: true, zero: true, yfmt: (v) => F.n(v, 0), vlines: [{ x: u.spot, color: T.css("--ink"), label: "spot" }] }));
       const g0 = BS.bookGreeks(legs, u.spot, sc), base = BS.pnl(legs, u.spot, sc), d1 = u.spot * atm / Math.sqrt(252), rows = [];
       for (const k of [-3, -2, -1, -0.5, 0.5, 1, 2, 3]) { const dS = k * d1, act = BS.pnl(legs, u.spot + dS, sc) - base, dl = g0.delta * dS, gm = 0.5 * g0.gamma * dS * dS;
         rows.push({ k, dS, pct: dS / u.spot, act, dl, gm, res: act - dl - gm, cvx: act - dl }); }
@@ -217,13 +217,13 @@
         { k: "res", t: "higher", f: (v) => F.sgn(v, 0), c: () => "mut", tip: "what delta and gamma do not explain: speed, and vol/time cross terms" },
         { k: "cvx", t: "convexity", f: (v) => F.sgn(v, 0), c: F.cls, tip: "P&L after delta hedging at inception: actual minus delta" }], rows, { nosort: true });
       pane.querySelector("#cx-b").insertAdjacentHTML("beforeend", `<div class="note" style="margin:4px">One-day sigma moves at ${F.n(atm * 100, 1)} vol = ${F.n(d1)} per σ. "Convexity" is what a delta-hedged book earns from the move itself. Compare with theta ${F.sgn(g0.theta / 365, 1)}/day: long gamma pays when realized moves exceed the cover rate above. Vanna ${F.sgn(g0.vanna / 100, 2)} (Δ per vol pt), volga ${F.sgn(g0.volga / 1e4, 2)} (vega per vol pt).</div>`); }
-    function scenario(c) { const { u } = c, legs = book.legs; pane.style.background = "#fff"; pane.onmousemove = null;
+    function scenario(c) { const { u } = c, legs = book.legs; pane.style.background = "var(--paper)"; pane.onmousemove = null;
       const moves = [-0.3, -0.2, -0.15, -0.1, -0.05, -0.02, 0, 0.02, 0.05, 0.1, 0.15, 0.2, 0.3], vols = [-15, -10, -5, 0, 5, 10, 15, 25];
       const cell = (m, v) => BS.pnl(legs, u.spot * (1 + m), { ...c.base, days: c.days, volAdd: v / 100 }), all = moves.flatMap((m) => vols.map((v) => cell(m, v))), mx = Math.max(...all.map(Math.abs)) || 1;
       pane.innerHTML = `<table class="g"><thead><tr><th class="l">Spot \\ Vol (T+${c.days}d)</th>${vols.map((v) => `<th>${F.sgn(v, 0)} pts</th>`).join("")}</tr></thead><tbody>` +
         moves.map((m) => `<tr><td class="l"><b>${F.pct(m, 0)}</b> &nbsp;${F.n(u.spot * (1 + m))}</td>${vols.map((v) => { const x = cell(m, v), a = Math.min(1, Math.abs(x) / mx) * 0.55;
           return `<td style="background:${x >= 0 ? `rgba(0,128,0,${a})` : `rgba(192,0,0,${a})`}">${F.sgn(x, 0)}</td>`; }).join("")}</tr>`).join("") + `</tbody></table>`; }
-    function byLeg(c, now) { const { u } = c; pane.style.background = "#fff"; pane.onmousemove = null;
+    function byLeg(c, now) { const { u } = c; pane.style.background = "var(--paper)"; pane.onmousemove = null;
       const rows = book.legs.map((l) => { const g = BS.legGreeks(l, u.spot, now), m = l.qty * l.mult;
         return { name: `${l.qty > 0 ? "+" : ""}${l.qty} ${l.type === "u" ? u.symbol : F.auto(l.k) + (l.type === "c" ? " C " : " P ") + l.exp}`, val: m * BS.legValue(l, u.spot, now), pl: m * (BS.legValue(l, u.spot, now) - l.entry), d: g.delta * m, g: g.gamma * m, v: g.vega * m / 100, t: g.theta * m / 365, va: g.vanna * m / 100, vo: g.volga * m / 1e4, dd: g.delta * m * u.spot }; });
       const tot = { name: "TOTAL", _tot: 1 }; for (const k of ["val", "pl", "d", "g", "v", "t", "va", "vo", "dd"]) tot[k] = rows.reduce((s, r) => s + r[k], 0);

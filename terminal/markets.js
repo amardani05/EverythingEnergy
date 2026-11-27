@@ -51,7 +51,7 @@
 
   T.app("balance", { title: "Oil Balance", group: "Models", w: 7, h: 10, open(win) {
     win.add(`<div class="tabs"><button data-t="g" class="on">Global liquids (monthly)</button><button data-t="b">Variance bridge</button><button data-t="u">US crude (weekly)</button></div>`);
-    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:#fff"></div>`);
+    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper)"></div>`);
     win.add(`<div class="status"><div class="thin">mb/d · stock build = supply - demand · source EIA STEO + WPSR</div><div class="thin"><a href="balances.html">full page</a></div></div>`);
     T.load("balance").then((D) => { if (!D) { lcd.textContent = "oil_balance.json missing. Run scripts/oil_balance.py"; return; }
       const G = D.global, U = D.us_weekly, M = D.stock_model, iL = G.periods.indexOf(G.last_hist.supply); let tab = "g";

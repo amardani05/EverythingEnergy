@@ -9,7 +9,7 @@
     win.add(`<div class="toolbar"><label>Product <select class="pb-p">${Object.entries(NAMES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
       <label>Since <select class="pb-y"><option value="2">2 years</option><option value="4" selected>4 years</option><option value="9">all</option></select></label></div>`);
     win.add(`<div class="tabs"><button data-t="o" class="on">Overview</button><button data-t="s">Stocks</button><button data-t="c">Days of cover</button><button data-t="d">Demand</button><button data-t="b">Balance</button></div>`);
-    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:#fff;min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
+    const lcd = win.add(`<div class="lcd"></div>`), pane = win.add(`<div class="fill in" style="flex:1;background:var(--paper);min-height:0"></div>`), st = win.add(`<div class="status"><div></div></div>`).querySelector("div");
     const q = (s) => win.el.querySelector(s); let P, prod = "distillate", tab = "o";
     const kv = (o) => { lcd.innerHTML = `<div class="kvs">${o.map(([k, v]) => `<div><span>${esc(k)}</span><b>${v}</b></div>`).join("")}</div>`; };
     const clear = () => { pane.onmousemove = pane.onmouseleave = null; T.tip({}, null); pane.innerHTML = ""; };

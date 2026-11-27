@@ -36,7 +36,7 @@ log = logging.getLogger("signals")
 
 def emit_json(df: pl.DataFrame, as_of: date, diff: object, corr: pl.DataFrame,
               out_path: Path, *, top_n: int = 50) -> None:
-    """Write the web artifact signals.html consumes. Committed to the repo
+    """Write the web artifact the terminal Equity signals table consumes. Committed to the repo
     and deployed with the site, same contract as dashboard_data.json:
     NaN-free, small, self-describing, stamped with its vintage."""
     import json

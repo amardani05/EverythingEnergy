@@ -25,3 +25,6 @@ __pycache__/
 *.md
 *.toml
 .env*
+
+# Retired classic pages: kept in git, not deployed
+retired/
